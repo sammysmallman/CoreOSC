@@ -26,11 +26,11 @@
 
 import Foundation
 
-internal struct OSCParser {
+public struct OSCParser {
 
     private init() {}
 
-    static func packet(from data: Data) throws -> OSCPacket {
+    public static func packet(from data: Data) throws -> OSCPacket {
         guard let string = String(data: data.prefix(upTo: 1), encoding: .utf8) else {
             throw OSCParserError.unrecognisedData
         }
