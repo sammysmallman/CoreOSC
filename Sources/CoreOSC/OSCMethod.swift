@@ -32,32 +32,28 @@ public enum OSCAddressPatternMatch {
     case wildcard
 }
 
-public struct OSCAddressMethod: Hashable, Equatable {
+public struct OSCMethod: Hashable, Equatable {
 
-    public let addressPattern: String
-    public let parts: [String]
-    public let completion: (OSCMessage) -> Void
+    public let address: OSCAddress
+    public let completionHandler: (OSCMessage) -> Void
 
-    public init(with addressPattern: String, andCompletionHandler completion: @escaping (OSCMessage) -> Void) {
-        self.addressPattern = addressPattern
-        var addressParts = addressPattern.components(separatedBy: "/")
-        addressParts.removeFirst()
-        self.parts = addressParts
-        self.completion = completion
+    public init(with address: OSCAddress, completionHandler: @escaping (OSCMessage) -> Void) {
+        self.address = address
+        self.completionHandler = completionHandler
     }
 
-    public static func == (lhs: OSCAddressMethod, rhs: OSCAddressMethod) -> Bool {
-        return lhs.addressPattern == rhs.addressPattern
+    public static func == (lhs: OSCMethod, rhs: OSCMethod) -> Bool {
+        return lhs.address == rhs.address
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(addressPattern)
+        hasher.combine(address)
     }
 
     // "/a/b/c/d/e" is equal to "/a/b/c/d/e" or "/a/b/c/d/*".
     public func match(part: String, atIndex index: Int) -> OSCAddressPatternMatch {
-        guard parts.indices.contains(index) else { return .different }
-        let match = parts[index]
+        guard address.parts.indices.contains(index) else { return .different }
+        let match = address.parts[index]
         switch match {
         case part: return .string
         case "*": return .wildcard

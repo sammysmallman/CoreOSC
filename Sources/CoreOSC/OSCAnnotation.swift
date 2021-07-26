@@ -28,33 +28,31 @@ import Foundation
 
 public class OSCAnnotation {
 
-    private static let equalsRegex =
-        "^(\\/[^ \\#*,?\\[\\]{}=]+)((?:=\"[^\"]+\")|(?:=[^\\s\",]+)){0,1}((?:(?:,\"[^\"]+\")|(?:,[^\\s\"=,]+))*)"
-
-    private static let spacesRegex =
-        "^(\\/(?:[^ \\#*,?\\[\\]{}]+))((?:(?: \"[^\"]+\")|(?: (?:[^\\s\"])+))*)"
-
-    public enum AnnotationStyle {
+    public enum OSCAnnotationStyle {
         // Equals/Comma Seperated Arguments: /an/address/pattern=1,3.142,"A string argument with spaces",String
         case equalsComma
         // Spaces Seperated Arguments: /an/address/pattern 1 3.142 "A string argument with spaces" String
         case spaces
-    }
-
-    public static func isValid(annotation: String, with style: AnnotationStyle) -> Bool {
-        switch style {
-        case .equalsComma:
-            return NSPredicate(format: "SELF MATCHES %@", equalsRegex).evaluate(with: annotation)
-        case .spaces:
-            return NSPredicate(format: "SELF MATCHES %@", spacesRegex).evaluate(with: annotation)
+        
+        var regex: String {
+            switch self {
+            case .equalsComma:
+                return "^(\\/[^ \\#*,?\\[\\]{}=]+)((?:=\"[^\"]+\")|(?:=[^\\s\",]+)){0,1}((?:(?:,\"[^\"]+\")|(?:,[^\\s\"=,]+))*)"
+            case .spaces:
+                return "^(\\/(?:[^ \\#*,?\\[\\]{}]+))((?:(?: \"[^\"]+\")|(?: (?:[^\\s\"])+))*)"
+            }
         }
     }
 
-    public static func oscMessage(for annotation: String, with style: AnnotationStyle) -> OSCMessage? {
+    public static func isValid(annotation: String, with style: OSCAnnotationStyle) -> Bool {
+        return NSPredicate(format: "SELF MATCHES %@", style.regex).evaluate(with: annotation)
+    }
+
+    public static func message(for annotation: String, with style: OSCAnnotationStyle) -> OSCMessage? {
         switch style {
         case .equalsComma:
             do {
-                let matches = try NSRegularExpression(pattern: equalsRegex)
+                let matches = try NSRegularExpression(pattern: style.regex)
                     .matches(in: annotation,
                              range: annotation.nsrange)
                 // There should only be one match. Range at index 1 will always be the address pattern.
@@ -62,7 +60,7 @@ public class OSCAnnotation {
                 // prefaced with "=" and index 3 if there are more than one argument.
                 var oscArguments: [Any] = []
                 guard let match = matches.first, match.range == annotation.nsrange,
-                      let addressPattern = annotation.substring(with: match.range(at: 1)) else { return nil }
+                      let address = annotation.substring(with: match.range(at: 1)) else { return nil }
                 if var argumentString = annotation.substring(with: match.range(at: 2)) {
                     // remove the "="
                     argumentString.removeFirst()
@@ -104,20 +102,20 @@ public class OSCAnnotation {
                         }
                     }
                 }
-                return OSCMessage(with: String(addressPattern), arguments: oscArguments)
+                return try? OSCMessage(String(address), arguments: oscArguments)
             } catch {
                 return nil
             }
         case .spaces:
             do {
-                let matches = try NSRegularExpression(pattern: spacesRegex)
+                let matches = try NSRegularExpression(pattern: style.regex)
                     .matches(in: annotation,
                              range: annotation.nsrange)
                 // There should only be one match. Range at index 1 will always be the address pattern.
                 // Range at index 2 will be the argument string prefaced with " "
                 var oscArguments: [Any] = []
                 guard let match = matches.first, match.range == annotation.nsrange,
-                      let addressPattern = annotation.substring(with: match.range(at: 1)),
+                      let address = annotation.substring(with: match.range(at: 1)),
                       let argumentString = annotation.substring(with: match.range(at: 2)) else {
                     return nil
                 }
@@ -167,8 +165,7 @@ public class OSCAnnotation {
 
                     }
                 }
-                return OSCMessage(with: String(addressPattern),
-                                  arguments: oscArguments)
+                return try? OSCMessage(String(address), arguments: oscArguments)
             } catch {
                 return nil
             }
@@ -176,9 +173,9 @@ public class OSCAnnotation {
     }
 
     public static func annotation(for message: OSCMessage,
-                                  with style: AnnotationStyle,
+                                  with style: OSCAnnotationStyle,
                                   andType type: Bool = false) -> String {
-        var string = message.addressPattern
+        var string = message.address.fullPath
         var argumentIndex = 0
         switch style {
         case .equalsComma:

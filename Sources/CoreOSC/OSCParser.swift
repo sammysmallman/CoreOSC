@@ -61,8 +61,8 @@ public struct OSCParser {
     }
 
     private static func parseOSCMessage(with data: Data, startIndex firstIndex: inout Int) throws -> OSCMessage {
-        guard let addressPattern = oscString(with: data, startIndex: &firstIndex) else {
-            throw OSCParserError.cantParseAddressPattern
+        guard let address = oscString(with: data, startIndex: &firstIndex) else {
+            throw OSCParserError.cantParseAddress
         }
 
         guard let typeTagString = oscString(with: data, startIndex: &firstIndex) else {
@@ -116,7 +116,7 @@ public struct OSCParser {
                 }
             }
         }
-        return OSCMessage(with: addressPattern, arguments: arguments)
+        return try OSCMessage(address, arguments: arguments)
     }
 
     private static func parseOSCBundle(with data: Data) throws -> OSCBundle {
@@ -259,7 +259,7 @@ public enum OSCParserError: Error {
     case unrecognisedData
     case noSocket
     case cantConfirmDanglingESC
-    case cantParseAddressPattern
+    case cantParseAddress
     case cantParseTypeTagString
     case cantParseOSCString
     case cantParseOSCInt

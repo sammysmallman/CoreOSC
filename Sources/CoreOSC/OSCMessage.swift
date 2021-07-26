@@ -26,23 +26,21 @@
 
 import Foundation
 
-public class OSCMessage: OSCPacket {
+public struct OSCMessage: OSCPacket {
 
-    public private(set) var addressPattern: String
-    public private(set) var addressParts: [String]  // Address Parts are components seperated by "/"
+    public private(set) var address: OSCAddress
+    
     public let arguments: [Any]
     public let typeTagString: String
     public let argumentTypes: [OSCArgument]
-
-    public init(with addressPattern: String, arguments: [Any] = []) {
-        if addressPattern.isEmpty || addressPattern.count == 0 || addressPattern.first != "/" {
-            self.addressPattern = "/"
-        } else {
-            self.addressPattern = addressPattern
-        }
-        var parts = self.addressPattern.components(separatedBy: "/")
-        parts.removeFirst()
-        self.addressParts = parts
+    
+    public init(_ address: String, arguments: [Any] = []) throws {
+        let address = try OSCAddress(address)
+        try self.init(address, arguments: arguments)
+    }
+    
+    public init(_ address: OSCAddress, arguments: [Any] = []) throws {
+        self.address = address
         var newArguments: [Any] = []
         var newTypeTagString: String = ","
         var types: [OSCArgument] = []
@@ -110,21 +108,12 @@ public class OSCMessage: OSCPacket {
         self.argumentTypes = types
     }
 
-    public func readdress(to addressPattern: String) {
-        if addressPattern.isEmpty ||
-           addressPattern.count == 0 ||
-           addressPattern.first != "/" {
-            self.addressPattern = "/"
-        } else {
-            self.addressPattern = addressPattern
-        }
-        var parts = self.addressPattern.components(separatedBy: "/")
-        parts.removeFirst()
-        self.addressParts = parts
+    public mutating func readdress(to address: OSCAddress) {
+        self.address = address
     }
 
     public func data() -> Data {
-        var result = addressPattern.oscStringData()
+        var result = address.fullPath.oscStringData()
         result.append(typeTagString.oscStringData())
         for argument in arguments {
             if argument is String {
