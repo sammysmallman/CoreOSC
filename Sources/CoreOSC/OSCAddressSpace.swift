@@ -37,7 +37,7 @@ internal class OSCAddressMethodMatch: Equatable {
         self.strings = strings
         self.wildcards = wildcards
     }
-    
+
     static func == (lhs: OSCAddressMethodMatch, rhs: OSCAddressMethodMatch) -> Bool {
         return lhs.method.address == rhs.method.address
     }

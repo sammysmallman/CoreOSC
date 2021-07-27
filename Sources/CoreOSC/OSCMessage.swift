@@ -29,83 +29,16 @@ import Foundation
 public struct OSCMessage: OSCPacket {
 
     public private(set) var address: OSCAddress
-    
-    public let arguments: [Any]
-    public let typeTagString: String
-    public let argumentTypes: [OSCArgument]
-    
-    public init(_ address: String, arguments: [Any] = []) throws {
+    public let arguments: [OSCArgumentProtocol]
+
+    public init(_ address: String, arguments: [OSCArgumentProtocol] = []) throws {
         let address = try OSCAddress(address)
-        try self.init(address, arguments: arguments)
+        self.init(address, arguments: arguments)
     }
-    
-    public init(_ address: OSCAddress, arguments: [Any] = []) throws {
+
+    public init(_ address: OSCAddress, arguments: [OSCArgumentProtocol] = []) {
         self.address = address
-        var newArguments: [Any] = []
-        var newTypeTagString: String = ","
-        var types: [OSCArgument] = []
-        for argument in arguments {
-            if argument is String {
-                newTypeTagString.append("s")
-                types.append(.oscString)
-            } else if argument is Data {
-                newTypeTagString.append("b")
-                types.append(.oscBlob)
-            } else if argument is NSNumber {
-                guard let number = argument as? NSNumber else {
-                    break
-                }
-                let numberType = CFNumberGetType(number)
-                switch numberType {
-                case CFNumberType.sInt8Type,
-                     CFNumberType.sInt16Type,
-                     CFNumberType.sInt32Type,
-                     CFNumberType.sInt64Type,
-                     CFNumberType.charType,
-                     CFNumberType.shortType,
-                     CFNumberType.intType, CFNumberType.longType,
-                     CFNumberType.longLongType,
-                     CFNumberType.nsIntegerType:
-                    newTypeTagString.append("i")
-                    types.append(.oscInt)
-                case CFNumberType.float32Type,
-                     CFNumberType.float64Type,
-                     CFNumberType.floatType,
-                     CFNumberType.doubleType,
-                     CFNumberType.cgFloatType:
-                    newTypeTagString.append("f")
-                    types.append(.oscFloat)
-                default:
-                    continue
-                }
-            } else if argument is OSCTimeTag {
-                newTypeTagString.append("t")
-                types.append(.oscTimetag)
-            } else if argument is OSCArgument {
-                guard let oscArgument = argument as? OSCArgument else {
-                    break
-                }
-                switch oscArgument {
-                case .oscTrue:
-                    newTypeTagString.append("T")
-                    types.append(.oscTrue)
-                case .oscFalse:
-                    newTypeTagString.append("F")
-                    types.append(.oscFalse)
-                case .oscNil:
-                    newTypeTagString.append("N")
-                    types.append(.oscNil)
-                case .oscImpulse:
-                    newTypeTagString.append("I")
-                    types.append(.oscImpulse)
-                default: break
-                }
-            }
-            newArguments.append(argument as Any)
-        }
-        self.arguments = newArguments
-        self.typeTagString = newTypeTagString
-        self.argumentTypes = types
+        self.arguments = arguments
     }
 
     public mutating func readdress(to address: OSCAddress) {
@@ -113,46 +46,10 @@ public struct OSCMessage: OSCPacket {
     }
 
     public func data() -> Data {
-        var result = address.fullPath.oscStringData()
-        result.append(typeTagString.oscStringData())
-        for argument in arguments {
-            if argument is String {
-                guard let stringArgument = argument as? String else { break }
-                result.append(stringArgument.oscStringData())
-            } else if argument is Data {
-                guard let blobArgument = argument as? Data else { break }
-                result.append(blobArgument.oscBlobData())
-            } else if argument is NSNumber {
-                guard let number = argument as? NSNumber else { break }
-                let numberType = CFNumberGetType(number)
-                switch numberType {
-                case CFNumberType.sInt8Type,
-                     CFNumberType.sInt16Type,
-                     CFNumberType.sInt32Type,
-                     CFNumberType.sInt64Type,
-                     CFNumberType.charType,
-                     CFNumberType.shortType,
-                     CFNumberType.intType,
-                     CFNumberType.longType,
-                     CFNumberType.longLongType,
-                     CFNumberType.nsIntegerType:
-                    result.append(number.oscIntData())
-                case CFNumberType.float32Type,
-                     CFNumberType.float64Type,
-                     CFNumberType.floatType,
-                     CFNumberType.doubleType,
-                     CFNumberType.cgFloatType:
-                    result.append(number.oscFloatData())
-                default: continue
-                }
-            } else if argument is OSCTimeTag {
-                guard let timeTag = argument as? OSCTimeTag else { break }
-                result.append(timeTag.oscTimeTagData())
-            } else if argument is OSCArgument {
-                // OSC Arguments T,F,N,I, have no data within the arguments.
-                continue
-            }
-        }
+        var result = address.fullPath.oscData
+        result.append(",\(arguments.map { String($0.oscTypeTag) }.joined())".oscData)
+        arguments.forEach { result.append($0.oscData) }
         return result
     }
+
 }

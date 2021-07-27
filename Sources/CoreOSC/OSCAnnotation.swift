@@ -33,7 +33,7 @@ public class OSCAnnotation {
         case equalsComma
         // Spaces Seperated Arguments: /an/address/pattern 1 3.142 "A string argument with spaces" String
         case spaces
-        
+
         var regex: String {
             switch self {
             case .equalsComma:
@@ -42,70 +42,24 @@ public class OSCAnnotation {
                 return "^(\\/(?:[^ \\#*,?\\[\\]{}]+))((?:(?: \"[^\"]+\")|(?: (?:[^\\s\"])+))*)"
             }
         }
+
+        var separator: String {
+            switch self {
+            case .equalsComma: return ","
+            case .spaces: return " "
+            }
+        }
     }
 
     public static func isValid(annotation: String, with style: OSCAnnotationStyle) -> Bool {
         return NSPredicate(format: "SELF MATCHES %@", style.regex).evaluate(with: annotation)
     }
 
-    public static func message(for annotation: String, with style: OSCAnnotationStyle) -> OSCMessage? {
+    public static func message(for annotation: String,
+                               with style: OSCAnnotationStyle) -> OSCMessage? {
         switch style {
         case .equalsComma:
-            do {
-                let matches = try NSRegularExpression(pattern: style.regex)
-                    .matches(in: annotation,
-                             range: annotation.nsrange)
-                // There should only be one match. Range at index 1 will always be the address pattern.
-                // If there are arguments these will be found at index 2,
-                // prefaced with "=" and index 3 if there are more than one argument.
-                var oscArguments: [Any] = []
-                guard let match = matches.first, match.range == annotation.nsrange,
-                      let address = annotation.substring(with: match.range(at: 1)) else { return nil }
-                if var argumentString = annotation.substring(with: match.range(at: 2)) {
-                    // remove the "="
-                    argumentString.removeFirst()
-                    if let moreArguments = annotation.substring(with: match.range(at: 3)) {
-                        argumentString += moreArguments
-                    }
-                    let argumentComponents = argumentString.components(separatedBy: ",")
-                    for argument in argumentComponents {
-                        if argument.isNumber {
-                            let formatter = NumberFormatter()
-                            formatter.numberStyle = .decimal
-                            if let numberArgument = formatter.number(from: argument) {
-                                oscArguments.append(numberArgument)
-                            }
-                        } else {
-                            switch argument {
-                            case "true":
-                                oscArguments.append(OSCArgument.oscTrue)
-                            case "false":
-                                oscArguments.append(OSCArgument.oscFalse)
-                            case "nil":
-                                oscArguments.append(OSCArgument.oscNil)
-                            case "impulse":
-                                oscArguments.append(OSCArgument.oscImpulse)
-                            default:
-                                // If the argument is prefaced with quotation marks,
-                                // the regex dictates the argument should close with them.
-                                // Remove the quotation marks.
-                                if argument.first == "\"" {
-                                    var quoationMarkArgument = argument
-                                    quoationMarkArgument.removeFirst()
-                                    quoationMarkArgument.removeLast()
-                                    oscArguments.append(quoationMarkArgument)
-                                } else {
-                                    oscArguments.append(argument)
-                                }
-                            }
-
-                        }
-                    }
-                }
-                return try? OSCMessage(String(address), arguments: oscArguments)
-            } catch {
-                return nil
-            }
+            return equalsCommaMessage(for: annotation)
         case .spaces:
             do {
                 let matches = try NSRegularExpression(pattern: style.regex)
@@ -113,7 +67,7 @@ public class OSCAnnotation {
                              range: annotation.nsrange)
                 // There should only be one match. Range at index 1 will always be the address pattern.
                 // Range at index 2 will be the argument string prefaced with " "
-                var oscArguments: [Any] = []
+                var arguments: [OSCArgumentProtocol] = []
                 guard let match = matches.first, match.range == annotation.nsrange,
                       let address = annotation.substring(with: match.range(at: 1)),
                       let argumentString = annotation.substring(with: match.range(at: 2)) else {
@@ -133,22 +87,22 @@ public class OSCAnnotation {
                     }
                 }
                 for argument in argumentsArray {
-                    if argument.isNumber {
-                        let formatter = NumberFormatter()
-                        formatter.numberStyle = .decimal
-                        if let numberArgument = formatter.number(from: argument) {
-                            oscArguments.append(numberArgument)
+                    if let decimal = Decimal(string: argument) {
+                        if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0), let int = Int32(argument) {
+                            arguments.append(int)
+                        } else if let float = Float32(argument) {
+                            arguments.append(float)
                         }
                     } else {
                         switch argument {
                         case "true":
-                            oscArguments.append(OSCArgument.oscTrue)
+                            arguments.append(true)
                         case "false":
-                            oscArguments.append(OSCArgument.oscFalse)
+                            arguments.append(false)
                         case "nil":
-                            oscArguments.append(OSCArgument.oscNil)
+                            arguments.append(OSCArgument.nil)
                         case "impulse":
-                            oscArguments.append(OSCArgument.oscImpulse)
+                            arguments.append(OSCArgument.impulse)
                         default:
                             // If the argument is prefaced with quotation marks,
                             // the regex dictates the argument should close with them.
@@ -157,190 +111,94 @@ public class OSCAnnotation {
                                 var quoationMarkArgument = argument
                                 quoationMarkArgument.removeFirst()
                                 quoationMarkArgument.removeLast()
-                                oscArguments.append(quoationMarkArgument)
+                                arguments.append(quoationMarkArgument)
                             } else {
-                                oscArguments.append(argument)
+                                arguments.append(argument)
                             }
                         }
 
                     }
                 }
-                return try? OSCMessage(String(address), arguments: oscArguments)
+                return try? OSCMessage(String(address), arguments: arguments)
             } catch {
                 return nil
             }
         }
     }
 
-    public static func annotation(for message: OSCMessage,
-                                  with style: OSCAnnotationStyle,
-                                  andType type: Bool = false) -> String {
+    private static func equalsCommaMessage(for annotation: String) -> OSCMessage? {
+        do {
+            let matches = try NSRegularExpression(pattern: OSCAnnotationStyle.equalsComma.regex)
+                .matches(in: annotation,
+                         range: annotation.nsrange)
+            // There should only be one match. Range at index 1 will always be the address pattern.
+            // If there are arguments these will be found at index 2,
+            // prefaced with "=" and index 3 if there are more than one argument.
+            var arguments: [OSCArgumentProtocol] = []
+            guard let match = matches.first, match.range == annotation.nsrange,
+                  let address = annotation.substring(with: match.range(at: 1)) else { return nil }
+            if var argumentString = annotation.substring(with: match.range(at: 2)) {
+                // remove the "="
+                argumentString.removeFirst()
+                if let moreArguments = annotation.substring(with: match.range(at: 3)) {
+                    argumentString += moreArguments
+                }
+                let argumentComponents = argumentString.components(separatedBy: ",")
+                for argument in argumentComponents {
+                    if let decimal = Decimal(string: argument) {
+                        if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0),
+                           let int = Int32(argument) {
+                            arguments.append(int)
+                        } else if let float = Float32(argument) {
+                            arguments.append(float)
+                        }
+                    } else {
+                        switch argument {
+                        case "true":
+                            arguments.append(true)
+                        case "false":
+                            arguments.append(false)
+                        case "nil":
+                            arguments.append(OSCArgument.nil)
+                        case "impulse":
+                            arguments.append(OSCArgument.impulse)
+                        default:
+                            // If the argument is prefaced with quotation marks,
+                            // the regex dictates the argument should close with them.
+                            // Remove the quotation marks.
+                            if argument.first == "\"" {
+                                var quoationMarkArgument = argument
+                                quoationMarkArgument.removeFirst()
+                                quoationMarkArgument.removeLast()
+                                arguments.append(quoationMarkArgument)
+                            } else {
+                                arguments.append(argument)
+                            }
+                        }
+
+                    }
+                }
+            }
+            return try? OSCMessage(String(address), arguments: arguments)
+        } catch {
+            return nil
+        }
+    }
+
+    public static func annotation(for message: OSCMessage, style: OSCAnnotationStyle, type: Bool = true) -> String {
         var string = message.address.fullPath
-        var argumentIndex = 0
-        switch style {
-        case .equalsComma:
-            if message.typeTagString.count > 1 {
+        if message.arguments.isEmpty == false {
+            switch style {
+            case .equalsComma:
                 string += "="
-            }
-            for typeTag in message.typeTagString {
-                switch typeTag {
-                case "s":
-                    if let stringArg = message.arguments[argumentIndex] as? String {
-                        if stringArg.contains(" ") {
-                            string += "\"\(stringArg)\""
-                        } else {
-                            string += "\(stringArg)"
-                        }
-                        if type {
-                            string += "(s),"
-                        } else {
-                            string += ","
-                        }
-                        argumentIndex += 1
-                    }
-                case "b":
-                    if let blobArg = message.arguments[argumentIndex] as? Data {
-                        string += "Bytes:\(blobArg.count)"
-                        if type {
-                            string += "(b),"
-                        } else {
-                            string += ","
-                        }
-                        argumentIndex += 1
-                    }
-                case "i":
-                    if let intArg = message.arguments[argumentIndex] as? NSNumber {
-                        string += "\(intArg)"
-                        if type {
-                            string += "(i),"
-                        } else {
-                            string += ","
-                        }
-                        argumentIndex += 1
-                    }
-                case "f":
-                    if let floatArg = message.arguments[argumentIndex] as? NSNumber {
-                        string += "\(floatArg)"
-                        if type {
-                            string += "(f),"
-                        } else {
-                            string += ","
-                        }
-                        argumentIndex += 1
-                    }
-                case "t":
-                    if let timeTagArg = message.arguments[argumentIndex] as? OSCTimeTag {
-                        string += "\(timeTagArg.hex())"
-                        if type {
-                            string += "(t),"
-                        } else {
-                            string += ","
-                        }
-                        argumentIndex += 1
-                    }
-                case "T":
-                    string += "true"
-                    if type {
-                        string += "(T),"
-                    } else {
-                        string += ","
-                    }
-                case "F":
-                    string += "false"
-                    if type {
-                        string += "(F),"
-                    } else {
-                        string += ","
-                    }
-                case "N":
-                    string += "nil"
-                    if type {
-                        string += "(N),"
-                    } else {
-                        string += ","
-                    }
-                case "I":
-                    string += "impulse"
-                    if type {
-                        string += "(I),"
-                    } else {
-                        string += ","
-                    }
-                default: break
-                }
-            }
-            if message.typeTagString.count > 1 {
-                string.removeLast()
-            }
-        case .spaces:
-            for typeTag in message.typeTagString {
-                switch typeTag {
-                case "s":
-                    if let stringArg = message.arguments[argumentIndex] as? String {
-                        if stringArg.contains(" ") {
-                            string += " \"\(stringArg)\""
-                        } else {
-                            string += " \(stringArg)"
-                        }
-                        if type {
-                            string += "(s)"
-                        }
-                        argumentIndex += 1
-                    }
-                case "b":
-                    if let blobArg = message.arguments[argumentIndex] as? Data {
-                        string += " Bytes:\(blobArg.count)"
-                        if type {
-                            string += "(b)"
-                        }
-                        argumentIndex += 1
-                    }
-                case "i":
-                    if let intArg = message.arguments[argumentIndex] as? NSNumber {
-                        string += " \(intArg)"
-                        if type {
-                            string += "(i)"
-                        }
-                        argumentIndex += 1
-                    }
-                case "f":
-                    if let floatArg = message.arguments[argumentIndex] as? NSNumber {
-                        string += " \(floatArg)"
-                        if type {
-                            string += "(f)"
-                        }
-                        argumentIndex += 1
-                    }
-                case "t":
-                    if let timeTagArg = message.arguments[argumentIndex] as? OSCTimeTag {
-                        string += " \(timeTagArg.hex())"
-                        if type {
-                            string += "(t)"
-                        }
-                        argumentIndex += 1
-                    }
-                case "T":
-                    string += " true"
-                    if type {
-                        string += "(T)"
-                    }
-                case "F":
-                    string += " false"
-                    if type {
-                        string += "(F)"
-                    }
-                case "N":
-                    string += " nil"
-                    if type {
-                        string += "(N)"
-                    }
-                case "I":
-                    string += " impulse"
-                    if type {
-                        string += "(I)"
-                    }
-                default: break
-                }
+                string += message.arguments
+                    .map { $0.oscAnnotation(withType: type) }
+                    .joined(separator: style.separator)
+            case .spaces:
+                string += style.separator
+                string += message.arguments
+                    .map { $0.oscAnnotation(withType: type) }
+                    .joined(separator: style.separator)
             }
         }
         return string

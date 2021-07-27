@@ -37,8 +37,8 @@ public class OSCBundle: OSCPacket {
     }
 
     public func data() -> Data {
-        var result = "#bundle".oscStringData()
-        let timeTagData = self.timeTag.oscTimeTagData()
+        var result = "#bundle".oscData
+        let timeTagData = self.timeTag.oscData
         result.append(timeTagData)
         for element in elements {
             if let message = element as? OSCMessage {

@@ -35,17 +35,9 @@ public struct OSCParser {
             throw OSCParserError.unrecognisedData
         }
         if string == "/" { // OSC Messages begin with /
-            do {
-                return try process(OSCMessageData: data)
-            } catch {
-                throw error
-            }
+            return try process(OSCMessageData: data)
         } else if string == "#" { // OSC Bundles begin with #
-            do {
-                return try process(OSCBundleData: data)
-            } catch {
-                throw error
-            }
+            return try process(OSCBundleData: data)
         } else {
             throw OSCParserError.unrecognisedData
         }
@@ -65,52 +57,56 @@ public struct OSCParser {
             throw OSCParserError.cantParseAddress
         }
 
-        guard let typeTagString = oscString(with: data, startIndex: &firstIndex) else {
+        guard var typeTagString = oscString(with: data, startIndex: &firstIndex) else {
             throw OSCParserError.cantParseTypeTagString
         }
 
         // If the Type Tag String starts with "," and has 1 or more characters after,
         // we possibly have some arguments.
-        var arguments: [Any] = []
+        var arguments: [OSCArgumentProtocol] = []
         if typeTagString.first == "," && typeTagString.count > 1 {
             // Remove "," as we will iterate over the different type of tags.
-            var typeTags = typeTagString
-            typeTags.removeFirst()
-            for tag in typeTags {
-                switch tag {
-                case "s":
-                    guard let stringArgument = oscString(with: data, startIndex: &firstIndex) else {
+            typeTagString.removeFirst()
+            for type in typeTagString {
+                switch type {
+                case .oscTypeTagString:
+                    guard let stringArgument = oscString(with: data,
+                                                         startIndex: &firstIndex) else {
                         throw OSCParserError.cantParseOSCString
                     }
                     arguments.append(stringArgument)
-                case "i":
-                    guard let intArgument = oscInt(with: data, startIndex: &firstIndex) else {
+                case .oscTypeTagInt:
+                    guard let intArgument = oscInt(with: data,
+                                                   startIndex: &firstIndex) else {
                         throw OSCParserError.cantParseOSCInt
                     }
                     arguments.append(intArgument)
-                case "f":
-                    guard let floatArgument = oscFloat(with: data, startIndex: &firstIndex) else {
+                case .oscTypeTagFloat:
+                    guard let floatArgument = oscFloat(with: data,
+                                                       startIndex: &firstIndex) else {
                         throw OSCParserError.cantParseOSCFloat
                     }
                     arguments.append(floatArgument)
-                case "b":
-                    guard let blobArgument = oscBlob(with: data, startIndex: &firstIndex) else {
+                case .oscTypeTagBlob:
+                    guard let blobArgument = oscBlob(with: data,
+                                                     startIndex: &firstIndex) else {
                         throw OSCParserError.cantParseOSCBlob
                     }
                     arguments.append(blobArgument)
-                case "t":
-                    guard let timeTagArgument = oscTimeTag(withData: data, startIndex: &firstIndex) else {
+                case .oscTypeTagTimeTag:
+                    guard let timeTagArgument = oscTimeTag(withData: data,
+                                                           startIndex: &firstIndex) else {
                         throw OSCParserError.cantParseOSCTimeTag
                     }
                     arguments.append(timeTagArgument)
-                case "T":
-                    arguments.append(OSCArgument.oscTrue)
-                case "F":
-                    arguments.append(OSCArgument.oscFalse)
-                case "N":
-                    arguments.append(OSCArgument.oscNil)
-                case "I":
-                    arguments.append(OSCArgument.oscImpulse)
+                case .oscTypeTagTrue:
+                    arguments.append(true)
+                case .oscTypeTagFalse:
+                    arguments.append(false)
+                case .oscTypeTagNil:
+                    arguments.append(OSCArgument.nil)
+                case .oscTypeTagImpulse:
+                    arguments.append(OSCArgument.impulse)
                 default:
                     continue
                 }
@@ -121,7 +117,7 @@ public struct OSCParser {
 
     private static func parseOSCBundle(with data: Data) throws -> OSCBundle {
         // Check the Bundle has a string prefix of "#bundle"
-        if "#bundle".oscStringData() == data.subdata(in: Range(0...7)) {
+        if "#bundle".oscData == data.subdata(in: Range(0...7)) {
             var startIndex = 8
             // All Bundles have a Time Tag, even if its just immedietly - Seconds 0, Fractions 1.
             guard let timeTag = oscTimeTag(withData: data, startIndex: &startIndex) else {
@@ -131,12 +127,11 @@ public struct OSCParser {
             if startIndex < data.endIndex {
                 let bundleData = data.subdata(in: startIndex..<data.endIndex)
                 let size = Int32(data.count - startIndex)
-                do {
-                    let elements = try parseOSCBundleElements(with: 0, data: bundleData, andSize: size)
-                    return OSCBundle(with: elements, timeTag: timeTag)
-                } catch {
-                    throw error
-                }
+                let elements = try parseOSCBundleElements(with: 0,
+                                                          data: bundleData,
+                                                          size: size)
+                return OSCBundle(with: elements,
+                                 timeTag: timeTag)
             } else {
                 return OSCBundle(timeTag: timeTag)
             }
@@ -145,7 +140,7 @@ public struct OSCParser {
         }
     }
 
-    private static func parseOSCBundleElements(with index: Int, data: Data, andSize size: Int32) throws -> [OSCPacket] {
+    private static func parseOSCBundleElements(with index: Int, data: Data, size: Int32) throws -> [OSCPacket] {
         var elements: [OSCPacket] = []
         var startIndex = 0
         var buffer: Int32 = 0
@@ -159,12 +154,9 @@ public struct OSCParser {
                 throw OSCParserError.cantParseTypeOfElement
             }
             if string == "/" { // OSC Messages begin with /
-                do {
-                    let newElement = try parseOSCMessage(with: data, startIndex: &startIndex)
-                    elements.append(newElement)
-                } catch {
-                    throw error
-                }
+                let newElement = try parseOSCMessage(with: data,
+                                                     startIndex: &startIndex)
+                elements.append(newElement)
             } else if string == "#" { // OSC Bundles begin with #
                 // #bundle takes up 8 bytes
                 startIndex += 8
@@ -174,14 +166,11 @@ public struct OSCParser {
                 }
                 if startIndex < size {
                     let bundleData = data.subdata(in: startIndex..<startIndex + Int(elementSize) - 16)
-                    do {
-                        let bundleElements = try parseOSCBundleElements(with: index,
-                                                                        data: bundleData,
-                                                                        andSize: Int32(bundleData.count))
-                        elements.append(OSCBundle(with: bundleElements, timeTag: timeTag))
-                    } catch {
-                        throw error
-                    }
+                    let bundleElements = try parseOSCBundleElements(with: index,
+                                                                    data: bundleData,
+                                                                    size: Int32(bundleData.count))
+                    elements.append(OSCBundle(with: bundleElements,
+                                              timeTag: timeTag))
                 } else {
                     elements.append(OSCBundle(timeTag: timeTag))
                 }
@@ -257,8 +246,6 @@ public struct OSCParser {
 
 public enum OSCParserError: Error {
     case unrecognisedData
-    case noSocket
-    case cantConfirmDanglingESC
     case cantParseAddress
     case cantParseTypeTagString
     case cantParseOSCString

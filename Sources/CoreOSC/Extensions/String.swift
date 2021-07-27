@@ -33,20 +33,9 @@ extension String {
         NSRange(location: 0, length: utf16.count)
     }
 
-    internal var isNumber: Bool { Double(self) != nil }
-
     internal func substring(with nsrange: NSRange) -> Substring? {
         guard let range = Range(nsrange, in: self) else { return nil }
         return self[range]
-    }
-
-    internal func oscStringData() -> Data {
-        var data = self.data(using: .utf8)!
-        for _ in 1...4 - data.count % 4 {
-            var null = UInt8(0)
-            data.append(&null, count: 1)
-        }
-        return data
     }
 
 }

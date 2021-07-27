@@ -28,16 +28,16 @@ import Foundation
 
 /// An object that represents the full path to an OSC Method in an OSC Address Space.
 public struct OSCAddress: Hashable, Equatable {
-    
+
     /// The full path to an OSC Method.
     public let fullPath: String
-    
+
     /// The names of all the containers, in order, along the path from the root of the tree to the OSC Method.
     public let parts: [String]
-    
+
     /// The name of the OSC Method the address is pointing to.
     public let methodName: String
-    
+
     /// An OSC Address.
     ///
     /// An OSC Address begins with the character ‘/’ followed by the symbolic ASCII names of all the containers,
