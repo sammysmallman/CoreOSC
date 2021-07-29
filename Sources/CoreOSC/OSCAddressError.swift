@@ -1,8 +1,8 @@
 //
-//  OSCMessage.swift
+//  OSCAddressError.swift
 //  CoreOSC
 //
-//  Created by Sam Smallman on 22/107/2021.
+//  Created by Sam Smallman on 29/07/2021.
 //  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,35 +26,7 @@
 
 import Foundation
 
-public struct OSCMessage: OSCPacket {
-
-    public private(set) var address: OSCAddress
-    public let arguments: [OSCArgumentProtocol]
-
-    public init(_ address: String, arguments: [OSCArgumentProtocol] = []) throws {
-        let address = try OSCAddress(address)
-        self.init(address, arguments: arguments)
-    }
-
-    public init(_ address: OSCAddress, arguments: [OSCArgumentProtocol] = []) {
-        self.address = address
-        self.arguments = arguments
-    }
-    
-    public mutating func readdress(to address: String) throws {
-        let address = try OSCAddress(address)
-        self.address = address
-    }
-
-    public mutating func readdress(to address: OSCAddress) {
-        self.address = address
-    }
-
-    public func data() -> Data {
-        var result = address.fullPath.oscData
-        result.append(",\(arguments.map { String($0.oscTypeTag) }.joined())".oscData)
-        arguments.forEach { result.append($0.oscData) }
-        return result
-    }
-
+public enum OSCAddressError: Error {
+    case emptyAddress
+    case invalidAddress
 }

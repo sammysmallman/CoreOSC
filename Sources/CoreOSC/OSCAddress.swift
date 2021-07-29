@@ -74,8 +74,3 @@ public struct OSCAddress: Hashable, Equatable {
         }
     }
 }
-
-public enum OSCAddressError: Error {
-    case emptyAddress
-    case invalidAddress
-}
