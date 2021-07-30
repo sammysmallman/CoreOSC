@@ -53,7 +53,7 @@ public struct OSCParser {
     }
 
     private static func parseOSCMessage(with data: Data, startIndex firstIndex: inout Int) throws -> OSCMessage {
-        guard let address = oscString(with: data, startIndex: &firstIndex) else {
+        guard let addressPattern = oscString(with: data, startIndex: &firstIndex) else {
             throw OSCParserError.cantParseAddress
         }
 
@@ -112,7 +112,7 @@ public struct OSCParser {
                 }
             }
         }
-        return try OSCMessage(address, arguments: arguments)
+        return OSCMessage(raw: addressPattern, arguments: arguments)
     }
 
     private static func parseOSCBundle(with data: Data) throws -> OSCBundle {

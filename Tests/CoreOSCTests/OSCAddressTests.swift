@@ -11,21 +11,23 @@ class OSCAddressTests: XCTestCase {
     ]
 
     func testInitializingOSCAddressPatternSucceeds() {
-        XCTAssertNoThrow(try OSCAddressPattern("/core/osc"))
-        XCTAssertNoThrow(try OSCAddressPattern("/core/osc/*"))
-        XCTAssertNoThrow(try OSCAddressPattern("/core/osc/,"))
-        XCTAssertNoThrow(try OSCAddressPattern("/core/osc/?"))
-        XCTAssertNoThrow(try OSCAddressPattern("/core/osc/["))
-        XCTAssertNoThrow(try OSCAddressPattern("/core/osc/]"))
-        XCTAssertNoThrow(try OSCAddressPattern("/core/osc/{"))
-        XCTAssertNoThrow(try OSCAddressPattern("/core/osc/}"))
+        XCTAssertNoThrow(try OSCAddress("/core/osc"))
     }
 
     func testInitializingOSCAddressPatternFails() {
-        XCTAssertThrowsError(try OSCAddressPattern("/"))
-        XCTAssertThrowsError(try OSCAddressPattern("core/osc"))
-        XCTAssertThrowsError(try OSCAddressPattern("/core/osc/#"))
-        XCTAssertThrowsError(try OSCAddressPattern("/core/osc/ "))
+        XCTAssertThrowsError(try OSCAddress(""))
+        XCTAssertThrowsError(try OSCAddress("/"))
+        XCTAssertThrowsError(try OSCAddress("core/osc"))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/"))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/ "))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/#"))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/*"))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/,"))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/?"))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/["))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/]"))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/{"))
+        XCTAssertThrowsError(try OSCAddress("/core/osc/}"))
     }
 
     func testParts() throws {

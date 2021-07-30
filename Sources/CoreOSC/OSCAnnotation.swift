@@ -186,7 +186,7 @@ public class OSCAnnotation {
     }
 
     public static func annotation(for message: OSCMessage, style: OSCAnnotationStyle, type: Bool = true) -> String {
-        var string = message.address.fullPath
+        var string = message.addressPattern.fullPath
         if message.arguments.isEmpty == false {
             switch style {
             case .equalsComma:

@@ -27,6 +27,6 @@
 import Foundation
 
 public enum OSCAddressError: Error {
-    case emptyAddress
     case invalidAddress
+    case invalidPartCount
 }

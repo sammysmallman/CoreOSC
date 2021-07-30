@@ -59,10 +59,7 @@ public struct OSCAddress: Hashable, Equatable {
     /// - Parameter address: The full path to an OSC Method.
     /// - Throws: `OSCAddressError` if the format of the given address is invalid.
     public init(_ address: String) throws {
-        guard address.isEmpty == false else {
-            throw OSCAddressError.emptyAddress
-        }
-        let pattern = "^\\/((?![ #*,?\\[\\]\\{\\}])[\\x00-\\x7F])+$"
+        let pattern = "^\\/(?:(?![ #*,?\\[\\]\\{\\}])[\\x00-\\x7F])+(?<!\\/)$"
         if NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: address) {
             self.fullPath = address
             var addressParts = address.components(separatedBy: "/")

@@ -28,30 +28,36 @@ import Foundation
 
 public struct OSCMessage: OSCPacket {
 
-    public private(set) var address: OSCAddress
+    public private(set) var addressPattern: OSCAddressPattern
     public let arguments: [OSCArgumentProtocol]
-
-    public init(_ address: String, arguments: [OSCArgumentProtocol] = []) throws {
-        let address = try OSCAddress(address)
-        self.init(address, arguments: arguments)
+    
+    internal init(raw addressPattern: String, arguments: [OSCArgumentProtocol] = []) {
+        let fullPath = OSCAddressPattern(raw: addressPattern)
+        self.addressPattern = fullPath
+        self.arguments = arguments
     }
 
-    public init(_ address: OSCAddress, arguments: [OSCArgumentProtocol] = []) {
-        self.address = address
+    public init(_ addressPattern: String, arguments: [OSCArgumentProtocol] = []) throws {
+        let fullPath = try OSCAddressPattern(addressPattern)
+        self.init(fullPath, arguments: arguments)
+    }
+
+    public init(_ addressPattern: OSCAddressPattern, arguments: [OSCArgumentProtocol] = []) {
+        self.addressPattern = addressPattern
         self.arguments = arguments
     }
     
-    public mutating func readdress(to address: String) throws {
-        let address = try OSCAddress(address)
-        self.address = address
+    public mutating func readdress(to addressPattern: String) throws {
+        let fullPath = try OSCAddressPattern(addressPattern)
+        self.addressPattern = fullPath
     }
 
-    public mutating func readdress(to address: OSCAddress) {
-        self.address = address
+    public mutating func readdress(to addressPattern: OSCAddressPattern) {
+        self.addressPattern = addressPattern
     }
 
     public func data() -> Data {
-        var result = address.fullPath.oscData
+        var result = addressPattern.fullPath.oscData
         result.append(",\(arguments.map { String($0.oscTypeTag) }.joined())".oscData)
         arguments.forEach { result.append($0.oscData) }
         return result

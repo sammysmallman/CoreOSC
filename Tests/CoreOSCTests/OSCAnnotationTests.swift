@@ -138,7 +138,7 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertTrue(OSCAnnotation.isValid(annotation: annotation, with: .spaces))
         let message = OSCAnnotation.message(for: annotation, with: .spaces)
         XCTAssertNotNil(message)
-        XCTAssertEqual(message?.address.fullPath, "/core/osc")
+        XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 5)
         let argument1 = message?.arguments[0] as? Int32
         XCTAssertEqual(argument1, 1)
@@ -157,7 +157,7 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertTrue(OSCAnnotation.isValid(annotation: annotation, with: .equalsComma))
         let message = OSCAnnotation.message(for: annotation, with: .equalsComma)
         XCTAssertNotNil(message)
-        XCTAssertEqual(message?.address.fullPath, "/core/osc")
+        XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 5)
         let argument1 = message?.arguments[0] as? Int32
         XCTAssertEqual(argument1, 1)
@@ -176,7 +176,7 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertTrue(OSCAnnotation.isValid(annotation: annotation, with: .spaces))
         let message = OSCAnnotation.message(for: annotation, with: .spaces)
         XCTAssertNotNil(message)
-        XCTAssertEqual(message?.address.fullPath, "/core/osc")
+        XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 1)
         let argument = message?.arguments[0] as? String
         XCTAssertEqual(argument, "this should be a single string argument")
@@ -187,7 +187,7 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertTrue(OSCAnnotation.isValid(annotation: annotation, with: .equalsComma))
         let message = OSCAnnotation.message(for: annotation, with: .equalsComma)
         XCTAssertNotNil(message)
-        XCTAssertEqual(message?.address.fullPath, "/core/osc")
+        XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 1)
         let argument = message?.arguments[0] as? String
         XCTAssertEqual(argument, "this should be a single string argument")

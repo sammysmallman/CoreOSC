@@ -47,10 +47,9 @@ public struct OSCAddressPattern: Hashable, Equatable {
     /// An OSC Address Pattern is different to an OSC Address in that it can contain wildcard characters
     /// and it is used to invoke one more OSC Methods in an OSC Address Space.
     ///
-    /// Printable ASCII characters not allowed in an OSC Address Pattern:
+    /// Printable ASCII characters not allowed in names of OSC Methods or OSC Containers:
     /// - ' ' - Space
     /// - \# - Number Sign
-    /// - /  - Forward Slash
     ///
     /// Wildcards:
     /// 1. ‘*’ in the OSC Address Pattern matches any sequence of zero or more characters.
@@ -68,10 +67,7 @@ public struct OSCAddressPattern: Hashable, Equatable {
     /// - Parameter addressPattern: The full path to one or more OSC Methods.
     /// - Throws: `OSCAddressError` if the format of the given address pattern is invalid.
     public init(_ addressPattern: String) throws {
-        guard addressPattern.isEmpty == false else {
-            throw OSCAddressError.emptyAddress
-        }
-        let pattern = "^\\/((?![ #])[\\x00-\\x7F])+$"
+        let pattern = "^\\/(?:(?![ #])[\\x00-\\x7F])+(?<!\\/)$"
         if NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: addressPattern) {
             self.fullPath = addressPattern
             var addressParts = addressPattern.components(separatedBy: "/")
@@ -81,6 +77,14 @@ public struct OSCAddressPattern: Hashable, Equatable {
         } else {
             throw OSCAddressError.invalidAddress
         }
+    }
+    
+    internal init(raw addressPattern: String) {
+        self.fullPath = addressPattern
+        var addressParts = addressPattern.components(separatedBy: "/")
+        addressParts.removeFirst()
+        self.parts = addressParts
+        self.methodName = addressParts.last ?? ""
     }
     
 }

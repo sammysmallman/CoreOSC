@@ -100,7 +100,7 @@ public class OSCAddressSpace {
 
     public func complete(with message: OSCMessage,
                          priority: OSCAddressSpaceMatchPriority = .none) -> Bool {
-        let methods = matches(for: message.address.fullPath, priority: priority)
+        let methods = matches(for: message.addressPattern.fullPath, priority: priority)
         guard !methods.isEmpty else { return false }
         methods.forEach { $0.completionHandler(message) }
         return true
