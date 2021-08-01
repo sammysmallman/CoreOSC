@@ -54,7 +54,7 @@ public struct OSCParser {
 
     private static func parseOSCMessage(with data: Data, startIndex firstIndex: inout Int) throws -> OSCMessage {
         guard let addressPattern = oscString(with: data, startIndex: &firstIndex) else {
-            throw OSCParserError.cantParseAddress
+            throw OSCParserError.cantParseAddressPattern
         }
 
         guard var typeTagString = oscString(with: data, startIndex: &firstIndex) else {
@@ -246,7 +246,7 @@ public struct OSCParser {
 
 public enum OSCParserError: Error {
     case unrecognisedData
-    case cantParseAddress
+    case cantParseAddressPattern
     case cantParseTypeTagString
     case cantParseOSCString
     case cantParseOSCInt
