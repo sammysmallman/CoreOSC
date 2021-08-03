@@ -122,7 +122,31 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testSquareBracketsMatch() {
-//        XCTAssertEqual(OSCMatch.match(pattern: "/core/[osc]", address: "/core/o"), 1)
+        XCTAssertEqual(OSCMatch.match(pattern: "/core/[osc]",
+                                      address: "/core/o"),
+                       OSCPatternMatch(match: .fullMatch,
+                                       patternCharactersMatched: "/core/[osc]".count,
+                                       addressCharactersMatched: "/core/o".count))
+        XCTAssertEqual(OSCMatch.match(pattern: "/core/[osc]",
+                                      address: "/core/s"),
+                       OSCPatternMatch(match: .fullMatch,
+                                       patternCharactersMatched: "/core/[osc]".count,
+                                       addressCharactersMatched: "/core/s".count))
+        XCTAssertEqual(OSCMatch.match(pattern: "/core/[osc]",
+                                      address: "/core/c"),
+                       OSCPatternMatch(match: .fullMatch,
+                                       patternCharactersMatched: "/core/[osc]".count,
+                                       addressCharactersMatched: "/core/c".count))
+        XCTAssertEqual(OSCMatch.match(pattern: "/core/[osc]",
+                                      address: "/core/a"),
+                       OSCPatternMatch(match: .unmatched,
+                                       patternCharactersMatched: "/core/[osc".count,
+                                       addressCharactersMatched: "/core/".count))
+        XCTAssertEqual(OSCMatch.match(pattern: "/core/[a-e]",
+                                      address: "/core/c"),
+                       OSCPatternMatch(match: .fullMatch,
+                                       patternCharactersMatched: "/core/[a-e]".count,
+                                       addressCharactersMatched: "/core/c".count))
 //        XCTAssertEqual(OSCMatch.match(pattern: "/core/[osc]", address: "/core/s"), 1)
 //        XCTAssertEqual(OSCMatch.match(pattern: "/core/[osc]", address: "/core/c"), 1)
 //        XCTAssertEqual(OSCMatch.match(pattern: "/core/[osc]", address: "/core/a"), 0)

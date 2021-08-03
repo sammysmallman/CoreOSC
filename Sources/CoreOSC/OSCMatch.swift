@@ -26,13 +26,13 @@ public struct OSCPatternMatch: Equatable {
         case fullMatch
     }
     
-    /// The result of matching a OSC Address Pattern with a OSC Address
+    /// The result of matching an OSC Address Pattern with an OSC Address
     public let match: Matching
     
-    /// The number of pattern chatacters successfully matched.
+    /// The number of OSC Address Pattern characters successfully matched.
     public let patternCharactersMatched: Int
     
-    /// The number of address chatacters successfully matched.
+    /// The number of OSC Address characters successfully matched.
     public let addressCharactersMatched: Int
     
     public init(match: OSCPatternMatch.Matching, patternCharactersMatched: Int, addressCharactersMatched: Int) {
@@ -117,7 +117,6 @@ public struct OSCMatch {
             }
         }
 
-        
         var r = OSCPatternMatch.Matching.unmatched.rawValue
         
         if addressCharacterOffset == address.endIndex {
@@ -221,9 +220,9 @@ public struct OSCMatch {
     }
     
     private static func matchSquareBracket(pattern: String,
-                                     patternCharacterOffset: inout String.Index,
-                                     address: String,
-                                     addressCharacterOffset: inout String.Index) -> Int {
+                                           patternCharacterOffset: inout String.Index,
+                                           address: String,
+                                           addressCharacterOffset: inout String.Index) -> Int {
         patternCharacterOffset = pattern.index(after: patternCharacterOffset)
         var val: Bool = true
         if pattern[patternCharacterOffset] == "!" {
@@ -237,6 +236,10 @@ public struct OSCMatch {
                 if address[addressCharacterOffset].asciiValue! >= pattern[patternCharacterOffset].asciiValue! &&
                    address[addressCharacterOffset].asciiValue! <= pattern[pattern.index(patternCharacterOffset, offsetBy: 2)].asciiValue! {
                     matched = val
+                    while patternCharacterOffset != pattern.endIndex &&
+                          pattern[patternCharacterOffset] != "]" {
+                        patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+                    }
                     break
                 } else {
                     patternCharacterOffset = pattern.index(patternCharacterOffset, offsetBy: 3)
@@ -244,6 +247,10 @@ public struct OSCMatch {
             } else {
                 if pattern[patternCharacterOffset] == address[addressCharacterOffset] {
                     matched = val
+                    while patternCharacterOffset != pattern.endIndex &&
+                          pattern[patternCharacterOffset] != "]" {
+                        patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+                    }
                     break
                 }
                 patternCharacterOffset = pattern.index(after: patternCharacterOffset)
