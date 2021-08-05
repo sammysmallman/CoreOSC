@@ -31,7 +31,7 @@ public class OSCBundle: OSCPacket {
     public var timeTag: OSCTimeTag
     public var elements: [OSCPacket]
 
-    public init(with elements: [OSCPacket] = [], timeTag: OSCTimeTag = .init()) {
+    public init(with elements: [OSCPacket] = [], timeTag: OSCTimeTag = .immediate) {
         self.timeTag = timeTag
         self.elements = elements
     }
