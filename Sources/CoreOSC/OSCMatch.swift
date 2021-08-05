@@ -29,6 +29,7 @@ import Foundation
 /// An object that represents the result of matching an OSC Address Pattern against an OSC Address.
 public struct OSCPatternMatch: Equatable {
 
+    /// The result of matching an OSC Address Pattern with an OSC Address.
     public enum Matching: Int {
         
         /// The pattern and address failed to match.
@@ -183,7 +184,7 @@ public struct OSCMatch {
     ///   - patternCharacterOffset: A `String.Index` of the first character in the OSC Address Pattern to begin matching from.
     ///   - address: An OSC Address.
     ///   - addressCharacterOffset: A `String.Index` of the first character in the OSC Address to begin matching from.
-    /// - Returns: A Boolean value indicating whether the pattern from the given offset matches using an asterisk wildcard up to the next forward slash, or end of string.
+    /// - Returns: A boolean value indicating whether the pattern from the given offset matches using an asterisk wildcard up to the next forward slash, or end of string.
     private static func matchAsterisk(pattern: String,
                                       patternCharacterOffset: inout String.Index,
                                       address: String,
@@ -228,7 +229,7 @@ public struct OSCMatch {
     ///   - patternCharacterOffset: A `String.Index` of the first character in the OSC Address Pattern to begin matching from.
     ///   - address: An OSC Address.
     ///   - addressCharacterOffset: A `String.Index` of the first character in the OSC Address to begin matching from.
-    /// - Returns: A Boolean value indicating whether the pattern from the given offset matches against the given OSC Address from the given offset.
+    /// - Returns: A boolean value indicating whether the pattern from the given offset matches against the given OSC Address from the given offset.
     private static func matchCharacters(pattern: String,
                                         patternCharacterOffset: inout String.Index,
                                         address: String,
@@ -256,7 +257,7 @@ public struct OSCMatch {
     ///   - patternCharacterOffset: A `String.Index` of the first character in the OSC Address Pattern to begin matching from.
     ///   - address: An OSC Address.
     ///   - addressCharacterOffset: A `String.Index` of the first character in the OSC Address to begin matching from.
-    /// - Returns: A Boolean value indicating whether the pattern from the given offset matches against the given OSC Address from the given offset.
+    /// - Returns: A boolean value indicating whether the pattern from the given offset matches against the given OSC Address from the given offset.
     private static func matchSquareBracket(pattern: String,
                                            patternCharacterOffset: inout String.Index,
                                            address: String,
@@ -304,7 +305,7 @@ public struct OSCMatch {
     ///   - patternCharacterOffset: A `String.Index` of the first character in the OSC Address Pattern to begin matching from.
     ///   - address: An OSC Address.
     ///   - addressCharacterOffset: A `String.Index` of the first character in the OSC Address to begin matching from.
-    /// - Returns: A Boolean value indicating whether the pattern from the given offset matches against the given OSC Address from the given offset.
+    /// - Returns: A boolean value indicating whether the pattern from the given offset matches against the given OSC Address from the given offset.
     private static func matchCurlyBrace(pattern: String,
                                         patternCharacterOffset: inout String.Index,
                                         address: String,

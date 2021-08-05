@@ -225,7 +225,7 @@ public struct OSCParser {
          // followed by 0-3 additional zero bytes to make the total number of bits a multiple of 32, 4 bytes
         guard let size = oscInt(with: buffer, startIndex: &firstIndex) else { return nil }
         let intSize = Int(size)
-        let result = buffer.subdata(in: firstIndex..<intSize)
+        let result = buffer.subdata(in: firstIndex..<firstIndex + intSize)
         let total = firstIndex + intSize
         if total.isMultiple(of: 4) {
             firstIndex = total
