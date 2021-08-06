@@ -3,7 +3,7 @@
 </p>
 
 # CoreOSC
-The CoreOSC package contains common infrastructural OSC code for your apps to communicate among computers, sound synthesizers, and other multimedia devices via [OSC](http://opensoundcontrol.org/README.html). 
+The CoreOSC package contains common infrastructural code for your apps to communicate among computers, sound synthesizers, and other multimedia devices via [OSC](http://opensoundcontrol.org/README.html). 
 
 ## Authors
 
