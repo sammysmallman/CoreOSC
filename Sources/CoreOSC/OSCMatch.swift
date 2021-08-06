@@ -76,73 +76,73 @@ public struct OSCMatch {
     
     /// Match an OSC Address Pattern against an OSC Address.
     /// - Parameters:
-    ///   - pattern: An OSC Address Pattern.
+    ///   - addressPattern: An OSC Address Pattern.
     ///   - address: An OSC Address.
     /// - Returns: A `OSCPatchMatch` indicating whether the two given values match and to what extent.
-    public static func match(pattern: String, address: String) -> OSCPatternMatch {
+    public static func match(addressPattern: String, address: String) -> OSCPatternMatch {
         
-        if pattern.compare(address, options: .literal) == .orderedSame {
+        if addressPattern.compare(address, options: .literal) == .orderedSame {
             return OSCPatternMatch(match: .fullMatch,
-                                   patternCharactersMatched: pattern.count,
+                                   patternCharactersMatched: addressPattern.count,
                                    addressCharactersMatched: address.count)
         }
 
         var patternCharacterOffset: String.Index = address.startIndex
-        var addressCharacterOffset: String.Index = pattern.startIndex
-        while patternCharacterOffset != pattern.endIndex &&
+        var addressCharacterOffset: String.Index = addressPattern.startIndex
+        while patternCharacterOffset != addressPattern.endIndex &&
               addressCharacterOffset != address.endIndex {
-            if pattern[patternCharacterOffset] == "*" {
-                if matchAsterisk(pattern: pattern,
+            if addressPattern[patternCharacterOffset] == "*" {
+                if matchAsterisk(pattern: addressPattern,
                                  patternCharacterOffset: &patternCharacterOffset,
                                  address: address,
                                  addressCharacterOffset: &addressCharacterOffset) == false {
                     return OSCPatternMatch(match: .unmatched,
-                                           patternCharactersMatched: pattern.distance(from: pattern.startIndex,
-                                                                                      to: patternCharacterOffset),
+                                           patternCharactersMatched: addressPattern.distance(from: addressPattern.startIndex,
+                                                                                             to: patternCharacterOffset),
                                            addressCharactersMatched: address.distance(from: address.startIndex,
                                                                                       to: addressCharacterOffset))
                 }
-                while patternCharacterOffset != pattern.endIndex &&
-                      pattern[patternCharacterOffset] != "/" {
-                    patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+                while patternCharacterOffset != addressPattern.endIndex &&
+                      addressPattern[patternCharacterOffset] != "/" {
+                    patternCharacterOffset = addressPattern.index(after: patternCharacterOffset)
                 }
                 while addressCharacterOffset != address.endIndex &&
                       address[addressCharacterOffset] != "/" {
                     addressCharacterOffset = address.index(after: addressCharacterOffset)
                 }
             } else if address[addressCharacterOffset] == "*" {
-                while patternCharacterOffset != pattern.endIndex &&
-                      pattern[patternCharacterOffset] != "/" {
-                    patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+                while patternCharacterOffset != addressPattern.endIndex &&
+                      addressPattern[patternCharacterOffset] != "/" {
+                    patternCharacterOffset = addressPattern.index(after: patternCharacterOffset)
                 }
                 while addressCharacterOffset != address.endIndex &&
                       address[addressCharacterOffset] != "/" {
                     addressCharacterOffset = address.index(after: addressCharacterOffset)
                 }
             } else {
-                let match = matchCharacters(pattern: pattern,
+                let match = matchCharacters(pattern: addressPattern,
                                             patternCharacterOffset: &patternCharacterOffset,
                                             address: address,
                                             addressCharacterOffset: &addressCharacterOffset)
                 if match == false {
-                    if patternCharacterOffset != pattern.endIndex &&
-                       pattern.index(after: patternCharacterOffset) == pattern.endIndex &&
-                       pattern[patternCharacterOffset] == "]" {
+                    if patternCharacterOffset != addressPattern.endIndex &&
+                       addressPattern.index(after: patternCharacterOffset) == addressPattern.endIndex &&
+                       addressPattern[patternCharacterOffset] == "]" {
                         return OSCPatternMatch(match: .unmatched,
-                                               patternCharactersMatched: pattern.distance(from: pattern.startIndex,
-                                                                                          to: pattern.endIndex),
+                                               patternCharactersMatched: addressPattern.distance(from: addressPattern.startIndex,
+                                                                                                 to: addressPattern.endIndex),
                                                addressCharactersMatched: address.distance(from: address.startIndex,
                                                                                           to: addressCharacterOffset))
                     } else {
                         return OSCPatternMatch(match: .unmatched,
-                                               patternCharactersMatched: pattern.distance(from: pattern.startIndex,
-                                                                                          to: patternCharacterOffset),
+                                               patternCharactersMatched: addressPattern.distance(from: addressPattern.startIndex,
+                                                                                                 to: patternCharacterOffset),
                                                addressCharactersMatched: address.distance(from: address.startIndex,
                                                                                           to: addressCharacterOffset))
                     }
                 }
-                if patternCharacterOffset != pattern.endIndex  {
-                    patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+                if patternCharacterOffset != addressPattern.endIndex  {
+                    patternCharacterOffset = addressPattern.index(after: patternCharacterOffset)
                 }
                 if addressCharacterOffset != address.endIndex {
                     addressCharacterOffset = address.index(after: addressCharacterOffset)
@@ -156,7 +156,7 @@ public struct OSCMatch {
             match |= OSCPatternMatch.Matching.partialAddress.rawValue
         }
     
-        if patternCharacterOffset == pattern.endIndex {
+        if patternCharacterOffset == addressPattern.endIndex {
             match |= OSCPatternMatch.Matching.partialPattern.rawValue
         }
 
@@ -169,8 +169,8 @@ public struct OSCMatch {
         
         return OSCPatternMatch(match: matching,
                                patternCharactersMatched:
-                                pattern.distance(from: pattern.startIndex,
-                                                 to: patternCharacterOffset),
+                                addressPattern.distance(from: addressPattern.startIndex,
+                                                        to: patternCharacterOffset),
                                addressCharactersMatched:
                                 matching == .fullMatch ?
                                 address.count :

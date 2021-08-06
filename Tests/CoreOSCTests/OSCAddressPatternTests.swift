@@ -51,7 +51,6 @@ class OSCAddressPatternTests: XCTestCase {
         XCTAssertThrowsError(try OSCAddressPattern(""))
         XCTAssertThrowsError(try OSCAddressPattern("/"))
         XCTAssertThrowsError(try OSCAddressPattern("core/osc"))
-        XCTAssertThrowsError(try OSCAddressPattern("/core/osc/"))
         XCTAssertThrowsError(try OSCAddressPattern("/core/osc/#"))
         XCTAssertThrowsError(try OSCAddressPattern("/core/osc/ "))
     }
