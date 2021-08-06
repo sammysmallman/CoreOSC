@@ -1,0 +1,41 @@
+/* Core OSC: Invalid Address */
+"CORE_OSC_INVALID_ADDRESS" = "Invalid address";
+
+/* Core OSC: Invalid Part Count */
+"CORE_OSC_INVALID_PART_COUNT" = "Invalid part count";
+
+/* Core OSC: Begin with forward slash */
+"CORE_OSC_FORWARD_SLASH" = "The address should begin with a \"/\".";
+
+/* Core OSC: ASCII */
+"CORE_OSC_ASCII" = "The address should contain only ASCII characters.";
+
+/* Core OSC: Space */
+"CORE_OSC_SPACE" = "The address should not contain a space.";
+
+/* Core OSC: Hash */
+"CORE_OSC_HASH" = "The address should not contain a \"#\" character.";
+
+/* Core OSC: Asterisk */
+"CORE_OSC_ASTERISK" = "The address should not contain a \"*\" character.";
+
+/* Core OSC: Comma */
+"CORE_OSC_COMMA" = "The address should not contain a \",\" character.";
+
+/* Core OSC: Question Mark */
+"CORE_OSC_QUESTION_MARK" = "The address should not contain a \"?\" character.";
+
+/* Core OSC: Open Bracket */
+"CORE_OSC_OPEN_BRACKET" = "The address should not contain a \"[\" character.";
+
+/* Core OSC: Close Bracket */
+"CORE_OSC_CLOSE_BRACKET" = "The address should not contain a \"]\" character.";
+
+/* Core OSC: Open Curly Brace */
+"CORE_OSC_OPEN_CURLY_BRACE" = "The address should not contain a \"{\" character.";
+
+/* Core OSC: Close Curly Brace */
+"CORE_OSC_CLOSE_CURLY_BRACE" = "The address should not contain a \"}\" character.";
+
+/* Core OSC: Wildcards */
+"CORE_OSC_WILDCARDS" = "The address should not contain the following characters: * , ? [ ] { }";
