@@ -47,33 +47,33 @@ extension OSCAddressError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .invalidAddress:
-            return NSLocalizedString("CORE_OSC_INVALID_ADDRESS", bundle: .module, comment: "Core OSC: Invalid Address")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_INVALID_ADDRESS", bundle: .module, comment: "OSC Address Error: Invalid Address")
         case .invalidPartCount:
-            return NSLocalizedString("CORE_OSC_INVALID_PART_COUNT", bundle: .module, comment: "Core OSC: Invalid Part Count")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_INVALID_PART_COUNT", bundle: .module, comment: "OSC Address Error: Invalid Part Count")
         case .forwardSlash:
-            return NSLocalizedString("CORE_OSC_FORWARD_SLASH", bundle: .module, comment: "Core OSC: Begin with forward slash")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_FORWARD_SLASH", bundle: .module, comment: "OSC Address Error: Begin with forward slash")
         case .ascii:
-            return NSLocalizedString("CORE_OSC_ASCII", bundle: .module, comment: "Core OSC: ASCII")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_ASCII", bundle: .module, comment: "OSC Address Error: ASCII")
         case .space:
-            return NSLocalizedString("CORE_OSC_SPACE", bundle: .module, comment: "Core OSC: Space")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_SPACE", bundle: .module, comment: "OSC Address Error: Space")
         case .hash:
-            return NSLocalizedString("CORE_OSC_HASH", bundle: .module, comment: "Core OSC: Hash")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_HASH", bundle: .module, comment: "OSC Address Error: Hash")
         case .asterisk:
-            return NSLocalizedString("CORE_OSC_ASTERISK", bundle: .module, comment: "Core OSC: Asterisk")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_ASTERISK", bundle: .module, comment: "OSC Address Error: Asterisk")
         case .comma:
-            return NSLocalizedString("CORE_OSC_COMMA", bundle: .module, comment: "Core OSC: Comma")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_COMMA", bundle: .module, comment: "OSC Address Error: Comma")
         case .questionMark:
-            return NSLocalizedString("CORE_OSC_QUESTION_MARK", bundle: .module, comment: "Core OSC: Question Mark")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_QUESTION_MARK", bundle: .module, comment: "OSC Address Error: Question Mark")
         case .openBracket:
-            return NSLocalizedString("CORE_OSC_OPEN_BRACKET", bundle: .module, comment: "Core OSC: Open Bracket")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_OPEN_BRACKET", bundle: .module, comment: "OSC Address Error: Open Bracket")
         case .closeBracket:
-            return NSLocalizedString("CORE_OSC_CLOSE_BRACKET", bundle: .module, comment: "Core OSC: Close Bracket")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_CLOSE_BRACKET", bundle: .module, comment: "OSC Address Error: Close Bracket")
         case .openCurlyBrace:
-            return NSLocalizedString("CORE_OSC_OPEN_CURLY_BRACE", bundle: .module, comment: "Core OSC: Open Curly Brace")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_OPEN_CURLY_BRACE", bundle: .module, comment: "OSC Address Error: Open Curly Brace")
         case .closeCurlyBrace:
-            return NSLocalizedString("CORE_OSC_CLOSE_CURLY_BRACE", bundle: .module, comment: "Core OSC: Close Curly Brace")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_CLOSE_CURLY_BRACE", bundle: .module, comment: "OSC Address Error: Close Curly Brace")
         case .wildcards:
-            return NSLocalizedString("CORE_OSC_WILDCARDS", bundle: .module, comment: "Core OSC: Wildcards")
+            return NSLocalizedString("OSC_ADDRESS_ERROR_WILDCARDS", bundle: .module, comment: "OSC Address Error: Wildcards")
         }
     }
 }
