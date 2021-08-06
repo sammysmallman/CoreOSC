@@ -1,41 +1,41 @@
-/* Core OSC: Invalid Address */
-"CORE_OSC_INVALID_ADDRESS" = "Invalid address";
+/* OSC Address Error: Invalid Address */
+"OSC_ADDRESS_ERROR_INVALID_ADDRESS" = "Invalid address";
 
-/* Core OSC: Invalid Part Count */
-"CORE_OSC_INVALID_PART_COUNT" = "Invalid part count";
+/* OSC Address Error: Invalid Part Count */
+"OSC_ADDRESS_ERROR_INVALID_PART_COUNT" = "Invalid part count";
 
-/* Core OSC: Begin with forward slash */
-"CORE_OSC_FORWARD_SLASH" = "The address should begin with a \"/\".";
+/* OSC Address Error: Begin with forward slash */
+"OSC_ADDRESS_ERROR_FORWARD_SLASH" = "The address should begin with a \"/\".";
 
-/* Core OSC: ASCII */
-"CORE_OSC_ASCII" = "The address should contain only ASCII characters.";
+/* OSC Address Error: ASCII */
+"OSC_ADDRESS_ERROR_ASCII" = "The address should contain only ASCII characters.";
 
-/* Core OSC: Space */
-"CORE_OSC_SPACE" = "The address should not contain a space.";
+/* OSC Address Error: Space */
+"OSC_ADDRESS_ERROR_SPACE" = "The address should not contain a space.";
 
-/* Core OSC: Hash */
-"CORE_OSC_HASH" = "The address should not contain a \"#\" character.";
+/* OSC Address Error: Hash */
+"OSC_ADDRESS_ERROR_HASH" = "The address should not contain a \"#\" character.";
 
-/* Core OSC: Asterisk */
-"CORE_OSC_ASTERISK" = "The address should not contain a \"*\" character.";
+/* OSC Address Error: Asterisk */
+"OSC_ADDRESS_ERROR_ASTERISK" = "The address should not contain a \"*\" character.";
 
-/* Core OSC: Comma */
-"CORE_OSC_COMMA" = "The address should not contain a \",\" character.";
+/* OSC Address Error: Comma */
+"OSC_ADDRESS_ERROR_COMMA" = "The address should not contain a \",\" character.";
 
-/* Core OSC: Question Mark */
-"CORE_OSC_QUESTION_MARK" = "The address should not contain a \"?\" character.";
+/* OSC Address Error: Question Mark */
+"OSC_ADDRESS_ERROR_QUESTION_MARK" = "The address should not contain a \"?\" character.";
 
-/* Core OSC: Open Bracket */
-"CORE_OSC_OPEN_BRACKET" = "The address should not contain a \"[\" character.";
+/* OSC Address Error: Open Bracket */
+"OSC_ADDRESS_ERROR_OPEN_BRACKET" = "The address should not contain a \"[\" character.";
 
-/* Core OSC: Close Bracket */
-"CORE_OSC_CLOSE_BRACKET" = "The address should not contain a \"]\" character.";
+/* OSC Address Error: Close Bracket */
+"OSC_ADDRESS_ERROR_CLOSE_BRACKET" = "The address should not contain a \"]\" character.";
 
-/* Core OSC: Open Curly Brace */
-"CORE_OSC_OPEN_CURLY_BRACE" = "The address should not contain a \"{\" character.";
+/* OSC Address Error: Open Curly Brace */
+"OSC_ADDRESS_ERROR_OPEN_CURLY_BRACE" = "The address should not contain a \"{\" character.";
 
-/* Core OSC: Close Curly Brace */
-"CORE_OSC_CLOSE_CURLY_BRACE" = "The address should not contain a \"}\" character.";
+/* OSC Address Error: Close Curly Brace */
+"OSC_ADDRESS_ERROR_CLOSE_CURLY_BRACE" = "The address should not contain a \"}\" character.";
 
-/* Core OSC: Wildcards */
-"CORE_OSC_WILDCARDS" = "The address should not contain the following characters: * , ? [ ] { }";
+/* OSC Address Error: Wildcards */
+"OSC_ADDRESS_ERROR_WILDCARDS" = "The address should not contain the following characters: * , ? [ ] { }";
