@@ -49,7 +49,7 @@ public struct OSCAddressPattern: Hashable, Equatable {
     ///
     /// Printable ASCII characters not allowed in names of OSC Methods or OSC Containers:
     /// - ' ' - Space
-    /// - \# - Number Sign
+    /// - \# - Hash
     ///
     /// Wildcards:
     /// 1. ‘*’ in the OSC Address Pattern matches any sequence of zero or more characters.
@@ -67,8 +67,8 @@ public struct OSCAddressPattern: Hashable, Equatable {
     /// - Parameter addressPattern: The full path to one or more OSC Methods.
     /// - Throws: `OSCAddressError` if the format of the given address pattern is invalid.
     public init(_ addressPattern: String) throws {
-        let pattern = "^\\/(?:(?![ #])[\\x00-\\x7F])+(?<!\\/)$"
-        if NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: addressPattern) {
+        let regex = "^\\/(?:(?![ #])[\\x00-\\x7F])+$"
+        if NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: addressPattern) {
             self.fullPath = addressPattern
             var addressParts = addressPattern.components(separatedBy: "/")
             addressParts.removeFirst()
@@ -85,6 +85,20 @@ public struct OSCAddressPattern: Hashable, Equatable {
         addressParts.removeFirst()
         self.parts = addressParts
         self.methodName = addressParts.last ?? ""
+    }
+    
+    /// Validate an OSC Address Pattern.
+    /// - Parameter addressPattern: A `String` to be validated.
+    /// - Returns: A `Result` that represents either the given string is valid, returning success,
+    ///            or that the given string is invalid returning a failure containing the `OSCAddressError`.
+    public static func isValid(_ addressPattern: String) -> Result<String, OSCAddressError> {
+        guard addressPattern.hasPrefix("/") else { return .failure(.forwardSlash) }
+        for character in addressPattern {
+            guard character.isASCII == true else { return .failure(.ascii) }
+            guard character != " " else { return .failure(.space) }
+            guard character != "#" else { return .failure(.hash) }
+        }
+        return .success(addressPattern)
     }
     
 }

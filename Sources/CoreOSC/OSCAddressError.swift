@@ -29,4 +29,51 @@ import Foundation
 public enum OSCAddressError: Error {
     case invalidAddress
     case invalidPartCount
+    case forwardSlash
+    case ascii
+    case space
+    case hash
+    case asterisk
+    case comma
+    case questionMark
+    case openBracket
+    case closeBracket
+    case openCurlyBrace
+    case closeCurlyBrace
+    case wildcards
+}
+
+extension OSCAddressError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .invalidAddress:
+            return NSLocalizedString("CORE_OSC_INVALID_ADDRESS", comment: "Core OSC: Invalid Address")
+        case .invalidPartCount:
+            return NSLocalizedString("CORE_OSC_INVALID_PART_COUNT", comment: "Core OSC: Invalid Part Count")
+        case .forwardSlash:
+            return NSLocalizedString("CORE_OSC_FORWARD_SLASH", comment: "Core OSC: Begin with forward slash")
+        case .ascii:
+            return NSLocalizedString("CORE_OSC_ASCII", comment: "Core OSC: ASCII")
+        case .space:
+            return NSLocalizedString("CORE_OSC_SPACE", comment: "Core OSC: Space")
+        case .hash:
+            return NSLocalizedString("CORE_OSC_HASH", comment: "Core OSC: Hash")
+        case .asterisk:
+            return NSLocalizedString("CORE_OSC_ASTERISK", comment: "Core OSC: Asterisk")
+        case .comma:
+            return NSLocalizedString("CORE_OSC_COMMA", comment: "Core OSC: Comma")
+        case .questionMark:
+            return NSLocalizedString("CORE_OSC_QUESTION_MARK", comment: "Core OSC: Question Mark")
+        case .openBracket:
+            return NSLocalizedString("CORE_OSC_OPEN_BRACKET", comment: "Core OSC: Open Bracket")
+        case .closeBracket:
+            return NSLocalizedString("CORE_OSC_CLOSE_BRACKET", comment: "Core OSC: Close Bracket")
+        case .openCurlyBrace:
+            return NSLocalizedString("CORE_OSC_OPEN_CURLY_BRACE", comment: "Core OSC: Open Curly Brace")
+        case .closeCurlyBrace:
+            return NSLocalizedString("CORE_OSC_CLOSE_CURLY_BRACE", comment: "Core OSC: Close Curly Brace")
+        case .wildcards:
+            return NSLocalizedString("CORE_OSC_WILDCARDS", comment: "Core OSC: Wildcards")
+        }
+    }
 }

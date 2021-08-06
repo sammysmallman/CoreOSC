@@ -51,12 +51,12 @@ public class OSCAnnotation {
         }
     }
 
-    public static func isValid(annotation: String, with style: OSCAnnotationStyle) -> Bool {
+    public static func isValid(annotation: String, with style: OSCAnnotationStyle = .spaces) -> Bool {
         return NSPredicate(format: "SELF MATCHES %@", style.regex).evaluate(with: annotation)
     }
 
     public static func message(for annotation: String,
-                               with style: OSCAnnotationStyle) -> OSCMessage? {
+                               with style: OSCAnnotationStyle = .spaces) -> OSCMessage? {
         switch style {
         case .equalsComma:
             return equalsCommaMessage(for: annotation)
@@ -185,7 +185,7 @@ public class OSCAnnotation {
         }
     }
 
-    public static func annotation(for message: OSCMessage, style: OSCAnnotationStyle, type: Bool = true) -> String {
+    public static func annotation(for message: OSCMessage, style: OSCAnnotationStyle = .spaces, type: Bool = true) -> String {
         var string = message.addressPattern.fullPath
         if message.arguments.isEmpty == false {
             switch style {

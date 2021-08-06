@@ -34,7 +34,7 @@ public struct OSCMessage: OSCPacket {
     public private(set) var addressPattern: OSCAddressPattern
     
     /// A sequence of type tag characters corresponding exactly to the sequence of OSC Arguments in the message.
-    var typeTagString: String { ",\(arguments.map { String($0.oscTypeTag) }.joined())" }
+    public var typeTagString: String { "\(arguments.map { String($0.oscTypeTag) }.joined())" }
     
     /// The `Array` of arguments associated with the message.
     public let arguments: [OSCArgumentProtocol]
@@ -82,24 +82,28 @@ public struct OSCMessage: OSCPacket {
         self.addressPattern = addressPattern
     }
 
-    /// The messages OSC Packet data.
+    /// The OSC Packet data for the message.
     public func data() -> Data {
         var result = addressPattern.fullPath.oscData
-        result.append(typeTagString.oscData)
+        result.append(",\(typeTagString)".oscData)
         arguments.forEach { result.append($0.oscData) }
         return result
     }
     
     /// Pattern match the message against an OSC Address.
     /// - Parameter address: An OSC Address to be matched against.
-    /// - Returns: A boolean value that indicates whether the given OSC Address matches against the message or not.
-    func matches(address: OSCAddress) -> Bool {
+    /// - Returns: A `Result` that represents either the given address matches, returning success,
+    ///            or that the given address is invalid returning a failure containing the `OSCAddressError`.
+    public func matches(address: OSCAddress) -> Result<OSCAddress, OSCAddressError> {
         guard addressPattern.parts.count == address.parts.count else {
-            return false
+            return .failure(.invalidPartCount)
         }
-        return OSCMatch.match(pattern: addressPattern.fullPath,
-                              address: address.fullPath)
-            .match == .fullMatch
+        if OSCMatch.match(addressPattern: addressPattern.fullPath,
+                          address: address.fullPath).match == .fullMatch {
+            return .success(address)
+        } else {
+            return .failure(.invalidAddress)
+        }
     }
 
 }

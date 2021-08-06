@@ -67,7 +67,7 @@ final class OSCMatchTests: XCTestCase {
     // MARK: - Standard OSC Address Pattern Tests
     
     func testStandardFullMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/a/b/c/d/e",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/b/c/d/e",
                                       address: "/a/b/c/d/e"),
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/a/b/c/d/e".count,
@@ -75,7 +75,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testStandardPartialAddressMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/a/b/c/d/e",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/b/c/d/e",
                                       address: "/a/b/c"),
                        OSCPatternMatch(match: .partialAddress,
                                        patternCharactersMatched: "/a/b/c".count,
@@ -83,7 +83,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testStandardPartialPatternMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/a/b/c",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/b/c",
                                       address: "/a/b/c/d/e"),
                        OSCPatternMatch(match: .partialPattern,
                                        patternCharactersMatched: "/a/b/c".count,
@@ -91,7 +91,7 @@ final class OSCMatchTests: XCTestCase {
     }
 
     func testStandardUnmatched() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/a/b/c",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/b/c",
                                       address: "/d/e/f"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/".count,
@@ -101,7 +101,7 @@ final class OSCMatchTests: XCTestCase {
     // MARK: - Asterisk Wildcard OSC Address Pattern Tests
     
     func testAsteriskFullMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/*/*/*",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/*/*/*",
                                       address: "/abc/def/hij"),
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/*/*/*".count,
@@ -109,7 +109,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testAsteriskPartialAddressMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/*/b/c/d/e",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/*/b/c/d/e",
                                       address: "/a/b/c"),
                        OSCPatternMatch(match: .partialAddress,
                                        patternCharactersMatched: "/a/b/c".count,
@@ -117,7 +117,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testAsteriskPartialPatternMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/*/b/c",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/*/b/c",
                                       address: "/a/b/c/d/e"),
                        OSCPatternMatch(match: .partialPattern,
                                        patternCharactersMatched: "/a/b/c".count,
@@ -125,7 +125,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testAsteriskUnmatched() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/*/abc",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/*/abc",
                                       address: "/abc/def"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/*/".count,
@@ -135,7 +135,7 @@ final class OSCMatchTests: XCTestCase {
     // MARK: - Question Mark Wildcard OSC Address Pattern Tests
     
     func testQuestionMarkFullMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/?b?d/?f?",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/?b?d/?f?",
                                       address: "/abcd/efg"),
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/?b?d/?f?".count,
@@ -143,7 +143,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testQuestionMarkPartialAddressMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/???????",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/???????",
                                       address: "/abc"),
                        OSCPatternMatch(match: .partialAddress,
                                        patternCharactersMatched: "/???".count,
@@ -151,7 +151,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testQuestionMarkPartialPatternMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/???",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/???",
                                       address: "/abc/def"),
                        OSCPatternMatch(match: .partialPattern,
                                        patternCharactersMatched: "/???".count,
@@ -159,7 +159,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testQuestionMarkUnmatched() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/?bcd",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/?bcd",
                                       address: "/abcX"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/?bc".count,
@@ -169,7 +169,7 @@ final class OSCMatchTests: XCTestCase {
     // MARK: - Square Brackets Wildcard OSC Address Pattern Tests
     
     func testSquareBracketsFullMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/[abc]def/[hij]klm",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/[abc]def/[hij]klm",
                                       address: "/adef/iklm"),
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/[abc]def/[hij]klm".count,
@@ -177,7 +177,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testNotSquareBracketsFullMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/[!abc]abc/[!hij]hij",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/[!abc]abc/[!hij]hij",
                                       address: "/dabc/lhij"),
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/[!abc]abc/[!hij]hij".count,
@@ -185,7 +185,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testSquareBracketsRangeFullMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/[a-c]def/[g-i]jkl",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/[a-c]def/[g-i]jkl",
                                       address: "/bdef/hjkl"),
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/[a-c]def/[g-i]jkl".count,
@@ -193,7 +193,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testNotSquareBracketsRangeFullMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/[!a-c]abc/[!h-j]hij",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/[!a-c]abc/[!h-j]hij",
                                       address: "/dabc/lhij"),
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/[!a-c]abc/[!h-j]hij".count,
@@ -201,7 +201,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testSquareBracketsPartialAddressMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/[abc]/def",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/[abc]/def",
                                       address: "/b/"),
                        OSCPatternMatch(match: .partialAddress,
                                        patternCharactersMatched: "/[abc]/".count,
@@ -209,7 +209,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testNotSquareBracketsPartialAddressMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/[!abc]/def",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/[!abc]/def",
                                       address: "/e/"),
                        OSCPatternMatch(match: .partialAddress,
                                        patternCharactersMatched: "/[!abc]/".count,
@@ -217,7 +217,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testSquareBracketsRangePartialAddressMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/[a-c]/def",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/[a-c]/def",
                                       address: "/b/"),
                        OSCPatternMatch(match: .partialAddress,
                                        patternCharactersMatched: "/[a-c]/".count,
@@ -225,7 +225,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testNotSquareBracketsRangePartialAddressMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/[!a-c]/def",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/[!a-c]/def",
                                       address: "/e/"),
                        OSCPatternMatch(match: .partialAddress,
                                        patternCharactersMatched: "/[!a-c]/".count,
@@ -233,7 +233,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testSquareBracketsPartialPatternMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/abc/[def]",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[def]",
                                       address: "/abc/def"),
                        OSCPatternMatch(match: .partialPattern,
                                        patternCharactersMatched: "/abc/[def]".count,
@@ -241,7 +241,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testNotSquareBracketsPartialPatternMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/abc/[!def]",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[!def]",
                                       address: "/abc/abc"),
                        OSCPatternMatch(match: .partialPattern,
                                        patternCharactersMatched: "/abc/[!def]".count,
@@ -249,7 +249,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testSquareBracketsRangePartialPatternMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/abc/[d-f]",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[d-f]",
                                       address: "/abc/def"),
                        OSCPatternMatch(match: .partialPattern,
                                        patternCharactersMatched: "/abc/[d-f]".count,
@@ -257,7 +257,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testNotSquareBracketsRangePartialPatternMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/abc/[!d-f]",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[!d-f]",
                                       address: "/abc/abc"),
                        OSCPatternMatch(match: .partialPattern,
                                        patternCharactersMatched: "/abc/[!d-f]".count,
@@ -265,7 +265,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testSquareBracketsUnmatched() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/abc/[def]",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[def]",
                                       address: "/abc/a"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/abc/[def]".count,
@@ -273,7 +273,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testNotSquareBracketsUnmatched() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/abc/[!def]",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[!def]",
                                       address: "/abc/d"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/abc/[!def]".count,
@@ -281,7 +281,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testSquareBracketsRangeUnmatched() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/abc/[d-f]",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[d-f]",
                                       address: "/abc/a"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/abc/[d-f]".count,
@@ -289,7 +289,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testNotSquareBracketsRangeUnmatched() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/abc/[!d-f]",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[!d-f]",
                                       address: "/abc/d"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/abc/[!d-f]".count,
@@ -299,7 +299,7 @@ final class OSCMatchTests: XCTestCase {
     // MARK: - Curly Braces Wildcard OSC Address Pattern Tests
     
     func testCurlyBracesFullMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/{abc,def}def/{ghi,jkl}ghi",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/{abc,def}def/{ghi,jkl}ghi",
                                       address: "/abcdef/jklghi"),
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/{abc,def}def/{ghi,jkl}ghi".count,
@@ -307,7 +307,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testCurlyBracesPartialAddressMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/{abc,def}/{ghi,jkl}",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/{abc,def}/{ghi,jkl}",
                                       address: "/abc"),
                        OSCPatternMatch(match: .partialAddress,
                                        patternCharactersMatched: "/{abc,def}".count,
@@ -315,7 +315,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testCurlyBracesPartialPatternMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/{abc,def}",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/{abc,def}",
                                       address: "/abc/def"),
                        OSCPatternMatch(match: .partialPattern,
                                        patternCharactersMatched: "/{abc,def}".count,
@@ -323,7 +323,7 @@ final class OSCMatchTests: XCTestCase {
     }
     
     func testCurlyBraceUnmatched() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/{abc,def}/{ghi,jkl}",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/{abc,def}/{ghi,jkl}",
                                       address: "/abc/mno"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/{abc,def}/".count,
@@ -333,7 +333,7 @@ final class OSCMatchTests: XCTestCase {
     // MARK: - All Wildcards OSC Address Pattern Tests
     
     func testAllWildcardsFullMatch() {
-        XCTAssertEqual(OSCMatch.match(pattern: "/core/???/*/[a-z][a-z][a-z][a-z][a-z]/{abc,def}",
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/core/???/*/[a-z][a-z][a-z][a-z][a-z]/{abc,def}",
                                       address: "/core/osc/hello/world/abc"),
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/core/???/*/[a-z][a-z][a-z][a-z][a-z]/{abc,def}".count,

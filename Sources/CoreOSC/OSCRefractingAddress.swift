@@ -50,8 +50,8 @@ public struct OSCRefractingAddress: Hashable, Equatable {
     /// - Parameter refractingAddress: The full path to an OSC Method.
     /// - Throws: `OSCAddressError` if the format of the given address is invalid.
     public init(_ refractingAddress: String) throws {
-        let pattern = "^\\/(?:(?:(?![ #])[\\x00-\\x7F])+|(?:(?<=\\/)#\\d?[1-9]|[1-9]0)(?=\\/|$))+(?<!\\/)$"
-        if NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: refractingAddress) {
+        let regex = "^\\/(?:(?:(?![ #])[\\x00-\\x7F])+|(?:(?<=\\/)#\\d?[1-9]|[1-9]0)(?=\\/|$))+$"
+        if NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: refractingAddress) {
             self.fullPath = refractingAddress
             var addressParts = refractingAddress.components(separatedBy: "/")
             addressParts.removeFirst()
@@ -82,5 +82,25 @@ public struct OSCRefractingAddress: Hashable, Equatable {
         } else {
             return try OSCAddress(fullPath)
         }
+    }
+    
+    /// Validate an OSC Refracting Address.
+    /// - Parameter address: A `String` to be validated.
+    /// - Returns: A `Result` that represents either the given string is valid, returning success,
+    ///            or that the given string is invalid returning a failure containing the `OSCAddressError`.
+    public static func isValid(_ address: String) -> Result<String, OSCAddressError> {
+        guard address.hasPrefix("/") else { return .failure(.forwardSlash) }
+        for character in address {
+            guard character.isASCII == true else { return .failure(.ascii) }
+            guard character != " " else { return .failure(.space) }
+            guard character != "*" else { return .failure(.asterisk) }
+            guard character != "," else { return .failure(.comma) }
+            guard character != "?" else { return .failure(.questionMark) }
+            guard character != "[" else { return .failure(.openBracket) }
+            guard character != "]" else { return .failure(.closeBracket) }
+            guard character != "{" else { return .failure(.openCurlyBrace) }
+            guard character != "}" else { return .failure(.closeCurlyBrace) }
+        }
+        return .success(address)
     }
 }

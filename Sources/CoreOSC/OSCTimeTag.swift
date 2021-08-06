@@ -28,6 +28,7 @@ import Foundation
 
 public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
     
+    /// Creates an OSC Time Tag initialized to immediately.
     public static let immediate: OSCTimeTag = OSCTimeTag()
 
     public var oscData: Data { Data(seconds.bigEndian.data + fraction.bigEndian.data) }

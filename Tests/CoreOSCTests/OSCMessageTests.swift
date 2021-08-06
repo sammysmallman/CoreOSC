@@ -62,7 +62,7 @@ class OSCMessageTests: XCTestCase {
                                                                OSCArgument.nil,
                                                                OSCArgument.impulse])
         XCTAssertEqual(message.addressPattern.fullPath, "/core/osc")
-        XCTAssertEqual(message.typeTagString, ",ifstTFbNI")
+        XCTAssertEqual(message.typeTagString, "ifstTFbNI")
         XCTAssertEqual(message.arguments.count, 9)
         XCTAssertEqual(message.arguments[0] as! Int32, 1)
         XCTAssertEqual(message.arguments[1] as! Float32, 3.142)
@@ -86,7 +86,7 @@ class OSCMessageTests: XCTestCase {
                                                               OSCArgument.nil,
                                                               OSCArgument.impulse])
         XCTAssertEqual(message.addressPattern.fullPath, "/core/osc")
-        XCTAssertEqual(message.typeTagString, ",ifstTFbNI")
+        XCTAssertEqual(message.typeTagString, "ifstTFbNI")
         XCTAssertEqual(message.arguments.count, 9)
         XCTAssertEqual(message.arguments[0] as! Int32, 1)
         XCTAssertEqual(message.arguments[1] as! Float32, 3.142)
@@ -115,7 +115,7 @@ class OSCMessageTests: XCTestCase {
                                                              OSCArgument.nil,
                                                              OSCArgument.impulse])
         XCTAssertEqual(message.addressPattern.fullPath, "/core/osc")
-        XCTAssertEqual(message.typeTagString, ",ifstTFbNI")
+        XCTAssertEqual(message.typeTagString, "ifstTFbNI")
         XCTAssertEqual(message.arguments.count, 9)
         XCTAssertEqual(message.arguments[0] as! Int32, 1)
         XCTAssertEqual(message.arguments[1] as! Float32, 3.142)
@@ -178,13 +178,13 @@ class OSCMessageTests: XCTestCase {
     func testPatternMatchingSucceeds() {
         let message = try! OSCMessage("/core/osc")
         let address = try! OSCAddress("/core/osc")
-        XCTAssertTrue(message.matches(address: address))
+        XCTAssertEqual(message.matches(address: address), .success(address))
     }
     
     func testPatternMatchingFails() {
         let message = try! OSCMessage("/core")
         let address = try! OSCAddress("/core/osc")
-        XCTAssertFalse(message.matches(address: address))
+        XCTAssertEqual(message.matches(address: address), .failure(.invalidPartCount))
     }
 
 }

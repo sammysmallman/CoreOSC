@@ -43,7 +43,6 @@ class OSCAddressTests: XCTestCase {
         XCTAssertThrowsError(try OSCAddress(""))
         XCTAssertThrowsError(try OSCAddress("/"))
         XCTAssertThrowsError(try OSCAddress("core/osc"))
-        XCTAssertThrowsError(try OSCAddress("/core/osc/"))
         XCTAssertThrowsError(try OSCAddress("/core/osc/ "))
         XCTAssertThrowsError(try OSCAddress("/core/osc/#"))
         XCTAssertThrowsError(try OSCAddress("/core/osc/*"))

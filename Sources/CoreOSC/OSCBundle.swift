@@ -26,6 +26,7 @@
 
 import Foundation
 
+/// An OSC Bundle.
 public class OSCBundle: OSCPacket {
 
     public var timeTag: OSCTimeTag
@@ -36,10 +37,10 @@ public class OSCBundle: OSCPacket {
         self.elements = elements
     }
 
+    /// The OSC Packet data for the bundle.
     public func data() -> Data {
         var result = "#bundle".oscData
-        let timeTagData = self.timeTag.oscData
-        result.append(timeTagData)
+        result.append(timeTag.oscData)
         for element in elements {
             if let message = element as? OSCMessage {
                 let data = message.data()
