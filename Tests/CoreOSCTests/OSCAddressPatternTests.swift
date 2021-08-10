@@ -32,7 +32,8 @@ class OSCAddressPatternTests: XCTestCase {
         ("testInitializingOSCAddressPatternSucceeds", testInitializingOSCAddressPatternSucceeds),
         ("testInitializingOSCAddressPatternFails", testInitializingOSCAddressPatternFails),
         ("testParts", testParts),
-        ("testMethodName", testMethodName)
+        ("testMethodName", testMethodName),
+        ("testEvaluate", testEvaluate)
     ]
 
     func testInitializingOSCAddressPatternSucceeds() {
@@ -66,6 +67,14 @@ class OSCAddressPatternTests: XCTestCase {
     func testMethodName() throws {
         let address = try OSCAddressPattern("/core/osc/methodName")
         XCTAssertEqual(address.methodName, "methodName")
+    }
+    
+    func testEvaluate() {
+        XCTAssertEqual(OSCAddressPattern.evaluate(with: "core/osc"), .failure(.forwardSlash))
+        XCTAssertEqual(OSCAddressPattern.evaluate(with: "/🥺"), .failure(.ascii))
+        XCTAssertEqual(OSCAddressPattern.evaluate(with: "/ "), .failure(.space))
+        XCTAssertEqual(OSCAddressPattern.evaluate(with: "/#"), .failure(.hash))
+        XCTAssertEqual(OSCAddressPattern.evaluate(with: "/core/osc"), .success("/core/osc"))
     }
 
 }

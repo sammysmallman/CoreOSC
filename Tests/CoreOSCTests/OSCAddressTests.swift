@@ -32,7 +32,8 @@ class OSCAddressTests: XCTestCase {
         ("testInitializingOSCAddressPatternSucceeds", testInitializingOSCAddressPatternSucceeds),
         ("testInitializingOSCAddressPatternFails", testInitializingOSCAddressPatternFails),
         ("testParts", testParts),
-        ("testMethodName", testMethodName)
+        ("testMethodName", testMethodName),
+        ("testEvaluate", testEvaluate)
     ]
 
     func testInitializingOSCAddressPatternSucceeds() {
@@ -66,6 +67,21 @@ class OSCAddressTests: XCTestCase {
     func testMethodName() throws {
         let address = try OSCAddress("/core/osc/methodName")
         XCTAssertEqual(address.methodName, "methodName")
+    }
+    
+    func testEvaluate() {
+        XCTAssertEqual(OSCAddress.evaluate(with: "core/osc"), .failure(.forwardSlash))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/🥺"), .failure(.ascii))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/ "), .failure(.space))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/#"), .failure(.hash))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/*"), .failure(.asterisk))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/,"), .failure(.comma))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/?"), .failure(.questionMark))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/["), .failure(.openBracket))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/]"), .failure(.closeBracket))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/{"), .failure(.openCurlyBrace))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/}"), .failure(.closeCurlyBrace))
+        XCTAssertEqual(OSCAddress.evaluate(with: "/core/osc"), .success("/core/osc"))
     }
 
 }
