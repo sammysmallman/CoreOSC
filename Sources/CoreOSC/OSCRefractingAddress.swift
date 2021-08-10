@@ -84,11 +84,11 @@ public struct OSCRefractingAddress: Hashable, Equatable {
         }
     }
     
-    /// Validate an OSC Refracting Address.
+    /// Evaluate an OSC Refracting Address.
     /// - Parameter address: A `String` to be validated.
     /// - Returns: A `Result` that represents either the given string is valid, returning success,
     ///            or that the given string is invalid returning a failure containing the `OSCAddressError`.
-    public static func isValid(_ address: String) -> Result<String, OSCAddressError> {
+    public static func evaluate(with address: String) -> Result<String, OSCAddressError> {
         guard address.hasPrefix("/") else { return .failure(.forwardSlash) }
         for character in address {
             guard character.isASCII == true else { return .failure(.ascii) }

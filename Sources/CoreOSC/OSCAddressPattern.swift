@@ -87,11 +87,11 @@ public struct OSCAddressPattern: Hashable, Equatable {
         self.methodName = addressParts.last ?? ""
     }
     
-    /// Validate an OSC Address Pattern.
+    /// Evaluate an OSC Address Pattern.
     /// - Parameter addressPattern: A `String` to be validated.
     /// - Returns: A `Result` that represents either the given string is valid, returning success,
     ///            or that the given string is invalid returning a failure containing the `OSCAddressError`.
-    public static func isValid(_ addressPattern: String) -> Result<String, OSCAddressError> {
+    public static func evaluate(with addressPattern: String) -> Result<String, OSCAddressError> {
         guard addressPattern.hasPrefix("/") else { return .failure(.forwardSlash) }
         for character in addressPattern {
             guard character.isASCII == true else { return .failure(.ascii) }

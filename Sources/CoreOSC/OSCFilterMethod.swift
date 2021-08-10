@@ -1,8 +1,8 @@
 //
-//  OSCAddressSpace.swift
+//  OSCAddressMethod.swift
 //  CoreOSC
 //
-//  Created by Sam Smallman on 10/08/2021.
+//  Created by Sam Smallman on 22/107/2021.
 //  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,28 +26,39 @@
 
 import Foundation
 
-/// A tree structure containing a set of OSC Methods to be invoked by a client.
-public struct OSCAddressSpace {
-    
-    /// A `Set` of OSC Methods to be invoked by a client
-    public var methods: Set<OSCMethod>
-    
-    /// Invoke the address spaces methods with a message.
-    /// - Parameter message: An OSC Message to ivoke the methods with.
-    ///
-    /// Each methods address is pattern matched against the address pattern of the message.
-    /// When a full match has been found the method will be invoked with the given message.
-    ///
-    /// The methods of the address space are unordered therefore invoked in any random order...
-    public func invoke(with message: OSCMessage) {
-        for method in methods {
-            if OSCMatch.match(addressPattern: message.addressPattern.fullPath,
-                              address: method.address.fullPath)
-                .match == .fullMatch {
-                method.invoke(message)
-            }
-        }
-    }
-    
+public enum OSCAddressPatternMatch {
+    case string
+    case different
+    case wildcard
 }
 
+public struct OSCFilterMethod: Hashable, Equatable {
+
+    public let address: OSCAddress
+    public let completionHandler: (OSCMessage) -> Void
+
+    public init(with address: OSCAddress, completionHandler: @escaping (OSCMessage) -> Void) {
+        self.address = address
+        self.completionHandler = completionHandler
+    }
+
+    public static func == (lhs: OSCFilterMethod, rhs: OSCFilterMethod) -> Bool {
+        return lhs.address == rhs.address
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(address)
+    }
+
+    // "/a/b/c/d/e" is equal to "/a/b/c/d/e" or "/a/b/c/d/*".
+    public func match(part: String, atIndex index: Int) -> OSCAddressPatternMatch {
+        guard address.parts.indices.contains(index) else { return .different }
+        let match = address.parts[index]
+        switch match {
+        case part: return .string
+        case "*": return .wildcard
+        default: return .different
+        }
+    }
+
+}

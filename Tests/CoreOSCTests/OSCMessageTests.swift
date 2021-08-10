@@ -1,6 +1,6 @@
 //
 //  OSCMessageTests.swift
-//  CoreOSC
+//  CoreOSCTests
 //
 //  Created by Sam Smallman on 05/08/2021.
 //  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman

@@ -74,6 +74,8 @@ public struct OSCPatternMatch: Equatable {
 /// A helper object for OSC Address Pattern and OSC Address matching operations.
 public struct OSCMatch {
     
+    private init() {}
+    
     /// Match an OSC Address Pattern against an OSC Address.
     /// - Parameters:
     ///   - addressPattern: An OSC Address Pattern.
