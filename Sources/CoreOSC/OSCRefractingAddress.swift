@@ -47,6 +47,13 @@ public struct OSCRefractingAddress: Hashable, Equatable {
     /// Printable ASCII characters not allowed in names of OSC Methods or OSC Containers:
     /// - ' ' - Space
     ///
+    /// Refracting allows for an OSC Address Patterns parts to be modified.
+    /// e.g. The refracting address "/osc/#1/theory" would refract the address pattern
+    /// "/core/osc/test" into "/osc/core/theory".
+    ///
+    /// The number after each hash e.g. "#1" within the refracting address denotes which part (not 0 indexed)
+    /// to take from the given OSC Address Pattern.
+    /// 
     /// - Parameter refractingAddress: The full path to an OSC Method.
     /// - Throws: `OSCAddressError` if the format of the given address is invalid.
     public init(_ refractingAddress: String) throws {
@@ -62,7 +69,18 @@ public struct OSCRefractingAddress: Hashable, Equatable {
         }
     }
     
-    public func refract(address: OSCAddress) throws -> OSCAddress {
+    /// Refract an OSC Address.
+    /// - Parameter address: An OSC Address to be refracted.
+    /// - Throws: A `OSCAddressError` if the given address can not be refracted.
+    /// - Returns: A new OSC Address that has been refracted.
+    ///
+    /// Refracting allows for an OSC Address Patterns parts to be modified.
+    /// e.g. The refracting address "/osc/#1/theory" would refract the address pattern
+    /// "/core/osc/test" into "/osc/core/theory".
+    ///
+    /// The number after each hash e.g. "#1" within the refracting address denotes which part (not 0 indexed)
+    /// to take from the given OSC Address Pattern.
+    public func refract(address: OSCAddressPattern) throws -> OSCAddressPattern {
         if parts.contains(where: { $0.hasPrefix("#") }) {
             var addressPattern = ""
             try parts.forEach { part in
@@ -78,9 +96,9 @@ public struct OSCRefractingAddress: Hashable, Equatable {
                     addressPattern += "/\(part)"
                 }
             }
-            return try OSCAddress(addressPattern)
+            return try OSCAddressPattern(addressPattern)
         } else {
-            return try OSCAddress(fullPath)
+            return try OSCAddressPattern(fullPath)
         }
     }
     

@@ -29,7 +29,7 @@ import Foundation
 /// A tree structure containing a set of OSC Methods to be invoked by a client.
 public struct OSCAddressSpace {
     
-    /// A `Set` of OSC Methods to be invoked by a client
+    /// A `Set` of OSC Methods to be invoked by a client.
     public var methods: Set<OSCMethod>
     
     /// Invoke the address spaces methods with a message.

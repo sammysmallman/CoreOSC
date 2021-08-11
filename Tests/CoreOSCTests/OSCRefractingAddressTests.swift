@@ -76,7 +76,7 @@ class OSCRefractingAddressTests: XCTestCase {
     }
     
     func testRefracting() throws {
-        let address = try OSCAddress("/core/osc/refracting/test")
+        let address = try OSCAddressPattern("/core/osc/refracting/test")
         let refractingAddress1 = try OSCRefractingAddress("/core/#2/#4")
         var refractedAddress = try refractingAddress1.refract(address: address)
         XCTAssertEqual(refractedAddress.fullPath, "/core/osc/test")
