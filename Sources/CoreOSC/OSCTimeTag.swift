@@ -28,12 +28,16 @@ import Foundation
 
 public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
     
-    /// Creates an OSC Time Tag initialized to immediately.
-    public static let immediate: OSCTimeTag = OSCTimeTag()
-
     public var oscData: Data { Data(seconds.bigEndian.data + fraction.bigEndian.data) }
 
     public var oscTypeTag: Character { "t" }
+    
+    public func oscAnnotation(withType type: Bool = true) -> String {
+        "\(self.hex())\(type ? "(\(oscTypeTag))" : "")"
+    }
+    
+    /// Creates an OSC Time Tag initialized to immediately.
+    public static let immediate: OSCTimeTag = OSCTimeTag()
 
     public let seconds: UInt32
     public let fraction: UInt32
@@ -86,10 +90,6 @@ public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
             .map { String(format: "%02X", $0) }
             .joined()
         return seconds + fration
-    }
-
-    public func oscAnnotation(withType type: Bool = true) -> String {
-        "\(self.hex())\(type ? "(\(oscTypeTag))" : "")"
     }
 
 }

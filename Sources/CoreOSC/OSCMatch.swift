@@ -26,51 +26,6 @@
 
 import Foundation
 
-/// An object that represents the result of matching an OSC Address Pattern against an OSC Address.
-public struct OSCPatternMatch: Equatable {
-
-    /// The result of matching an OSC Address Pattern with an OSC Address.
-    public enum Matching: Int {
-        
-        /// The pattern and address failed to match.
-        case unmatched = 0
-        
-        /// A partial match where all OSC Address characters were matched,
-        /// but there still remained OSC Address Pattern characters.
-        case partialAddress
-        
-        /// A partial match where all OSC Address Pattern characters were matched,
-        /// but there still remained OSC Address characters.
-        case partialPattern
-        
-        /// A full match of all OSC Address Pattern and OSC Address characters.
-        case fullMatch
-        
-    }
-    
-    /// The result of matching an OSC Address Pattern with an OSC Address.
-    public let match: Matching
-    
-    /// The number of OSC Address Pattern characters successfully matched.
-    public let patternCharactersMatched: Int
-    
-    /// The number of OSC Address characters successfully matched.
-    public let addressCharactersMatched: Int
-    
-    /// An object that represents the result of matching an OSC Address Pattern against an OSC Address.
-    /// - Parameters:
-    ///   - match: The result of matching an OSC Address Pattern with an OSC Address.
-    ///   - patternCharactersMatched: The number of OSC Address Pattern characters successfully matched.
-    ///   - addressCharactersMatched: The number of OSC Address characters successfully matched.
-    public init(match: OSCPatternMatch.Matching,
-                patternCharactersMatched: Int,
-                addressCharactersMatched: Int) {
-        self.match = match
-        self.patternCharactersMatched = patternCharactersMatched
-        self.addressCharactersMatched = addressCharactersMatched
-    }
-}
-
 /// A helper object for OSC Address Pattern and OSC Address matching operations.
 public struct OSCMatch {
     
