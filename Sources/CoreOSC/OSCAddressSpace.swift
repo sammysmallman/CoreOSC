@@ -32,6 +32,12 @@ public struct OSCAddressSpace {
     /// A `Set` of OSC Methods to be invoked by a client.
     public var methods: Set<OSCMethod>
     
+    /// An OSC Address Space.
+    /// - Parameter methods: A `Set` of OSC Methods the address space should begin with.
+    public init(methods: Set<OSCMethod> = []) {
+        self.methods = methods
+    }
+    
     /// Invoke the address spaces methods with a message.
     /// - Parameter message: An OSC Message to ivoke the methods with.
     ///
