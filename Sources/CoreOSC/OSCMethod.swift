@@ -33,14 +33,17 @@ public struct OSCMethod: Hashable, Equatable {
     public let address: OSCAddress
     
     /// A closure that is invoked by passing in an OSC Message.
-    internal let invoke: (OSCMessage) -> Void
+    internal let invoke: (OSCMessage, [AnyHashable : Any]?) -> Void
     
     /// An OSC Method that can be invoked by an OSC Message.
     /// - Parameters:
     ///   - address: The full path to this OSC Method.
     ///   - invokedAction: A closure that is invoked when the address pattern of an OSC Message matches against the given address.
     ///   - message: `OSCMessage`
-    public init(with address: OSCAddress, invokedAction: @escaping (_ message: OSCMessage) -> Void) {
+    ///   - userInfo: `[AnyHashable : Any]`?
+    ///
+    /// The user information dictionary stores any additional objects that the invoking action might use.
+    public init(with address: OSCAddress, invokedAction: @escaping (_ message: OSCMessage, _ userInfo: [AnyHashable : Any]?) -> Void) {
         self.address = address
         self.invoke = invokedAction
     }
@@ -54,15 +57,17 @@ public struct OSCMethod: Hashable, Equatable {
     }
     
     /// Invoke the method.
-    /// - Parameter message: An OSC Message to invoke the method with.
+    /// - Parameters:
+    ///   - message:  An OSC Message to invoke the method with.
+    ///   - userInfo: The user information dictionary stores any additional objects that the invoking action might use.
     /// - Returns: A boolean value indicating whether the method has been invoked.
-    public func invoke(with message: OSCMessage) -> Bool {
+    public func invoke(with message: OSCMessage, userInfo: [AnyHashable : Any]? = nil) -> Bool {
         guard OSCMatch.match(addressPattern: message.addressPattern.fullPath,
                              address: address.fullPath)
                 .match == .fullMatch else {
             return false
         }
-        invoke(message)
+        invoke(message, userInfo)
         return true
     }
     

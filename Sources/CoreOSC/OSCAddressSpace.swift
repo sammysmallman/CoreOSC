@@ -39,18 +39,20 @@ public struct OSCAddressSpace {
     }
     
     /// Invoke the address spaces methods with a message.
-    /// - Parameter message: An OSC Message to ivoke the methods with.
-    ///
+    /// - Parameters:
+    ///   - message: An OSC Message to ivoke the methods with.
+    ///   - userInfo: The user information dictionary stores any additional objects that the invoking action might use.
+    ///   
     /// Each methods address is pattern matched against the address pattern of the message.
     /// When a full match has been found the method will be invoked with the given message.
     ///
     /// The methods of the address space are unordered therefore invoked in any random order...
-    public func invoke(with message: OSCMessage) {
+    public func invoke(with message: OSCMessage, userInfo: [AnyHashable : Any]? = nil) {
         for method in methods {
             if OSCMatch.match(addressPattern: message.addressPattern.fullPath,
                               address: method.address.fullPath)
                 .match == .fullMatch {
-                method.invoke(message)
+                method.invoke(message, userInfo)
             }
         }
     }

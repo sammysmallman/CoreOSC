@@ -35,19 +35,19 @@ class OSCAddressSpaceTests: XCTestCase {
     func testInternalInvokingOSCAddressSpace() {
         let address1 = try! OSCAddress("/core/osc/1")
         var value1: Bool = false
-        let method1 = OSCMethod(with: address1, invokedAction: { message in
+        let method1 = OSCMethod(with: address1, invokedAction: { message, _ in
             let boolValue = message.arguments.first as! Bool
             value1 = boolValue
         })
         let address2 = try! OSCAddress("/core/osc/2")
         var value2: Bool = false
-        let method2 = OSCMethod(with: address2, invokedAction: { message in
+        let method2 = OSCMethod(with: address2, invokedAction: { message, _ in
             let boolValue = message.arguments.first as! Bool
             value2 = boolValue
         })
         let address3 = try! OSCAddress("/core/osc/3")
         var value3: Bool = false
-        let method3 = OSCMethod(with: address3, invokedAction: { message in
+        let method3 = OSCMethod(with: address3, invokedAction: { message, _ in
             let boolValue = message.arguments.first as! Bool
             value3 = boolValue
         })
