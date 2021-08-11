@@ -101,13 +101,6 @@ class OSCRefractingAddressTests: XCTestCase {
         XCTAssertEqual(OSCRefractingAddress.evaluate(with: "core/osc"), .failure(.forwardSlash))
         XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/🥺"), .failure(.ascii))
         XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/ "), .failure(.space))
-        XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/*"), .failure(.asterisk))
-        XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/,"), .failure(.comma))
-        XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/?"), .failure(.questionMark))
-        XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/["), .failure(.openBracket))
-        XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/]"), .failure(.closeBracket))
-        XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/{"), .failure(.openCurlyBrace))
-        XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/}"), .failure(.closeCurlyBrace))
         XCTAssertEqual(OSCRefractingAddress.evaluate(with: "/core/#1/osc"), .success("/core/#1/osc"))
     }
 

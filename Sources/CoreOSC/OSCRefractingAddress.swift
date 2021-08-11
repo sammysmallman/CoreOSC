@@ -93,13 +93,6 @@ public struct OSCRefractingAddress: Hashable, Equatable {
         for character in address {
             guard character.isASCII == true else { return .failure(.ascii) }
             guard character != " " else { return .failure(.space) }
-            guard character != "*" else { return .failure(.asterisk) }
-            guard character != "," else { return .failure(.comma) }
-            guard character != "?" else { return .failure(.questionMark) }
-            guard character != "[" else { return .failure(.openBracket) }
-            guard character != "]" else { return .failure(.closeBracket) }
-            guard character != "{" else { return .failure(.openCurlyBrace) }
-            guard character != "}" else { return .failure(.closeCurlyBrace) }
         }
         return .success(address)
     }
