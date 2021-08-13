@@ -26,7 +26,7 @@
 
 import Foundation
 
-public class OSCAnnotation {
+public struct OSCAnnotation {
 
     public enum OSCAnnotationStyle {
         // Equals/Comma Seperated Arguments: /an/address/pattern=1,3.142,"A string argument with spaces",String

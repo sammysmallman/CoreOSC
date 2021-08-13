@@ -1,3 +1,5 @@
+/* OSC Address Error */
+
 /* OSC Address Error: Invalid Address */
 "OSC_ADDRESS_ERROR_INVALID_ADDRESS" = "Invalid address";
 
@@ -39,3 +41,38 @@
 
 /* OSC Address Error: Wildcards */
 "OSC_ADDRESS_ERROR_WILDCARDS" = "The address should not contain the following characters: * , ? [ ] { }";
+
+/* OSC Parser Error */
+
+/* OSC Parser Error: Unrecognized data */
+"OSC_PARSER_ERROR_UNRECOGNIZED_DATA" = "The parser could not recognize the data as either a message or bundle.";
+
+/* OSC Parser Error: Can't parse address pattern */
+"OSC_PARSER_ERROR_CANT_PARSE_ADDRESS_PATTERN" = "The address pattern cannot be parsed.";
+
+/* OSC Parser Error: Can't parse type tag string */
+"OSC_PARSER_ERROR_CANT_PARSE_TYPE_TAG_STRING" = "The type tag string cannot be parsed.";
+
+/* OSC Parser Error: Can't parse OSC string */
+"OSC_PARSER_ERROR_CANT_PARSE_ARGUMENT_STRING" = "Cannot parse argument type: String.";
+
+/* OSC Parser Error: Can't parse OSC integer */
+"OSC_PARSER_ERROR_CANT_PARSE_ARGUMENT_INT" = "Cannot parse argument type: Int32.";
+
+/* OSC Parser Error: Can't parse OSC float */
+"OSC_PARSER_ERROR_CANT_PARSE_ARGUMENT_FLOAT" = "Cannot parse argument type: Float32.";
+
+/* OSC Parser Error: Can't parse OSC blob */
+"OSC_PARSER_ERROR_CANT_PARSE_ARGUMENT_BLOB" = "Cannot parse argument type: Blob.";
+
+/* OSC Parser Error: Can't parse OSC time tag */
+"OSC_PARSER_ERROR_CANT_PARSE_ARGUMENT_TIMETAG" = "Cannot parse argument type: Time Tag.";
+
+/* OSC Parser Error: Can't parse size of element */
+"OSC_PARSER_ERROR_CANT_PARSE_ELEMENT_SIZE" = "The parser could not parse the siza of a bundles element.";
+
+/* OSC Parser Error: Can't parse type of element */
+"OSC_PARSER_ERROR_CANT_PARSE_ELEMENT_TYPE" = "The parser could not parse the type of a bundles element.";
+
+/* OSC Parser Error: Can't parse bundle element */
+"OSC_PARSER_ERROR_CANT_PARSE_ELEMENT" = "The parser could not parse a bundles element.";
