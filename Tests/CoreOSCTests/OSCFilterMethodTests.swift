@@ -1,8 +1,8 @@
 //
-//  OSCMethodTests.swift
+//  OSCFilterMethodTests.swift
 //  CoreOSCTests
 //
-//  Created by Sam Smallman on 10/08/2021.
+//  Created by Sam Smallman on 13/08/2021.
 //  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,20 +26,19 @@
 import XCTest
 @testable import CoreOSC
 
-class OSCMethodTests: XCTestCase {
+class OSCFilterMethodTests: XCTestCase {
 
     static var allTests = [
-        ("testInternalInvokingOSCMethod", testInternalInvokingOSCMethod),
-        ("testInternalInvokingOSCMethodSucceeds", testInternalInvokingOSCMethodSucceeds),
-        ("testInternalInvokingOSCMethodFails", testInternalInvokingOSCMethodFails),
+        ("testInternalInvokingOSCFilterMethod", testInternalInvokingOSCFilterMethod),
+        ("testInternalInvokingOSCFilterMethodSucceeds", testInternalInvokingOSCFilterMethodSucceeds),
         ("testInternalInvokingOSCMethodWithUserInfo", testInternalInvokingOSCMethodWithUserInfo)
     ]
 
-    func testInternalInvokingOSCMethod() {
+    func testInternalInvokingOSCFilterMethod() {
         let addressString = "/core/osc"
-        let address = try! OSCAddress(addressString)
+        let address = try! OSCFilterAddress(addressString)
         var value: Bool = false
-        let method = OSCMethod(with: address, invokedAction: { message, _ in
+        let method = OSCFilterMethod(with: address, invokedAction: { message, _ in
             XCTAssertEqual(message.addressPattern.fullPath, addressString)
             XCTAssertEqual(message.arguments.count, 1)
             let boolValue = message.arguments.first as! Bool
@@ -50,42 +49,29 @@ class OSCMethodTests: XCTestCase {
         XCTAssertEqual(value, true)
     }
     
-    func testInternalInvokingOSCMethodSucceeds() {
+    func testInternalInvokingOSCFilterMethodSucceeds() {
         let addressString = "/core/osc"
-        let address = try! OSCAddress(addressString)
+        let address = try! OSCFilterAddress(addressString)
         var value: Bool = false
-        let method = OSCMethod(with: address, invokedAction: { message, _ in
+        let method = OSCFilterMethod(with: address, invokedAction: { message, _ in
             XCTAssertEqual(message.arguments.count, 1)
             let boolValue = message.arguments.first as! Bool
             value = boolValue
         })
         let message = OSCMessage(raw: addressString, arguments: [true])
-        XCTAssertEqual(method.invoke(with: message), true)
+        method.invoke(message, nil)
         XCTAssertEqual(value, true)
-    }
-    
-    func testInternalInvokingOSCMethodFails() {
-        let address = try! OSCAddress("/core/osc")
-        var value: Bool = false
-        let method = OSCMethod(with: address, invokedAction: { message, _ in
-            XCTAssertEqual(message.arguments.count, 1)
-            let boolValue = message.arguments.first as! Bool
-            value = boolValue
-        })
-        let message = OSCMessage(raw: "/core/test", arguments: [true])
-        XCTAssertEqual(method.invoke(with: message), false)
-        XCTAssertEqual(value, false)
     }
     
     func testInternalInvokingOSCMethodWithUserInfo() {
         let addressString = "/core/osc"
-        let address = try! OSCAddress(addressString)
-        let method = OSCMethod(with: address, invokedAction: { _, userInfo in
+        let address = try! OSCFilterAddress(addressString)
+        let method = OSCFilterMethod(with: address, invokedAction: { _, userInfo in
             XCTAssertEqual(userInfo?["bool"] as! Bool, true)
             XCTAssertEqual(userInfo?["string"] as! String, "test")
         })
         let message = OSCMessage(raw: addressString, arguments: [true])
-        XCTAssertEqual(method.invoke(with: message, userInfo: ["bool":true, "string":"test"]), true)
+        method.invoke(message, ["bool":true, "string":"test"])
     }
 
 }

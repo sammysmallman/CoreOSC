@@ -2,7 +2,7 @@
 //  OSCAddressMethod.swift
 //  CoreOSC
 //
-//  Created by Sam Smallman on 22/107/2021.
+//  Created by Sam Smallman on 13/08/2021.
 //  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,39 +26,68 @@
 
 import Foundation
 
-public enum OSCAddressPatternMatch {
-    case string
-    case different
-    case wildcard
-}
-
+/// The potential destination of an OSC Message and a point of control made available by invoking the method.
 public struct OSCFilterMethod: Hashable, Equatable {
-
-    public let address: OSCAddress
-    public let completionHandler: (OSCMessage) -> Void
-
-    public init(with address: OSCAddress, completionHandler: @escaping (OSCMessage) -> Void) {
-        self.address = address
-        self.completionHandler = completionHandler
+    
+    /// An object that represents the full path to this OSC Method in an OSC Address Filter.
+    public let filterAddress: OSCFilterAddress
+    
+    /// A closure that is invoked by passing in an OSC Message.
+    internal let invoke: (OSCMessage, [AnyHashable : Any]?) -> Void
+    
+    /// An OSC Method that can be invoked by an OSC Message.
+    /// - Parameters:
+    ///   - filterAddress: The full path to this OSC Method.
+    ///   - invokedAction: A closure that is invoked when the address pattern of an OSC Message matches against the given address.
+    ///   - message: `OSCMessage`
+    ///   - userInfo: `[AnyHashable : Any]`?
+    ///
+    /// The user information dictionary stores any additional objects that the invoking action might use.
+    public init(with filterAddress: OSCFilterAddress,
+                invokedAction: @escaping (_ message: OSCMessage,
+                                          _ userInfo: [AnyHashable : Any]?) -> Void) {
+        self.filterAddress = filterAddress
+        self.invoke = invokedAction
     }
-
-    public static func == (lhs: OSCFilterMethod, rhs: OSCFilterMethod) -> Bool {
-        return lhs.address == rhs.address
-    }
-
+    
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(address)
+        hasher.combine(filterAddress)
     }
-
-    // "/a/b/c/d/e" is equal to "/a/b/c/d/e" or "/a/b/c/d/*".
-    public func match(part: String, atIndex index: Int) -> OSCAddressPatternMatch {
-        guard address.parts.indices.contains(index) else { return .different }
-        let match = address.parts[index]
+    
+    public static func == (lhs: OSCFilterMethod, rhs: OSCFilterMethod) -> Bool {
+        return lhs.filterAddress == rhs.filterAddress
+    }
+    
+    /// Match an `OSCAddressPattern`'s part against the corresponding part of the methods `OSCFilterAddress`.
+    /// - Parameters:
+    ///   - part: The `OSCAddressPatterns` part to match against.
+    ///   - index: The index of the `OSCFilterAddress`'s part to match against.
+    /// - Returns: A `OSCFilterPatternMatch` indicating the result of the match.
+    internal func match(part: String, index: Int) -> OSCFilterPatternMatch {
+        guard filterAddress.parts.indices.contains(index) else { return .different }
+        let match = filterAddress.parts[index]
         switch match {
         case part: return .string
-        case "*": return .wildcard
+        case "#": return .wildcard
         default: return .different
         }
     }
+    
+}
 
+extension OSCFilterMethod {
+    
+    /// The result of matching an `OSCAddressPattern`'s part against the corresponding
+    /// `OSCFilterAddress`'s part.
+    internal enum OSCFilterPatternMatch {
+        /// The `OSCAddressPattern`'s part matches fully against the
+        /// `OSCFilterAddress`'s part.
+        case string
+        /// The `OSCAddressPattern`'s part matches against the
+        /// `OSCFilterAddress`'s part with the wildcard "#".
+        case wildcard
+        /// The `OSCAddressPattern`'s part does the match against
+        /// `OSCFilterAddress`'s part.
+        case different
+    }
 }

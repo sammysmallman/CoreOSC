@@ -2,7 +2,7 @@
 //  OSCPacket.swift
 //  CoreOSC
 //
-//  Created by Sam Smallman on 22/107/2021.
+//  Created by Sam Smallman on 22/07/2021.
 //  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
