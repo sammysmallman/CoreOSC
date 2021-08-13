@@ -74,7 +74,7 @@ class OSCAddressFilterTests: XCTestCase {
             messages.append("2")
         })
         
-        let addressFilter = OSCAddressFilter(methods: [method1, method2, method3])
+        var addressFilter = OSCAddressFilter(methods: [method1, method2, method3])
         addressFilter.priority = .string
         
         _ = addressFilter.invoke(with: OSCMessage(raw: "/core/osc/test"))
@@ -105,7 +105,7 @@ class OSCAddressFilterTests: XCTestCase {
             messages.append("3")
         })
         
-        let addressFilter = OSCAddressFilter(methods: [method1, method2, method3])
+        var addressFilter = OSCAddressFilter(methods: [method1, method2, method3])
         addressFilter.priority = .wildcard
         
         _ = addressFilter.invoke(with: OSCMessage(raw: "/core/osc/test"))

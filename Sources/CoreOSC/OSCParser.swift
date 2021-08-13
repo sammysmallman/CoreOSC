@@ -243,17 +243,3 @@ public struct OSCParser {
     }
 
 }
-
-public enum OSCParserError: Error {
-    case unrecognisedData
-    case cantParseAddressPattern
-    case cantParseTypeTagString
-    case cantParseOSCString
-    case cantParseOSCInt
-    case cantParseOSCFloat
-    case cantParseOSCBlob
-    case cantParseOSCTimeTag
-    case cantParseSizeOfElement
-    case cantParseTypeOfElement
-    case cantParseBundleElement
-}

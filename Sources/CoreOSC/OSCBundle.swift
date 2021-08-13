@@ -27,7 +27,7 @@
 import Foundation
 
 /// An OSC Bundle.
-public class OSCBundle: OSCPacket {
+public struct OSCBundle: OSCPacket {
 
     public var timeTag: OSCTimeTag
     public var elements: [OSCPacket]

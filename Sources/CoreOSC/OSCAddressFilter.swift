@@ -27,7 +27,7 @@
 import Foundation
 
 /// An object containing a set of OSC Methods to be invoked by a client after a filter process.
-public class OSCAddressFilter {
+public struct OSCAddressFilter {
     
     /// The priority for which OSC Filter Methods are invoked first.
     public enum FilterPriority {
