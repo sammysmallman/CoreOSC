@@ -43,7 +43,9 @@ public struct OSCMethod: Hashable, Equatable {
     ///   - userInfo: `[AnyHashable : Any]`?
     ///
     /// The user information dictionary stores any additional objects that the invoking action might use.
-    public init(with address: OSCAddress, invokedAction: @escaping (_ message: OSCMessage, _ userInfo: [AnyHashable : Any]?) -> Void) {
+    public init(with address: OSCAddress,
+                invokedAction: @escaping (_ message: OSCMessage,
+                                          _ userInfo: [AnyHashable : Any]?) -> Void) {
         self.address = address
         self.invoke = invokedAction
     }

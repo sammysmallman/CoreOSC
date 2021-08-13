@@ -2,7 +2,7 @@
 //  OSCAddressFilter.swift
 //  CoreOSC
 //
-//  Created by Sam Smallman on 22/107/2021.
+//  Created by Sam Smallman on 13/08/2021.
 //  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,52 +26,68 @@
 
 import Foundation
 
-internal class OSCAddressMethodMatch: Equatable {
-
-    let method: OSCFilterMethod
-    var strings: Int
-    var wildcards: Int
-
-    init(method: OSCFilterMethod, strings: Int = 0, wildcards: Int = 0) {
-        self.method = method
-        self.strings = strings
-        self.wildcards = wildcards
-    }
-
-    static func == (lhs: OSCAddressMethodMatch, rhs: OSCAddressMethodMatch) -> Bool {
-        return lhs.method.address == rhs.method.address
-    }
-}
-
-public enum OSCAddressSpaceMatchPriority {
-    case string
-    case wildcard
-    case none
-}
-
+/// An object containing a set of OSC Methods to be invoked by a client after a filter process.
 public class OSCAddressFilter {
+    
+    /// The priority for which OSC Filter Methods are invoked first.
+    public enum FilterPriority {
+        /// Parts that match as raw strings are prioritised.
+        /// OSC Filter Methods are sorted by the amount of `String` matches
+        /// and will be invoked in that order.
+        case string
+        /// Parts that match with the wildcard "#" are prioritised.
+        /// OSC Filter Methods sorted by the amount of "#" matches
+        /// and will be invoked in that order.
+        case wildcard
+        /// There is no prioritization.
+        /// OSC Filter Methods that match will be invoked in a random order.
+        case none
+    }
+    
+    /// The priority for which OSC Filter Methods are invoked first.
+    public var priority: FilterPriority = .none
 
+    /// A `Set` of OSC Methods to be invoked by a client.
     public var methods: Set<OSCFilterMethod> = []
 
-    public init(addressSpace: Set<OSCFilterMethod> = []) {
-        self.methods = addressSpace
+    /// An OSC Address Filter.
+    /// - Parameter methods: A `Set` of OSC Methods the address filter should begin with.
+    public init(methods: Set<OSCFilterMethod> = []) {
+        self.methods = methods
     }
-
-    // MARK: - Pattern Matching
-    private func matches(for address: String,
-                         priority: OSCAddressSpaceMatchPriority = .none) -> Set<OSCFilterMethod> {
-        var parts = address.components(separatedBy: "/")
-        parts.removeFirst()
-        var matchedAddresses = methods.map { OSCAddressMethodMatch(method: $0) }
-        // 1. The OSC Address and the OSC Address Pattern contain the same number of parts; and
+    
+    /// Invoke the address filters methods with a message.
+    /// - Parameters:
+    ///   - message: An OSC Message to ivoke the methods with.
+    ///   - userInfo: The user information dictionary stores any additional objects that the invoking action might use.
+    ///
+    /// Each methods filter address is matched against the address pattern of the message.
+    /// When a full match has been found the method will be invoked with the given message.
+    /// - Returns: A boolean value indicating whether any methods were invoked.
+    public func invoke(with message: OSCMessage, userInfo: [AnyHashable : Any]? = nil) -> Bool {
+        let methods = methods(matching: message.addressPattern, priority: priority)
+        guard !methods.isEmpty else { return false }
+        methods.forEach { $0.invoke(message, userInfo) }
+        return true
+    }
+    
+    /// Returns a `Set` of `OSCFilterMethods`s that match against the given `OSCAddressPattern`.
+    /// - Parameters:
+    ///   - addressPattern: An `OSCAddressPattern` to be matched against.
+    ///   - priority: The priority for which the matched OSC Filter Methods should be sorted.
+    /// - Returns: An `Array` of `OSCAddressPattern` to be invoked in that order.
+    private func methods(matching addressPattern: OSCAddressPattern,
+                         priority: FilterPriority = .none) -> [OSCFilterMethod] {
+        var matchedAddresses = methods.map { OSCFilterMatch(method: $0) }
+        // 1. The OSC Filter Address and the OSC Address Pattern contain the same number of parts; and
         let matchedAddressesWithEqualPartsCount = matchedAddresses.filter {
-            parts.count == $0.method.address.parts.count
+            addressPattern.parts.count == $0.method.filterAddress.parts.count
         }
         matchedAddresses = matchedAddressesWithEqualPartsCount
-        // 2. Each part of the OSC Address Pattern matches the corresponding part of the OSC Address.
-        for (index, part) in parts.enumerated() {
+        // 2. Each part of the OSC Address Pattern matches the corresponding part of the OSC Filter Address.
+        for (index, part) in addressPattern.parts.enumerated() {
             matchedAddressesWithEqualPartsCount.forEach { match in
-                switch match.method.match(part: part, atIndex: index) {
+                switch match.method.match(part: part, index: index) {
                 case .string:
                     match.strings += 1
                 case .wildcard:
@@ -82,28 +98,47 @@ public class OSCAddressFilter {
             }
         }
         switch priority {
-        case .none: return Set(matchedAddresses.map { $0.method })
+        case .none: return matchedAddresses.map { $0.method }
         case .string:
             let sorted = matchedAddresses
                 .sorted { $0.strings > $1.strings }
                 .map { $0.method }
-            guard let first = sorted.first else { return [] }
-            return [first]
+            print(sorted.map { $0.filterAddress.fullPath })
+            return sorted
         case .wildcard:
             let sorted = matchedAddresses
                 .sorted { $0.wildcards > $1.wildcards }
                 .map { $0.method }
-            guard let first = sorted.first else { return [] }
-            return [first]
+            return sorted
         }
     }
 
-    public func complete(with message: OSCMessage,
-                         priority: OSCAddressSpaceMatchPriority = .none) -> Bool {
-        let methods = matches(for: message.addressPattern.fullPath, priority: priority)
-        guard !methods.isEmpty else { return false }
-        methods.forEach { $0.completionHandler(message) }
-        return true
-    }
+}
 
+extension OSCAddressFilter {
+    
+    /// An object that contains the current state of a filter match on a method.
+    private class OSCFilterMatch: Equatable {
+        
+        /// The `OSCFilterMethod` that is being matched against.
+        let method: OSCFilterMethod
+        
+        /// The number of raw string matches.
+        var strings: Int = 0
+        
+        /// The number of wildcard "#" matches.
+        var wildcards: Int = 0
+        
+        /// An `OSCFilterMatch`.
+        /// - Parameters:
+        ///   - method: An `OSCFilterMethod` that will be matched against an `OSCAddressPattern`.
+        init(method: OSCFilterMethod) {
+            self.method = method
+        }
+
+        static func == (lhs: OSCFilterMatch, rhs: OSCFilterMatch) -> Bool {
+            return lhs.method.filterAddress == rhs.method.filterAddress
+        }
+    }
+    
 }

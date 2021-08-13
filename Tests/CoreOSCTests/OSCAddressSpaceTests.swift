@@ -29,10 +29,10 @@ import XCTest
 class OSCAddressSpaceTests: XCTestCase {
 
     static var allTests = [
-        ("testInternalInvokingOSCAddressSpace", testInternalInvokingOSCAddressSpace)
+        ("testInvokingOSCAddressSpace", testInvokingOSCAddressSpace)
     ]
 
-    func testInternalInvokingOSCAddressSpace() {
+    func testInvokingOSCAddressSpace() {
         let address1 = try! OSCAddress("/core/osc/1")
         var value1: Bool = false
         let method1 = OSCMethod(with: address1, invokedAction: { message, _ in
