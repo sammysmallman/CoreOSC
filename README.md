@@ -65,14 +65,45 @@ An `OSCMessage` is a packet formed of an `OSCAddressPattern` that directs it tow
 Initialization of an `OSCMessage` will `throw` if the format is incorrect or invalid characters are found in the given `String` address pattern.
 
 ### Bundles
-An `OSCBundle` is a container for messages, but also other bundles and allows for the dispatching of multiple messages atomically as well scheduling them to be invoked at some point in the future. For further information regarding the temporal semantics of bundles and their associated `OSCTimeTag`'s, please see [OSC 1.0](http://opensoundcontrol.org/spec-1_0.html#timetags).
+An `OSCBundle` is a container for messages, but also other bundles and allows for the invokation of multiple messages atomically as well scheduling them to be invoked at some point in the future. For further information regarding the temporal semantics of bundles and their associated `OSCTimeTag`'s, please see [OSC 1.0](http://opensoundcontrol.org/spec-1_0.html#timetags).
 ```swift
     let message1 = try! OSCMessage("/core/osc/1")
     let message2 = try! OSCMessage("/core/osc/2")
     let message3 = try! OSCMessage("/core/osc/3")
     
-    let bundle = OSCBundle([message1, message2, message3])
+    let bundle = OSCBundle([message1, message2, message3], 
+                           timetag: .immediate)
 ```
+
+### Address Spaces
+An `OSCAddressSpace` is a set of methods hosted by an "OSC Server" that can be invoked by one or more `OSCMessage`'s. Think of it as a container for blocks of code, that can be dispatched when a message is received, with an address pattern that matches against a methods `OSCAddress`.
+
+#### Methods
+An `OSCMethod` is a `struct` that encapsulates a closure and the `OSCAddress` needed to invoke it. The idea is that if you wanted to make available control functionality within your application to "OSC Clients" you would begin by creating `OSCMethods`, adding them to an `OSCAddressSpace` and when an `OSCMessage` is received it would be passed to the address space to potentially invoke a method it contains. 
+
+For example:
+```swift
+    let method = OSCMethod(with try! OSCAddress("object/coords"), invokedAction { message, _ in
+        guard message.arguments.count == 2,
+              let x = message.argument[0] as? Float32, 
+              let y = message.argument[1] as? Float32 else { return }
+        print("Received /object/coords, x: \(x), y: \(y)"
+        object.x = x
+        object.y = y
+    })
+    
+    var addressSpace = OSCAddressSpace(methods: [method])
+    
+    addressSpace.invoke(with: OSCMessage(try! OSCAddressPattern("object/coords"), 
+                                         arguments: [Float32(3), 
+                                                     Float32(5)]))
+                                                     
+    print(object.x) // 3
+    print(object.y) // 5
+```
+
+## Extensions
+The following objects are not part of either OSC specification but have been developed after observation of implementations of OSC in the wild and aim to provide help and functionality for you to integrate with them.
 
 ## To Do
 - Enhance the regexes for all address objects: `OSCAddressPattern`, `OSCAddress`, `OSCRefractingAddress`, `OSCFilterAddress`.
