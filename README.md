@@ -186,7 +186,7 @@ For example:
     print(logs) // ["Cue 1", "Cue 2", "Cue 3"]
 ```
 
-:warning: An `OSCFilterAddress` uses the "#" character, which has been specifically chosen because it is invalid within an `OSCAddressPattern`. Under no circumstances should you attempt to create an `OSCMessage` using an `OSCFilterAddress` as its address pattern.
+:warning: - An `OSCFilterAddress` uses the "#" character, which has been specifically chosen because it is invalid within an `OSCAddressPattern`. Under no circumstances should you attempt to create an `OSCMessage` using an `OSCFilterAddress` as its address pattern.
 
 ---
 
@@ -207,7 +207,7 @@ A `String` can be evaluated to verify whether it is a valid refracting address b
     let valid: Bool = OSCRefractingAddress.evaluate("/core/#2/#4")    
 ```
 
-:warning: An `OSCRefractingAddress` uses the "#" character, which has been specifically chosen because it is invalid within an `OSCAddressPattern`. Under no circumstances should you attempt to create an `OSCMessage` using an `OSCRefractingAddress` as its address pattern.
+:warning: - An `OSCRefractingAddress` uses the "#" character, which has been specifically chosen because it is invalid within an `OSCAddressPattern`. Under no circumstances should you attempt to create an `OSCMessage` using an `OSCRefractingAddress` as its address pattern.
 
 ## To Do
 - Enhance the regexes for all address objects: `OSCAddressPattern`, `OSCAddress`, `OSCRefractingAddress`, `OSCFilterAddress`.
