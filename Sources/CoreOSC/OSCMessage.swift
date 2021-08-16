@@ -54,16 +54,16 @@ public struct OSCMessage: OSCPacket {
     ///   - addressPattern: The messages OSC Address Pattern.
     ///   - arguments: The messages `Array` of arguments.
     /// - Throws: An `OSCAddressError` if the given `addressPattern` can not be initialized as a `OSCAddressPattern`.
-    public init(_ addressPattern: String, arguments: [OSCArgumentProtocol] = []) throws {
+    public init(with addressPattern: String, arguments: [OSCArgumentProtocol] = []) throws {
         let fullPath = try OSCAddressPattern(addressPattern)
-        self.init(fullPath, arguments: arguments)
+        self.init(with: fullPath, arguments: arguments)
     }
 
     /// An OSC Message.
     /// - Parameters:
     ///   - addressPattern: The messages OSC Address Pattern.
     ///   - arguments: The messages `Array` of arguments.
-    public init(_ addressPattern: OSCAddressPattern, arguments: [OSCArgumentProtocol] = []) {
+    public init(with addressPattern: OSCAddressPattern, arguments: [OSCArgumentProtocol] = []) {
         self.addressPattern = addressPattern
         self.arguments = arguments
     }

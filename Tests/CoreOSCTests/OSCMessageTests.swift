@@ -76,7 +76,7 @@ class OSCMessageTests: XCTestCase {
     }
     
     func testInitializingOSCMessageWithStringSucceeds() throws {
-        let message = try OSCMessage("/core/osc", arguments: [Int32(1),
+        let message = try OSCMessage(with: "/core/osc", arguments: [Int32(1),
                                                               Float32(3.142),
                                                               "Core OSC",
                                                               OSCTimeTag.immediate,
@@ -100,12 +100,12 @@ class OSCMessageTests: XCTestCase {
     }
     
     func testInitializingOSCMessageWithStringFails() throws {
-        XCTAssertThrowsError(try OSCMessage("/core/#"))
+        XCTAssertThrowsError(try OSCMessage(with: "/core/#"))
     }
     
     func testInitializingOSCMessageWithOSCAddressPatternSucceeds() throws {
         let addressPattern = try OSCAddressPattern("/core/osc")
-        let message = OSCMessage(addressPattern, arguments: [Int32(1),
+        let message = OSCMessage(with: addressPattern, arguments: [Int32(1),
                                                              Float32(3.142),
                                                              "Core OSC",
                                                              OSCTimeTag.immediate,
@@ -129,18 +129,18 @@ class OSCMessageTests: XCTestCase {
     }
     
     func testReaddressWithStringSucceeds() throws {
-        var message = try OSCMessage("/core/osc")
+        var message = try OSCMessage(with: "/core/osc")
         try message.readdress(to: "/hello/world")
         XCTAssertEqual(message.addressPattern.fullPath, "/hello/world")
     }
     
     func testReaddressWithStringFails() throws {
-        var message = try OSCMessage("/core/osc")
+        var message = try OSCMessage(with: "/core/osc")
         XCTAssertThrowsError(try message.readdress(to: "/hello/#"))
     }
     
     func testReaddressWithOSCAddressPatternSucceeds() throws {
-        var message = try OSCMessage("/core/osc")
+        var message = try OSCMessage(with: "/core/osc")
         let addressPattern = try OSCAddressPattern("/hello/world")
         message.readdress(to: addressPattern)
         XCTAssertEqual(message.addressPattern.fullPath, addressPattern.fullPath)
@@ -176,13 +176,13 @@ class OSCMessageTests: XCTestCase {
     }
     
     func testPatternMatchingSucceeds() {
-        let message = try! OSCMessage("/core/osc")
+        let message = try! OSCMessage(with: "/core/osc")
         let address = try! OSCAddress("/core/osc")
         XCTAssertEqual(message.matches(address: address), .success(address))
     }
     
     func testPatternMatchingFails() {
-        let message = try! OSCMessage("/core")
+        let message = try! OSCMessage(with: "/core")
         let address = try! OSCAddress("/core/osc")
         XCTAssertEqual(message.matches(address: address), .failure(.invalidPartCount))
     }
