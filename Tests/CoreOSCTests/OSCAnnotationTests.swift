@@ -153,8 +153,8 @@ final class OSCAnnotationTests: XCTestCase {
 
     func testAnnotationToMessageSpaceStyle() {
         let annotation = "/core/osc 1 3.142 \"a string with spaces\" string true"
-        XCTAssertTrue(OSCAnnotation.evaluate(annotation, with: .spaces))
-        let message = OSCAnnotation.message(for: annotation, with: .spaces)
+        XCTAssertTrue(OSCAnnotation.evaluate(annotation, style: .spaces))
+        let message = OSCAnnotation.message(for: annotation, style: .spaces)
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 5)
@@ -172,8 +172,8 @@ final class OSCAnnotationTests: XCTestCase {
 
     func testAnnotationToMessageEqualsCommaStyle() {
         let annotation = "/core/osc=1,3.142,\"a string with spaces\",string,true"
-        XCTAssertTrue(OSCAnnotation.evaluate(annotation, with: .equalsComma))
-        let message = OSCAnnotation.message(for: annotation, with: .equalsComma)
+        XCTAssertTrue(OSCAnnotation.evaluate(annotation, style: .equalsComma))
+        let message = OSCAnnotation.message(for: annotation, style: .equalsComma)
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 5)
@@ -191,8 +191,8 @@ final class OSCAnnotationTests: XCTestCase {
 
     func testAnnotationToMessageSpaceStyleSingleStringWithSpacesArgument() {
         let annotation = "/core/osc \"this should be a single string argument\""
-        XCTAssertTrue(OSCAnnotation.evaluate(annotation, with: .spaces))
-        let message = OSCAnnotation.message(for: annotation, with: .spaces)
+        XCTAssertTrue(OSCAnnotation.evaluate(annotation, style: .spaces))
+        let message = OSCAnnotation.message(for: annotation, style: .spaces)
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 1)
@@ -202,8 +202,8 @@ final class OSCAnnotationTests: XCTestCase {
 
     func testAnnotationToMessageEqualsCommaStyleSingleStringWithSpacesArgument() {
         let annotation = "/core/osc=\"this should be a single string argument\""
-        XCTAssertTrue(OSCAnnotation.evaluate(annotation, with: .equalsComma))
-        let message = OSCAnnotation.message(for: annotation, with: .equalsComma)
+        XCTAssertTrue(OSCAnnotation.evaluate(annotation, style: .equalsComma))
+        let message = OSCAnnotation.message(for: annotation, style: .equalsComma)
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 1)

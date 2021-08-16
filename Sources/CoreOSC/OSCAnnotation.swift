@@ -26,14 +26,17 @@
 
 import Foundation
 
+/// A human readable/writable representation of an OSC Packet.
 public struct OSCAnnotation {
 
+    /// An OSC annotation style.
     public enum OSCAnnotationStyle {
-        // Equals/Comma Seperated Arguments: /an/address/pattern=1,3.142,"A string argument with spaces",String
+        /// Equals/Comma Seperated Arguments: /an/address/pattern=1,3.142,"A string argument with spaces",aStringArgumentWithoutSpace
         case equalsComma
-        // Spaces Seperated Arguments: /an/address/pattern 1 3.142 "A string argument with spaces" String
+        /// Spaces Seperated Arguments: /an/address/pattern 1 3.142 "A string argument with spaces" aStringArgumentWithoutSpace
         case spaces
 
+        /// The regular expression for the `OSCAnnotationStyle`.
         var regex: String {
             switch self {
             case .equalsComma:
@@ -43,6 +46,7 @@ public struct OSCAnnotation {
             }
         }
 
+        /// The character that seperates the OSCArguments in the OSC annotation.
         var separator: String {
             switch self {
             case .equalsComma: return ","
@@ -51,81 +55,34 @@ public struct OSCAnnotation {
         }
     }
 
-    public static func evaluate(_ annotation: String, with style: OSCAnnotationStyle = .spaces) -> Bool {
+    /// Evaluate an OSC annotation.
+    /// - Parameters:
+    ///     - annotation: A `String` to be validated.
+    ///     - style: The `OSCAnnotationStyle` of the given `String` annotation.
+    /// - Returns: A boolean value indicating whether any the given string is a valid OSC annotation.
+    public static func evaluate(_ annotation: String,
+                                style: OSCAnnotationStyle = .spaces) -> Bool {
         return NSPredicate(format: "SELF MATCHES %@", style.regex).evaluate(with: annotation)
     }
-
+    
+    /// Returns an `OSCMessage` from a valid OSC annotation.
+    /// - Parameters:
+    ///   - annotation: A `String` OSC annotation to be converted.
+    ///   - style: The `OSCAnnotationStyle` of the given `String` annotation.
+    /// - Returns: An `OSCMessage`or nil if the given OSC annotation was invalid.
     public static func message(for annotation: String,
-                               with style: OSCAnnotationStyle = .spaces) -> OSCMessage? {
+                               style: OSCAnnotationStyle = .spaces) -> OSCMessage? {
         switch style {
         case .equalsComma:
             return equalsCommaMessage(for: annotation)
         case .spaces:
-            do {
-                let matches = try NSRegularExpression(pattern: style.regex)
-                    .matches(in: annotation,
-                             range: annotation.nsrange)
-                // There should only be one match. Range at index 1 will always be the address pattern.
-                // Range at index 2 will be the argument string prefaced with " "
-                var arguments: [OSCArgumentProtocol] = []
-                guard let match = matches.first, match.range == annotation.nsrange,
-                      let address = annotation.substring(with: match.range(at: 1)),
-                      let argumentString = annotation.substring(with: match.range(at: 2)) else {
-                    return nil
-                }
-                let components = argumentString.components(separatedBy: "\"")
-                var argumentsArray: [String] = []
-                for (index, component) in components.enumerated() {
-                    if index % 2 != 0 {
-                        argumentsArray.append(component)
-                    } else {
-                        let arguments = component.split(separator: " ",
-                                                        omittingEmptySubsequences: true)
-                        for element in arguments {
-                            argumentsArray.append(String(element))
-                        }
-                    }
-                }
-                for argument in argumentsArray {
-                    if let decimal = Decimal(string: argument) {
-                        if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0), let int = Int32(argument) {
-                            arguments.append(int)
-                        } else if let float = Float32(argument) {
-                            arguments.append(float)
-                        }
-                    } else {
-                        switch argument {
-                        case "true":
-                            arguments.append(true)
-                        case "false":
-                            arguments.append(false)
-                        case "nil":
-                            arguments.append(OSCArgument.nil)
-                        case "impulse":
-                            arguments.append(OSCArgument.impulse)
-                        default:
-                            // If the argument is prefaced with quotation marks,
-                            // the regex dictates the argument should close with them.
-                            // Remove the quotation marks.
-                            if argument.first == "\"" {
-                                var quoationMarkArgument = argument
-                                quoationMarkArgument.removeFirst()
-                                quoationMarkArgument.removeLast()
-                                arguments.append(quoationMarkArgument)
-                            } else {
-                                arguments.append(argument)
-                            }
-                        }
-
-                    }
-                }
-                return try? OSCMessage(with: String(address), arguments: arguments)
-            } catch {
-                return nil
-            }
+            return spacesMessage(for: annotation)
         }
     }
-
+    
+    /// Returns an `OSCMessage` from a valid OSC equals/comma style annotation.
+    /// - Parameter annotation: A `String` OSC annotation to be converted.
+    /// - Returns: An `OSCMessage`or nil if the given OSC annotation was invalid.
     private static func equalsCommaMessage(for annotation: String) -> OSCMessage? {
         do {
             let matches = try NSRegularExpression(pattern: OSCAnnotationStyle.equalsComma.regex)
@@ -184,7 +141,80 @@ public struct OSCAnnotation {
             return nil
         }
     }
-
+    
+    /// Returns an `OSCMessage` from a valid OSC spaces style annotation.
+    /// - Parameter annotation: A `String` OSC annotation to be converted.
+    /// - Returns: An `OSCMessage`or nil if the given OSC annotation was invalid.
+    private static func spacesMessage(for annotation: String) -> OSCMessage? {
+        do {
+            let matches = try NSRegularExpression(pattern: OSCAnnotationStyle.spaces.regex)
+                .matches(in: annotation,
+                         range: annotation.nsrange)
+            // There should only be one match. Range at index 1 will always be the address pattern.
+            // Range at index 2 will be the argument string prefaced with " "
+            var arguments: [OSCArgumentProtocol] = []
+            guard let match = matches.first, match.range == annotation.nsrange,
+                  let address = annotation.substring(with: match.range(at: 1)),
+                  let argumentString = annotation.substring(with: match.range(at: 2)) else {
+                return nil
+            }
+            let components = argumentString.components(separatedBy: "\"")
+            var argumentsArray: [String] = []
+            for (index, component) in components.enumerated() {
+                if index % 2 != 0 {
+                    argumentsArray.append(component)
+                } else {
+                    let arguments = component.split(separator: " ",
+                                                    omittingEmptySubsequences: true)
+                    for element in arguments {
+                        argumentsArray.append(String(element))
+                    }
+                }
+            }
+            for argument in argumentsArray {
+                if let decimal = Decimal(string: argument) {
+                    if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0), let int = Int32(argument) {
+                        arguments.append(int)
+                    } else if let float = Float32(argument) {
+                        arguments.append(float)
+                    }
+                } else {
+                    switch argument {
+                    case "true":
+                        arguments.append(true)
+                    case "false":
+                        arguments.append(false)
+                    case "nil":
+                        arguments.append(OSCArgument.nil)
+                    case "impulse":
+                        arguments.append(OSCArgument.impulse)
+                    default:
+                        // If the argument is prefaced with quotation marks,
+                        // the regex dictates the argument should close with them.
+                        // Remove the quotation marks.
+                        if argument.first == "\"" {
+                            var quoationMarkArgument = argument
+                            quoationMarkArgument.removeFirst()
+                            quoationMarkArgument.removeLast()
+                            arguments.append(quoationMarkArgument)
+                        } else {
+                            arguments.append(argument)
+                        }
+                    }
+                }
+            }
+            return try? OSCMessage(with: String(address), arguments: arguments)
+        } catch {
+            return nil
+        }
+    }
+    
+    /// Returns an annotation of the given `OSCMessage`.
+    /// - Parameters:
+    ///   - message: an `OSCMessage` to be annotated.
+    ///   - style: The `OSCAnnotationStyle` the annotation should take.
+    ///   - type: Whether the annotation should include type tag flags in the annotation or not.
+    /// - Returns: An OSC annotation.
     public static func annotation(for message: OSCMessage, style: OSCAnnotationStyle = .spaces, type: Bool = true) -> String {
         var string = message.addressPattern.fullPath
         if message.arguments.isEmpty == false {
@@ -202,14 +232,6 @@ public struct OSCAnnotation {
             }
         }
         return string
-    }
-
-    private func isNumeric(character: Character) -> Bool {
-        return Double("\(character)") != nil
-    }
-
-    private func isNumeric(string: String) -> Bool {
-        return Double(string) != nil
     }
 
 }
