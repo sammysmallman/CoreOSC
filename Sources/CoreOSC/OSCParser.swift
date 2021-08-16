@@ -130,7 +130,7 @@ public struct OSCParser {
                 let elements = try parseOSCBundleElements(with: 0,
                                                           data: bundleData,
                                                           size: size)
-                return OSCBundle(with: elements,
+                return OSCBundle(elements: elements,
                                  timeTag: timeTag)
             } else {
                 return OSCBundle(timeTag: timeTag)
@@ -169,7 +169,7 @@ public struct OSCParser {
                     let bundleElements = try parseOSCBundleElements(with: index,
                                                                     data: bundleData,
                                                                     size: Int32(bundleData.count))
-                    elements.append(OSCBundle(with: bundleElements,
+                    elements.append(OSCBundle(elements: bundleElements,
                                               timeTag: timeTag))
                 } else {
                     elements.append(OSCBundle(timeTag: timeTag))
