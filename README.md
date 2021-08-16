@@ -8,7 +8,7 @@ The CoreOSC package contains common infrastructural code for your apps to commun
 ## Architecture
 
 ### Addresses
-An address has a similar syntax to a URL and begins with the character "/", followed by the names of all the containers, in order, along the path from the root of the tree to the method, separated by forward slash characters, followed by the name of the method. All types of addresses found in CoreOSC are ASCII characters only, as specified in [OSC 1.0](http://opensoundcontrol.org/spec-1_0.html).
+An address has a similar syntax to a URL and begins with the character "/", followed by the names of all the containers, in order, along the path from the root of the tree to the method, separated by forward slash characters, followed by the name of the method. All types of addresses found in CoreOSC contain ASCII characters only, as specified in [OSC 1.0](http://opensoundcontrol.org/spec-1_0.html).
 
 #### OSC Address Pattern
 An address pattern is an address to a potential destination of one ore more methods hosted by an "OSC Server". A number of wildcard characters, such as "*", can be used to allow for a single address pattern to invoke multiple methods.
