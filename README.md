@@ -38,7 +38,7 @@ An `OSCMessage` is a packet formed of an `OSCAddressPattern` that directs it tow
 ```swift
 
     let addressPattern = try! OSCAddressPattern("/core/osc/*")
-    let message = OSCMessage(addressPattern,
+    let message = OSCMessage(with: addressPattern,
                              arguments: [Int32(1),
                                          Float32(3.142),
                                          "Core OSC",
@@ -51,7 +51,7 @@ An `OSCMessage` is a packet formed of an `OSCAddressPattern` that directs it tow
 ```
 #### Initialization with a raw address pattern `String`:
 ```swift
-    let message = try? OSCMessage("/core/osc/*",
+    let message = try? OSCMessage(with: "/core/osc/*",
                                   arguments: [Int32(1),
                                               Float32(3.142),
                                               "Core OSC",
@@ -67,9 +67,9 @@ Initialization of an `OSCMessage` will `throw` if the format is incorrect or inv
 ### Bundles
 An `OSCBundle` is a container for messages, but also other bundles and allows for the invokation of multiple messages atomically as well scheduling them to be invoked at some point in the future. For further information regarding the temporal semantics of bundles and their associated `OSCTimeTag`s, please see [OSC 1.0](http://opensoundcontrol.org/spec-1_0.html#timetags).
 ```swift
-    let message1 = try! OSCMessage("/core/osc/1")
-    let message2 = try! OSCMessage("/core/osc/2")
-    let message3 = try! OSCMessage("/core/osc/3")
+    let message1 = try! OSCMessage(with: "/core/osc/1")
+    let message2 = try! OSCMessage(with: "/core/osc/2")
+    let message3 = try! OSCMessage(with: "/core/osc/3")
     
     let bundle = OSCBundle([message1, message2, message3], 
                            timetag: .immediate)
@@ -119,13 +119,13 @@ For example:
     
     var addressFilter = OSCAddressFilter(methods: [method])
     
-    let message1 = try! OSCMessage("cue/1/fired")
+    let message1 = try! OSCMessage(with: "cue/1/fired")
     addressFilter.invoke(with: message1)
     
-    let message2 = try! OSCMessage("cue/2/fired")
+    let message2 = try! OSCMessage(with: "cue/2/fired")
     addressFilter.invoke(with: message2)
     
-    let message3 = try OSCMEssage("cue/3/fired")
+    let message3 = try OSCMessage(with: "cue/3/fired")
     addressFilter.invoke(with: message3)
     
     print(logs) // ["Cue 1", "Cue 2", "Cue 3"]
