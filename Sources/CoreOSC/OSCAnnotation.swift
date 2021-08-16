@@ -51,7 +51,7 @@ public struct OSCAnnotation {
         }
     }
 
-    public static func isValid(annotation: String, with style: OSCAnnotationStyle = .spaces) -> Bool {
+    public static func evaluate(_ annotation: String, with style: OSCAnnotationStyle = .spaces) -> Bool {
         return NSPredicate(format: "SELF MATCHES %@", style.regex).evaluate(with: annotation)
     }
 
@@ -119,7 +119,7 @@ public struct OSCAnnotation {
 
                     }
                 }
-                return try? OSCMessage(String(address), arguments: arguments)
+                return try? OSCMessage(with: String(address), arguments: arguments)
             } catch {
                 return nil
             }
@@ -179,7 +179,7 @@ public struct OSCAnnotation {
                     }
                 }
             }
-            return try? OSCMessage(String(address), arguments: arguments)
+            return try? OSCMessage(with: String(address), arguments: arguments)
         } catch {
             return nil
         }
