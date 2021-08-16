@@ -131,6 +131,23 @@ For example:
     print(logs) // ["Cue 1", "Cue 2", "Cue 3"]
 ```
 
+### Refracting
+An `OSCRefractingAddress` can be used to "refract" an `OSCAddressPattern` to something else. The core idea for this object is to allow an "OSC Server" to act as a router, taking an `OSCMessage` from one application and rerouting it to another with modifcations made to the address pattern. Refracting is made possible by using an "#" wildcard character suffixed by a part index number (not 0 indexed). Where a wildcard is used within the refracting address the part will be replaced by the part from the given address pattern. To be succesful at refracting the suffixed index number but be valid with regards to the given address patterns number of parts.
+```swift
+        let refractingAddress = try? OSCRefractingAddress("/core/#2/#4")
+        
+        let addressPattern = try? OSCAddressPattern("/core/osc/refracting/test")
+        
+        let refractedAddress: OSCAddressPattern = try? refractingAddress.refract(address: addressPattern)
+        
+        print(refractedAddress!.fullPath) // "/core/osc/test"
+```
+
+A `String` can be evaluated to verify whether it is a valid refracting address by using the following:
+```swift
+    let valid: Bool = OSCRefractingAddress.evaluate("/core/#2/#4")    
+```
+
 ## To Do
 - Enhance the regexes for all address objects: `OSCAddressPattern`, `OSCAddress`, `OSCRefractingAddress`, `OSCFilterAddress`.
 - Enhance the `evaluate(:String)` function for all address objects: `OSCAddressPattern`, `OSCAddress`, `OSCRefractingAddress`, `OSCFilterAddress`.
