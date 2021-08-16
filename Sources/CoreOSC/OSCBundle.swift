@@ -41,7 +41,7 @@ public struct OSCBundle: OSCPacket {
     /// - Parameters:
     ///   - elements: The elements contained by the bundle.
     ///   - timeTag: The bundles `OSCTimeTag`.
-    public init(elements: [OSCPacket] = [], timeTag: OSCTimeTag = .immediate) {
+    public init(_ elements: [OSCPacket] = [], timeTag: OSCTimeTag = .immediate) {
         self.timeTag = timeTag
         self.elements = elements
     }
