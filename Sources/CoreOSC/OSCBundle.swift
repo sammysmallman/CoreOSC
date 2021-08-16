@@ -29,10 +29,19 @@ import Foundation
 /// An OSC Bundle.
 public struct OSCBundle: OSCPacket {
 
+    /// The bundles time tag used to indicate
+    ///when it's contained elements should be invoked
     public var timeTag: OSCTimeTag
+    
+    /// The bundles elements. The contents are either `OSCMessage` or `OSCBundle`.
+    /// Note that a bundle may contain bundles.
     public var elements: [OSCPacket]
-
-    public init(with elements: [OSCPacket] = [], timeTag: OSCTimeTag = .immediate) {
+    
+    /// An OSC Bundle.
+    /// - Parameters:
+    ///   - elements: The elements contained by the bundle.
+    ///   - timeTag: The bundles `OSCTimeTag`.
+    public init(elements: [OSCPacket] = [], timeTag: OSCTimeTag = .immediate) {
         self.timeTag = timeTag
         self.elements = elements
     }

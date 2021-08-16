@@ -71,7 +71,7 @@ An `OSCBundle` is a container for messages, but also other bundles and allows fo
     let message2 = try! OSCMessage(with: "/core/osc/2")
     let message3 = try! OSCMessage(with: "/core/osc/3")
     
-    let bundle = OSCBundle([message1, message2, message3], 
+    let bundle = OSCBundle(elements: [message1, message2, message3], 
                            timetag: .immediate)
 ```
 
