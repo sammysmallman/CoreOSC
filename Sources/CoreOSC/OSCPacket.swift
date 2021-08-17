@@ -26,8 +26,10 @@
 
 import Foundation
 
+/// An OSC Packet, either an `OSCMessage` or `OSCBundle`.
 public protocol OSCPacket {
 
+    /// The OSC data representation for the packet conforming to the protocol.
     func data() -> Data
 
 }
