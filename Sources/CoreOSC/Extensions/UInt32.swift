@@ -1,6 +1,6 @@
 //
 //  UInt32.swift
-//  OSCKit
+//  CoreOSC
 //
 //  Created by Sam Smallman on 18/07/2021.
 //  Copyright © 2020 Sam Smallman. https://github.com/SammySmallman

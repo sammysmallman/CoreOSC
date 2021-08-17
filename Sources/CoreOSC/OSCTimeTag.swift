@@ -26,12 +26,16 @@
 
 import Foundation
 
+/// An OSC Time Tag.
 public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
     
+    /// The OSC data representation for the argument.
     public var oscData: Data { Data(seconds.bigEndian.data + fraction.bigEndian.data) }
 
-    public var oscTypeTag: Character { "t" }
+    /// The OSC type tag chracter for the argument.
+    public var oscTypeTag: Character { Character.oscTypeTagTimeTag }
     
+    /// The OSC annotation for the argument.
     public func oscAnnotation(withType type: Bool = true) -> String {
         "\(self.hex())\(type ? "(\(oscTypeTag))" : "")"
     }

@@ -26,10 +26,18 @@
 
 import Foundation
 
+/// An OSC Argument.
 public protocol OSCArgumentProtocol {
+    
+    /// The OSC data representation for the argument conforming to the protocol.
     var oscData: Data { get }
+    
+    /// The OSC type tag chracter for the argument conforming to the protocol.
     var oscTypeTag: Character { get }
+    
+    /// The OSC annotation for the argument conforming to the protocol.
     func oscAnnotation(withType type: Bool) -> String
+    
 }
 
 public enum OSCArgument: OSCArgumentProtocol, CustomStringConvertible {

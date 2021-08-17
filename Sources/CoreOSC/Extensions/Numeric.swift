@@ -1,8 +1,8 @@
 //
 //  Numeric.swift
-//  OSCKit
+//  CoreOSC
 //
-//  Created by Sam Smallman on 13/07/2021.
+//  Created by Sam Smallman on 18/07/2021.
 //  Copyright © 2020 Sam Smallman. https://github.com/SammySmallman
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
