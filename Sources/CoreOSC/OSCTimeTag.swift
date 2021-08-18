@@ -87,13 +87,13 @@ public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
     }
 
     public func hex() -> String {
-        let seconds = seconds.byteArray()
+        let secondsHex = seconds.byteArray()
             .map { String(format: "%02X", $0) }
             .joined()
-        let fration = fraction.byteArray()
+        let frationHex = fraction.byteArray()
             .map { String(format: "%02X", $0) }
             .joined()
-        return seconds + fration
+        return secondsHex + frationHex
     }
 
 }

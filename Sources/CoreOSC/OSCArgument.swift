@@ -143,12 +143,12 @@ extension Double: OSCArgumentProtocol {
 extension String: OSCArgumentProtocol {
 
     public var oscData: Data {
-        var data = data(using: .utf8)!
-        for _ in 1...4 - data.count % 4 {
+        var argumentData = data(using: .utf8)!
+        for _ in 1...4 - argumentData.count % 4 {
             var null = UInt8(0)
-            data.append(&null, count: 1)
+            argumentData.append(&null, count: 1)
         }
-        return data
+        return argumentData
     }
 
     public var oscTypeTag: Character { .oscTypeTagString }
@@ -167,14 +167,14 @@ extension Data: OSCArgumentProtocol {
 
     public var oscData: Data {
         let length = UInt32(count)
-        var data = Data()
-        data.append(length.bigEndian.data)
-        data.append(self)
-        while data.count % 4 != 0 {
+        var argumentData = Data()
+        argumentData.append(length.bigEndian.data)
+        argumentData.append(self)
+        while argumentData.count % 4 != 0 {
             var null = UInt8(0)
-            data.append(&null, count: 1)
+            argumentData.append(&null, count: 1)
         }
-        return data
+        return argumentData
     }
 
     public var oscTypeTag: Character { .oscTypeTagBlob }
