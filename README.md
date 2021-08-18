@@ -3,7 +3,7 @@
 </p>
 
 
-# CoreOSC ![Build & Test](https://github.com/sammysmallman/CoreOSC/actions/workflows/swift.yml/badge.svg)
+# CoreOSC [![Build & Test](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml)
 The CoreOSC package contains common infrastructural code for your apps to communicate among computers, sound synthesizers, and other multimedia devices via [OSC](http://opensoundcontrol.org/README.html).
 
 ## Architecture
