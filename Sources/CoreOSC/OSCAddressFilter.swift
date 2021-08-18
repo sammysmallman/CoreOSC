@@ -65,9 +65,9 @@ public struct OSCAddressFilter {
     /// When a full match has been found the method will be invoked with the given message.
     /// - Returns: A boolean value indicating whether any methods were invoked.
     public func invoke(with message: OSCMessage, userInfo: [AnyHashable : Any]? = nil) -> Bool {
-        let methods = methods(matching: message.addressPattern, priority: priority)
-        guard !methods.isEmpty else { return false }
-        methods.forEach { $0.invoke(message, userInfo) }
+        let filterMethods = methods(matching: message.addressPattern, priority: priority)
+        guard !filterMethods.isEmpty else { return false }
+        filterMethods.forEach { $0.invoke(message, userInfo) }
         return true
     }
     
