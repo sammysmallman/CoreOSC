@@ -3,7 +3,9 @@
 </p>
 
 
-# CoreOSC [![Build & Test](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml)
+# CoreOSC 
+[![Build & Test](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml) [![License: MIT](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/sammysmallman/CoreOSC/blob/main/LICENSE.md)
+
 The CoreOSC package contains common infrastructural code for your apps to communicate among computers, sound synthesizers, and other multimedia devices via [OSC](http://opensoundcontrol.org/README.html).
 
 ## Architecture
