@@ -123,7 +123,7 @@ to use the valid "=" character in your `OSCAddressPattern`s.
 
 A `String` can be evaluated to verify whether it is a valid annotation by using the following:
 ```swift
-    let annotation = "/core/osc 1 3.142 \"A string with spaced\" aString true false nil impulse"
+    let annotation = "/core/osc 1 3.142 \"A string with spaces\" aString true false nil impulse"
     let valid: Bool = OSCAnnotation.evaluate(annotation, style: .spaces)    
 ```
 
