@@ -103,7 +103,6 @@ public struct OSCAddressFilter {
             let sorted = matchedAddresses
                 .sorted { $0.strings > $1.strings }
                 .map { $0.method }
-            print(sorted.map { $0.filterAddress.fullPath })
             return sorted
         case .wildcard:
             let sorted = matchedAddresses
