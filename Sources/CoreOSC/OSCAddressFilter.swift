@@ -46,6 +46,9 @@ public struct OSCAddressFilter {
     
     /// The priority for which OSC Filter Methods are invoked first.
     public var priority: FilterPriority = .none
+    
+    /// A boolean value indicating whether only the first method matched should be invoked.
+    public var invokeFirstOnly: Bool = false
 
     /// A `Set` of OSC Methods to be invoked by a client.
     public var methods: Set<OSCFilterMethod> = []
@@ -67,7 +70,11 @@ public struct OSCAddressFilter {
     public func invoke(with message: OSCMessage, userInfo: [AnyHashable : Any]? = nil) -> Bool {
         let filterMethods = methods(matching: message.addressPattern, priority: priority)
         guard !filterMethods.isEmpty else { return false }
-        filterMethods.forEach { $0.invoke(message, userInfo) }
+        if invokeFirstOnly {
+            filterMethods.first?.invoke(message, userInfo)
+        } else {
+            filterMethods.forEach { $0.invoke(message, userInfo) }
+        }
         return true
     }
     
