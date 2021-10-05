@@ -147,14 +147,14 @@ An OSC annotation can be initialized from an `OSCMessage`.
                                               OSCArgument.impulse])
     // Without argument type tags.
     let annotation1 = OSCAnnotation.annotation(for: message,
-                                               style: .equalsComma,
+                                               style: .spaces,
                                                type: false)
                                                
     print(annotation1) // "/core/osc 1 3.142 "Core OSC" true false nil impulse"
     
     // With argument type tags.
     let annotation2 = OSCAnnotation.annotation(for: message,
-                                               style: .equalsComma,
+                                               style: .spaces,
                                                type: true)
                                                
     print(annotation2) // "/core/osc 1(i) 3.142(f) "Core OSC"(s) true(T) false(F) nil(N) impulse(I)"
