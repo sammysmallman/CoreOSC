@@ -194,7 +194,7 @@ For example:
 ---
 
 ### Refracting
-An `OSCRefractingAddress` can be used to "refract" an `OSCAddressPattern` to something else. The core idea for this object is to allow an "OSC Server" to act as a router, taking an `OSCMessage` from one application and routing it to another with modifcations made to the address pattern. Refracting is made possible by using an "#" wildcard character suffixed by a part index number (not 0 indexed). Where a wildcard is used within the refracting address the part will be replaced by the part from the given address pattern. To be succesful at refracting the suffixed index number but be valid with regards to the given address patterns number of parts.
+An `OSCRefractingAddress` can be used to "refract" an `OSCAddressPattern` to something else. The core idea for this object is to allow an "OSC Server" to act as a router, taking an `OSCMessage` from one application and routing it to another with modifcations made to the address pattern. Refracting is made possible by using an "#" wildcard character suffixed by a part index number (not 0 indexed). Where a wildcard is used within the refracting address the part will be replaced by the part from the given address pattern. To be succesful at refracting the suffixed index number must be valid with regards to the given address patterns number of parts.
 ```swift
         let refractingAddress = try? OSCRefractingAddress("/core/#2/#4")
         
