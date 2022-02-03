@@ -12,7 +12,10 @@ let package = Package(
     targets: [
         .target(
             name: "CoreOSC",
-            dependencies: []),
+            dependencies: [],
+            resources: [
+                .process("LICENSE.md")
+            ]),
         .testTarget(
             name: "CoreOSCTests",
             dependencies: ["CoreOSC"])

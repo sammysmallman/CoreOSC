@@ -4,9 +4,12 @@
 
 
 # CoreOSC 
-[![Build & Test](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml) [![License: MIT](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/sammysmallman/CoreOSC/blob/main/LICENSE.md)
+[![Build & Test](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml) [![License: MIT](http://img.shields.io/badge/license-gplv3-lightgrey.svg?style=flat)](https://github.com/sammysmallman/CoreOSC/blob/main/LICENSE.md)
 
 The CoreOSC package contains common infrastructural code for your apps to communicate among computers, sound synthesizers, and other multimedia devices via [OSC](http://opensoundcontrol.org/README.html).
+
+## License
+CoreOSC is licensed under the GNU Affero General Public License, version 3. If you require a commercial license for an application that you would not like to trigger AGPLv3 obligations (e.g. open sourcing your application), please get in touch.
 
 ## Architecture
 

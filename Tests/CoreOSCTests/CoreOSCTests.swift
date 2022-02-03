@@ -1,8 +1,8 @@
 //
-//  OSCPacket.swift
-//  CoreOSC
+//  CoreOSCTests.swift
+//  CoreOSCTests
 //
-//  Created by Sam Smallman on 22/07/2021.
+//  Created by Sam Smallman on 03/02/2021.
 //  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
@@ -23,10 +23,24 @@
 
 import Foundation
 
-/// An OSC Packet, either an `OSCMessage` or `OSCBundle`.
-public protocol OSCPacket {
+import XCTest
+@testable import CoreOSC
 
-    /// The OSC data representation for the packet conforming to the protocol.
-    func data() -> Data
+class CoreOSCTests: XCTestCase {
 
+    static var allTests = [
+        ("testVersion", testVersion),
+        ("testLicense", testLicense),
+    ]
+
+    func testVersion() {
+        XCTAssertEqual(CoreOSC.version, "1.1.0")
+    }
+    
+    func testLicense() {
+        let license = CoreOSC.license
+        XCTAssertTrue(license.hasPrefix("Copyright © 2022 Sam Smallman. https://github.com/SammySmallman"))
+        XCTAssertTrue(license.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\n"))
+    }
+    
 }

@@ -1,8 +1,8 @@
 //
-//  OSCPacket.swift
+//  CoreOSC.swift
 //  CoreOSC
 //
-//  Created by Sam Smallman on 22/07/2021.
+//  Created by Sam Smallman on 03/02/2022.
 //  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
@@ -23,10 +23,16 @@
 
 import Foundation
 
-/// An OSC Packet, either an `OSCMessage` or `OSCBundle`.
-public protocol OSCPacket {
-
-    /// The OSC data representation for the packet conforming to the protocol.
-    func data() -> Data
+public enum CoreOSC {
+    
+    /// This package's semantic version number, mirrored also in git history as a `git tag`.
+    public static let version: String = "1.1.0"
+    
+    /// The license agreement this repository is licensed under.
+    public static let license: String = {
+        let url = Bundle.module.url(forResource: "LICENSE", withExtension: "md")
+        let data = try! Data(contentsOf: url!)
+        return String(decoding: data, as: UTF8.self)
+    }()
 
 }
