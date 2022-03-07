@@ -22,6 +22,7 @@
 //
 
 import Foundation
+import CoreGraphics
 
 /// An OSC Argument.
 public protocol OSCArgumentProtocol {
@@ -135,6 +136,28 @@ extension Double: OSCArgumentProtocol {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
     }
 
+}
+
+extension CGFloat: OSCArgumentProtocol {
+    
+    public var oscData: Data {
+        let floatFromCGFloat = Float32(truncating: NSNumber(value: self))
+        var float: CFSwappedFloat32 = CFConvertFloatHostToSwapped(floatFromCGFloat)
+        let size: Int = MemoryLayout<CFSwappedFloat32>.size
+        let result: [UInt8] = withUnsafePointer(to: &float) {
+            $0.withMemoryRebound(to: UInt8.self, capacity: size) {
+                Array(UnsafeBufferPointer(start: $0, count: size))
+            }
+        }
+        return Data(result)
+    }
+    
+    public var oscTypeTag: Character { .oscTypeTagFloat }
+    
+    public func oscAnnotation(withType type: Bool = true) -> String {
+        "\(self)\(type ? "(\(oscTypeTag))" : "")"
+    }
+    
 }
 
 extension String: OSCArgumentProtocol {
