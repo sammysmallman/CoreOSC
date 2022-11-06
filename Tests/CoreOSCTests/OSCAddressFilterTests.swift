@@ -26,12 +26,6 @@ import XCTest
 
 class OSCAddressFilterTests: XCTestCase {
 
-    static var allTests = [
-        ("testInvokingOSCAddressFilter", testInvokingOSCAddressFilter),
-        ("testInvokingOSCAddressFilterStringPriority", testInvokingOSCAddressFilterStringPriority),
-        ("testInvokingOSCAddressFilterWildcardPriority", testInvokingOSCAddressFilterWildcardPriority)
-    ]
-
     func testInvokingOSCAddressFilter() {
         let address1 = try! OSCFilterAddress("/core/osc/#")
         var value: Int = 0

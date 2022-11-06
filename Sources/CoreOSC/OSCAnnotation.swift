@@ -156,46 +156,46 @@ public struct OSCAnnotation {
                 return nil
             }
             let components = argumentString.components(separatedBy: "\"")
-            var argumentsArray: [String] = []
+            var argumentsArray: [(string: String, quoted: Bool)] = []
             for (index, component) in components.enumerated() {
                 if index % 2 != 0 {
-                    argumentsArray.append(component)
+                    argumentsArray.append((component, true))
                 } else {
                     let arguments = component.split(separator: " ",
                                                     omittingEmptySubsequences: true)
                     for element in arguments {
-                        argumentsArray.append(String(element))
+                        argumentsArray.append((String(element), false))
                     }
                 }
             }
             for argument in argumentsArray {
-                if let decimal = Decimal(string: argument) {
-                    if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0), let int = Int32(argument) {
+                if argument.quoted == false, let decimal = Decimal(string: argument.string) {
+                    if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0), let int = Int32(argument.string) {
                         arguments.append(int)
-                    } else if let float = Float32(argument) {
+                    } else if let float = Float32(argument.string) {
                         arguments.append(float)
                     }
                 } else {
-                    switch argument {
+                    switch argument.string {
                     case "true":
-                        arguments.append(true)
+                        argument.quoted ? arguments.append("true") : arguments.append(true)
                     case "false":
-                        arguments.append(false)
+                        argument.quoted ? arguments.append("false") : arguments.append(false)
                     case "nil":
-                        arguments.append(OSCArgument.nil)
+                        argument.quoted ? arguments.append("nil") : arguments.append(OSCArgument.nil)
                     case "impulse":
-                        arguments.append(OSCArgument.impulse)
+                        argument.quoted ? arguments.append("impulse") : arguments.append(OSCArgument.impulse)
                     default:
                         // If the argument is prefaced with quotation marks,
                         // the regex dictates the argument should close with them.
                         // Remove the quotation marks.
-                        if argument.first == "\"" {
-                            var quoationMarkArgument = argument
+                        if argument.string.first == "\"" {
+                            var quoationMarkArgument = argument.string
                             quoationMarkArgument.removeFirst()
                             quoationMarkArgument.removeLast()
                             arguments.append(quoationMarkArgument)
                         } else {
-                            arguments.append(argument)
+                            arguments.append(argument.string)
                         }
                     }
                 }

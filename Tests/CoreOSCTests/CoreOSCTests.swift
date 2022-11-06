@@ -28,11 +28,6 @@ import XCTest
 
 class CoreOSCTests: XCTestCase {
 
-    static var allTests = [
-        ("testVersion", testVersion),
-        ("testLicense", testLicense),
-    ]
-
     func testVersion() {
         XCTAssertEqual(CoreOSC.version, "1.1.0")
     }

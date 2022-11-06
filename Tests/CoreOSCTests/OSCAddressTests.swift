@@ -26,14 +26,6 @@ import XCTest
 
 class OSCAddressTests: XCTestCase {
 
-    static var allTests = [
-        ("testInitializingOSCAddressPatternSucceeds", testInitializingOSCAddressPatternSucceeds),
-        ("testInitializingOSCAddressPatternFails", testInitializingOSCAddressPatternFails),
-        ("testParts", testParts),
-        ("testMethodName", testMethodName),
-        ("testEvaluate", testEvaluate)
-    ]
-
     func testInitializingOSCAddressPatternSucceeds() {
         XCTAssertNoThrow(try OSCAddress("/core/osc"))
     }

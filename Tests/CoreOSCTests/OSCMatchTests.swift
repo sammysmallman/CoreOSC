@@ -25,42 +25,6 @@ import XCTest
 @testable import CoreOSC
 
 final class OSCMatchTests: XCTestCase {
-
-    static var allTests = [
-        ("testStandardFullMatch", testStandardFullMatch),
-        ("testStandardPartialAddressMatch", testStandardPartialAddressMatch),
-        ("testStandardPartialPatternMatch", testStandardPartialPatternMatch),
-        ("testStandardUnmatched", testStandardUnmatched),
-        ("testAsteriskFullMatch", testAsteriskFullMatch),
-        ("testAsteriskPartialAddressMatch", testAsteriskPartialAddressMatch),
-        ("testAsteriskPartialPatternMatch", testAsteriskPartialPatternMatch),
-        ("testAsteriskUnmatched", testAsteriskUnmatched),
-        ("testQuestionMarkFullMatch", testQuestionMarkFullMatch),
-        ("testQuestionMarkPartialAddressMatch", testQuestionMarkPartialAddressMatch),
-        ("testQuestionMarkPartialPatternMatch", testQuestionMarkPartialPatternMatch),
-        ("testQuestionMarkUnmatched",testQuestionMarkUnmatched),
-        ("testSquareBracketsFullMatch", testSquareBracketsFullMatch),
-        ("testNotSquareBracketsFullMatch", testNotSquareBracketsFullMatch),
-        ("testSquareBracketsRangeFullMatch", testSquareBracketsRangeFullMatch),
-        ("testNotSquareBracketsRangeFullMatch", testNotSquareBracketsRangeFullMatch),
-        ("testSquareBracketsPartialAddressMatch", testSquareBracketsPartialAddressMatch),
-        ("testNotSquareBracketsPartialAddressMatch", testNotSquareBracketsPartialAddressMatch),
-        ("testSquareBracketsRangePartialAddressMatch", testSquareBracketsRangePartialAddressMatch),
-        ("testNotSquareBracketsRangePartialAddressMatch", testNotSquareBracketsRangePartialAddressMatch),
-        ("testSquareBracketsPartialPatternMatch", testSquareBracketsPartialPatternMatch),
-        ("testNotSquareBracketsPartialPatternMatch", testNotSquareBracketsPartialPatternMatch),
-        ("testSquareBracketsRangePartialPatternMatch", testSquareBracketsRangePartialPatternMatch),
-        ("testNotSquareBracketsRangePartialPatternMatch", testNotSquareBracketsRangePartialPatternMatch),
-        ("testSquareBracketsUnmatched", testSquareBracketsUnmatched),
-        ("testNotSquareBracketsUnmatched", testNotSquareBracketsUnmatched),
-        ("testSquareBracketsRangeUnmatched", testSquareBracketsRangeUnmatched),
-        ("testNotSquareBracketsRangeUnmatched", testNotSquareBracketsRangeUnmatched),
-        ("testCurlyBracesFullMatch", testCurlyBracesFullMatch),
-        ("testCurlyBracesPartialAddressMatch", testCurlyBracesPartialAddressMatch),
-        ("testCurlyBracesPartialPatternMatch", testCurlyBracesPartialPatternMatch),
-        ("testCurlyBraceUnmatched", testCurlyBraceUnmatched),
-        ("testAllWildcardsFullMatch", testAllWildcardsFullMatch)
-    ]
     
     // MARK: - Standard OSC Address Pattern Tests
     

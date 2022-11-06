@@ -26,14 +26,6 @@ import XCTest
 
 class OSCFilterAddressTests: XCTestCase {
 
-    static var allTests = [
-        ("testInitializingOSCFilterAddressSucceeds", testInitializingOSCFilterAddressSucceeds),
-        ("testInitializingOSCFilterAddressFails", testInitializingOSCFilterAddressFails),
-        ("testParts", testParts),
-        ("testMethodName", testMethodName),
-        ("testEvaluate", testEvaluate)
-    ]
-
     func testInitializingOSCFilterAddressSucceeds() {
         XCTAssertNoThrow(try OSCFilterAddress("/core/#/osc"))
         XCTAssertNoThrow(try OSCFilterAddress("/#"))
