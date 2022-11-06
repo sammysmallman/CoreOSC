@@ -26,13 +26,6 @@ import XCTest
 
 class OSCMethodTests: XCTestCase {
 
-    static var allTests = [
-        ("testInternalInvokingOSCMethod", testInternalInvokingOSCMethod),
-        ("testInternalInvokingOSCMethodSucceeds", testInternalInvokingOSCMethodSucceeds),
-        ("testInternalInvokingOSCMethodFails", testInternalInvokingOSCMethodFails),
-        ("testInternalInvokingOSCMethodWithUserInfo", testInternalInvokingOSCMethodWithUserInfo)
-    ]
-
     func testInternalInvokingOSCMethod() {
         let addressString = "/core/osc"
         let address = try! OSCAddress(addressString)

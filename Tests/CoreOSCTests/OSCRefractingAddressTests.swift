@@ -26,15 +26,6 @@ import XCTest
 
 class OSCRefractingAddressTests: XCTestCase {
 
-    static var allTests = [
-        ("testInitializingOSCRefractingAddressSucceeds", testInitializingOSCRefractingAddressSucceeds),
-        ("testInitializingOSCRefractingAddressFails", testInitializingOSCRefractingAddressFails),
-        ("testParts", testParts),
-        ("testMethodName", testMethodName),
-        ("testRefracting", testRefracting),
-        ("testEvaluate", testEvaluate)
-    ]
-
     func testInitializingOSCRefractingAddressSucceeds() {
         XCTAssertNoThrow(try OSCRefractingAddress("/core/#1/osc"))
         XCTAssertNoThrow(try OSCRefractingAddress("/#1"))

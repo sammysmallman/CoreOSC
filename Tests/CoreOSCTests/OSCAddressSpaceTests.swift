@@ -26,10 +26,6 @@ import XCTest
 
 class OSCAddressSpaceTests: XCTestCase {
 
-    static var allTests = [
-        ("testInvokingOSCAddressSpace", testInvokingOSCAddressSpace)
-    ]
-
     func testInvokingOSCAddressSpace() {
         let address1 = try! OSCAddress("/core/osc/1")
         var value1: Bool = false

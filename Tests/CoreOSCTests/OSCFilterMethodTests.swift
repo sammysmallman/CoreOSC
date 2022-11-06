@@ -26,12 +26,6 @@ import XCTest
 
 class OSCFilterMethodTests: XCTestCase {
 
-    static var allTests = [
-        ("testInternalInvokingOSCFilterMethod", testInternalInvokingOSCFilterMethod),
-        ("testInternalInvokingOSCFilterMethodSucceeds", testInternalInvokingOSCFilterMethodSucceeds),
-        ("testInternalInvokingOSCMethodWithUserInfo", testInternalInvokingOSCMethodWithUserInfo)
-    ]
-
     func testInternalInvokingOSCFilterMethod() {
         let addressString = "/core/osc"
         let address = try! OSCFilterAddress(addressString)

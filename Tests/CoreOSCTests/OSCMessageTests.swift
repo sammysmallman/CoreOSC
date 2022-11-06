@@ -26,29 +26,6 @@ import XCTest
 
 class OSCMessageTests: XCTestCase {
 
-    static var allTests = [
-        ("testInitializingRawOSCMessageSucceeds",
-         testInitializingRawOSCMessageSucceeds),
-        ("testInitializingOSCMessageWithStringSucceeds",
-         testInitializingOSCMessageWithStringSucceeds),
-        ("testInitializingOSCMessageWithStringFails",
-         testInitializingOSCMessageWithStringFails),
-        ("testInitializingOSCMessageWithOSCAddressPatternSucceeds",
-         testInitializingOSCMessageWithOSCAddressPatternSucceeds),
-        ("testReaddressWithStringSucceeds",
-         testReaddressWithStringSucceeds),
-        ("testReaddressWithStringFails",
-         testReaddressWithStringFails),
-        ("testReaddressWithOSCAddressPatternSucceeds",
-         testReaddressWithOSCAddressPatternSucceeds),
-        ("testMessageDataAndParsing",
-         testMessageDataAndParsing),
-        ("testPatternMatchingSucceeds",
-         testPatternMatchingSucceeds),
-        ("testPatternMatchingFails",
-         testPatternMatchingFails)
-    ]
-
     func testInitializingRawOSCMessageSucceeds() {
         let message = OSCMessage(raw: "/core/osc", arguments: [Int32(1),
                                                                Float32(3.142),
