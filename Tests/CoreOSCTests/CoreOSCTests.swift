@@ -29,7 +29,7 @@ import XCTest
 class CoreOSCTests: XCTestCase {
 
     func testVersion() {
-        XCTAssertEqual(CoreOSC.version, "1.1.0")
+        XCTAssertEqual(CoreOSC.version, "1.2.0")
     }
     
     func testLicense() {
