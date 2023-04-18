@@ -4,7 +4,7 @@
 
 
 # CoreOSC 
-[![Build & Test](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml) [![License: MIT](http://img.shields.io/badge/license-gplv3-lightgrey.svg?style=flat)](https://github.com/sammysmallman/CoreOSC/blob/main/LICENSE.md)
+[![Build & Test](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/sammysmallman/CoreOSC/actions/workflows/build.yml) [![License: GPLv3](http://img.shields.io/badge/license-gplv3-lightgrey.svg?style=flat)](https://github.com/sammysmallman/CoreOSC/blob/main/LICENSE.md)
 
 The CoreOSC package contains common infrastructural code for your apps to communicate among computers, sound synthesizers, and other multimedia devices via [OSC](http://opensoundcontrol.org/README.html).
 
@@ -78,7 +78,7 @@ Initialization of an `OSCMessage` will `throw` if the format is incorrect or inv
 ---
 
 ### Bundles
-An `OSCBundle` is a container for messages, but also other bundles and allows for the invokation of multiple messages atomically as well scheduling them to be invoked at some point in the future. For further information regarding the temporal semantics of bundles and their associated `OSCTimeTag`s, please see [OSC 1.0](http://opensoundcontrol.org/spec-1_0.html#timetags).
+An `OSCBundle` is a container for messages, but also other bundles and allows for the invokation of multiple messages atomically as well as scheduling them to be invoked at some point in the future. For further information regarding the temporal semantics of bundles and their associated `OSCTimeTag`s, please see [OSC 1.0](http://opensoundcontrol.org/spec-1_0.html#timetags).
 ```swift
 let message1 = try! OSCMessage(with: "/core/osc/1")
 let message2 = try! OSCMessage(with: "/core/osc/2")

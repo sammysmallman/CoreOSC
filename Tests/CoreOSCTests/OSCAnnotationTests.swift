@@ -255,5 +255,27 @@ final class OSCAnnotationTests: XCTestCase {
         let argument12 = message?.arguments[11] as? String
         XCTAssertEqual(argument12, "impulse")
     }
+    
+    func testAnnotationToMessageSpaceStyleWithSingleDecimalStringArgument() {
+        let annotation = "/core/osc 127.0.0.1"
+        XCTAssertTrue(OSCAnnotation.evaluate(annotation, style: .spaces))
+        let message = OSCAnnotation.message(for: annotation, style: .spaces)
+        XCTAssertNotNil(message)
+        XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
+        XCTAssertEqual(message?.arguments.count, 1)
+        let argument2 = message?.arguments[0] as? String
+        XCTAssertEqual(argument2, "127.0.0.1")
+    }
+    
+    func testAnnotationToMessageEqualsCommaStyleWithSingleDecimalStringArgument() {
+        let annotation = "/core/osc=127.0.0.1"
+        XCTAssertTrue(OSCAnnotation.evaluate(annotation, style: .equalsComma))
+        let message = OSCAnnotation.message(for: annotation, style: .equalsComma)
+        XCTAssertNotNil(message)
+        XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
+        XCTAssertEqual(message?.arguments.count, 1)
+        let argument2 = message?.arguments[0] as? String
+        XCTAssertEqual(argument2, "127.0.0.1")
+    }
 
 }

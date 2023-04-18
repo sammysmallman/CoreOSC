@@ -28,9 +28,9 @@ public struct OSCAnnotation {
 
     /// An OSC annotation style.
     public enum OSCAnnotationStyle {
-        /// Equals/Comma Seperated Arguments: /an/address/pattern=1,3.142,"A string argument with spaces",aStringArgumentWithoutSpace
+        /// Equals/Comma Seperated Arguments: /an/address/pattern=1,3.142,"A string argument with spaces",aStringArgumentWithoutSpaces
         case equalsComma
-        /// Spaces Seperated Arguments: /an/address/pattern 1 3.142 "A string argument with spaces" aStringArgumentWithoutSpace
+        /// Spaces Seperated Arguments: /an/address/pattern 1 3.142 "A string argument with spaces" aStringArgumentWithoutSpaces
         case spaces
 
         /// The regular expression for the `OSCAnnotationStyle`.
@@ -99,12 +99,14 @@ public struct OSCAnnotation {
                 }
                 let argumentComponents = argumentString.components(separatedBy: ",")
                 for argument in argumentComponents {
-                    if let decimal = Decimal(string: argument) {
+                    if let decimal = Decimal(string: argument, locale: Locale(identifier: "en_US")) {
                         if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0),
                            let int = Int32(argument) {
                             arguments.append(int)
                         } else if let float = Float32(argument) {
                             arguments.append(float)
+                        } else {
+                            arguments.append(argument)
                         }
                     } else {
                         switch argument {
@@ -161,19 +163,24 @@ public struct OSCAnnotation {
                 if index % 2 != 0 {
                     argumentsArray.append((component, true))
                 } else {
-                    let arguments = component.split(separator: " ",
-                                                    omittingEmptySubsequences: true)
+                    let arguments = component.split(
+                        separator: " ",
+                        omittingEmptySubsequences: true
+                    )
                     for element in arguments {
                         argumentsArray.append((String(element), false))
                     }
                 }
             }
             for argument in argumentsArray {
-                if argument.quoted == false, let decimal = Decimal(string: argument.string) {
+                if argument.quoted == false,
+                   let decimal = Decimal(string: argument.string, locale: Locale(identifier: "en_US")) {
                     if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0), let int = Int32(argument.string) {
                         arguments.append(int)
                     } else if let float = Float32(argument.string) {
                         arguments.append(float)
+                    } else {
+                        arguments.append(argument.string)
                     }
                 } else {
                     switch argument.string {

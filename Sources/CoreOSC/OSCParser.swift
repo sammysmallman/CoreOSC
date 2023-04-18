@@ -24,9 +24,7 @@
 import Foundation
 
 /// An OSC Parser able to parse and create `OSCPacket`s from `Data`.
-public struct OSCParser {
-
-    private init() {}
+public enum OSCParser {
     
     /// Returns an `OSCPacket` from `Data`.
     /// - Parameter data: The `Data` to process.
