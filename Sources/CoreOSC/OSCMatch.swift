@@ -24,9 +24,7 @@
 import Foundation
 
 /// A helper object for OSC Address Pattern and OSC Address matching operations.
-public struct OSCMatch {
-    
-    private init() {}
+public enum OSCMatch {
     
     /// Match an OSC Address Pattern against an OSC Address.
     /// - Parameters:
