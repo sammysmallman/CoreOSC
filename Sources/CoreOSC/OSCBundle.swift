@@ -66,4 +66,18 @@ public struct OSCBundle: OSCPacket {
         return result
     }
 
+    /// Flatten the elements contained by the bundle, ignoring all `OSCTimeTag`'s.
+    /// - Returns: An array of `OSCMessage`'s.
+    public func flatten() -> [OSCMessage] {
+        elements.reduce([OSCMessage]()) {
+            if let message = $1 as? OSCMessage {
+                return $0 + [message]
+            } else if let bundle = $1 as? OSCBundle {
+                return $0 + bundle.flatten()
+            } else {
+                return $0
+            }
+        }
+    }
+
 }
