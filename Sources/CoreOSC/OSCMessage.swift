@@ -24,8 +24,14 @@
 import Foundation
 
 /// An OSC Message.
-public struct OSCMessage: OSCPacket {
-    
+public struct OSCMessage: OSCPacket, Equatable {
+
+    public static func == (lhs: OSCMessage, rhs: OSCMessage) -> Bool {
+        lhs.addressPattern == rhs.addressPattern &&
+        lhs.typeTagString == rhs.typeTagString &&
+        lhs.arguments.map { $0.oscData } == rhs.arguments.map { $0.oscData }
+    }
+
     /// The OSC Address Pattern associated with the message that represents the full path to one
     /// or more OSC Methods through pattern matching.
     public private(set) var addressPattern: OSCAddressPattern
