@@ -230,13 +230,11 @@ public enum OSCParser {
         return elements
     }
 
-    /// An object that represents an array of either valid or invalid characters.
-    ///
-    /// This object is used when parsing the OSC Address Pattern and Type Tag String from an OSC Message.
+    /// ASCII Characters that are either valid or invalid when parsing an OSC string.
     enum OSCCharacters {
-        /// An array of either valid characters.
+        /// A collection of valid ASCII characters.
         case valid(bytes: Set<UInt8>)
-        /// An array of either invalid characters.
+        /// A collection of invalid ASCII characters.
         case invalid(bytes: Set<UInt8>)
     }
 
