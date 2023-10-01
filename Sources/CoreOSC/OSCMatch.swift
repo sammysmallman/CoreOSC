@@ -78,8 +78,8 @@ public enum OSCMatch {
                                             addressCharacterOffset: &addressCharacterOffset)
                 if match == false {
                     if patternCharacterOffset != addressPattern.endIndex &&
-                       addressPattern.index(after: patternCharacterOffset) == addressPattern.endIndex &&
-                       addressPattern[patternCharacterOffset] == "]" {
+                        addressPattern.index(after: patternCharacterOffset) == addressPattern.endIndex &&
+                        addressPattern[patternCharacterOffset] == "]" {
                         return OSCPatternMatch(match: .unmatched,
                                                patternCharactersMatched: addressPattern.distance(from: addressPattern.startIndex,
                                                                                                  to: addressPattern.endIndex),
@@ -118,7 +118,6 @@ public enum OSCMatch {
                                    patternCharactersMatched: 0,
                                    addressCharactersMatched: 0)
         }
-        
         return OSCPatternMatch(match: matching,
                                patternCharactersMatched:
                                 addressPattern.distance(from: addressPattern.startIndex,
@@ -224,17 +223,19 @@ public enum OSCMatch {
         while patternCharacterOffset != pattern.endIndex &&
               pattern[patternCharacterOffset] != "]" {
             if pattern[pattern.index(after: patternCharacterOffset)] == "-" {
-                if address[addressCharacterOffset].asciiValue! >= pattern[patternCharacterOffset].asciiValue! &&
-                   address[addressCharacterOffset].asciiValue! <= pattern[pattern.index(patternCharacterOffset,
-                                                                                        offsetBy: 2)].asciiValue! {
+                if address[addressCharacterOffset].asciiValue! >= pattern[patternCharacterOffset].asciiValue!,
+                   let index = pattern.index(patternCharacterOffset, offsetBy: 2, limitedBy: pattern.index(before: pattern.endIndex)),
+                   address[addressCharacterOffset].asciiValue! <= pattern[index].asciiValue! {
                     matched = val
                     while patternCharacterOffset != pattern.endIndex &&
                           pattern[patternCharacterOffset] != "]" {
                         patternCharacterOffset = pattern.index(after: patternCharacterOffset)
                     }
                     break
+                } else if let index = pattern.index(patternCharacterOffset, offsetBy: 3, limitedBy: pattern.index(before: pattern.endIndex)) {
+                    patternCharacterOffset = index
                 } else {
-                    patternCharacterOffset = pattern.index(patternCharacterOffset, offsetBy: 3)
+                    return false
                 }
             } else {
                 if pattern[patternCharacterOffset] == address[addressCharacterOffset] {
@@ -283,8 +284,12 @@ public enum OSCMatch {
                       pattern[offset] != "/" {
                     offset = pattern.index(after: offset)
                 }
-                patternCharacterOffset = offset
+                if pattern.endIndex == pattern.index(patternCharacterOffset, offsetBy: distance) || pattern[offset] != "}" {
+                    patternCharacterOffset = startIndex
+                    return false
+                }
                 addressCharacterOffset = address.index(addressCharacterOffset, offsetBy: distance - 1)
+                patternCharacterOffset = offset
                 return true
             } else {
                 offset = pattern.index(after: offset)
