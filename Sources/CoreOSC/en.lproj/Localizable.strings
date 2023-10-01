@@ -1,7 +1,7 @@
 /* OSC Address Error */
 
 /* OSC Version */
-"OSC_VERSION" = "1.3.0";
+"OSC_VERSION" = "1.3.1";
 
 /* OSC Address Error: Invalid Address */
 "OSC_ADDRESS_ERROR_INVALID_ADDRESS" = "Invalid address";
