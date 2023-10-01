@@ -24,8 +24,8 @@
 import Foundation
 
 /// An OSC Time Tag.
-public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
-    
+public struct OSCTimeTag: OSCArgumentProtocol, Equatable, Comparable {
+
     /// The OSC data representation for the argument.
     public var oscData: Data { Data(seconds.bigEndian.data + fraction.bigEndian.data) }
 
@@ -59,7 +59,7 @@ public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
 
     public init(date: Date) {
         // OSCTimeTags uses 1900 as it's marker.
-        // We need to get the seconds from 1900 not 1970 which Apple's Date Object gets.
+        // We need to get the seconds from 1900 not 1970 which Apple's Date object gets.
         // Seconds between 1900 and 1970 = 2208988800
         let secondsSince1900 = date.timeIntervalSince1970 + 2208988800
         // Bitwise AND operator to get the first 32 bits of secondsSince1900 which is cast from a double to UInt64
@@ -91,6 +91,14 @@ public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
             .map { String(format: "%02X", $0) }
             .joined()
         return secondsHex + frationHex
+    }
+
+    public static func < (lhs: OSCTimeTag, rhs: OSCTimeTag) -> Bool {
+        if lhs.seconds < rhs.seconds { return true }
+        if lhs.seconds == rhs.seconds {
+            return lhs.fraction < rhs.fraction
+        }
+        return false
     }
 
 }
