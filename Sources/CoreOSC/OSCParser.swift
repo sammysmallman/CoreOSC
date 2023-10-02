@@ -59,7 +59,7 @@ public enum OSCParser {
     private static func process(bundle data: Data) throws -> OSCPacket {
         return try parseOSCBundle(with: data)
     }
-    
+
     /// Parse `OSCMessage` data.
     /// - Parameters:
     ///   - data: The `Data` to parse.
@@ -68,12 +68,27 @@ public enum OSCParser {
     /// - Returns: An `OSCMessage`.
     private static func parseOSCMessage(with data: Data, startIndex: inout Int) throws -> OSCMessage {
         guard let addressPattern = parse(string: data,
-                                         startIndex: &startIndex) else {
+                                         startIndex: &startIndex,
+                                         characters: .invalid(bytes: [
+                                            0x20, // Space - ' '
+                                            0x23  // Hash - #
+                                         ])) else {
             throw OSCParserError.cantParseAddressPattern
         }
-
         guard var typeTagString = parse(string: data,
-                                        startIndex: &startIndex) else {
+                                        startIndex: &startIndex,
+                                        characters: .valid(bytes: [
+                                            0x2C, // Comma - ,
+                                            0x73, // s
+                                            0x69, // i
+                                            0x66, // f
+                                            0x62, // b
+                                            0x74, // t
+                                            0x54, // T
+                                            0x46, // F
+                                            0x4E, // N
+                                            0x49  // I
+                                        ])) else {
             throw OSCParserError.cantParseTypeTagString
         }
 
@@ -124,7 +139,8 @@ public enum OSCParser {
                 case .oscTypeTagImpulse:
                     arguments.append(OSCArgument.impulse)
                 default:
-                    continue
+                    // We shouldn't ever get here as we've checked the type tag string for invalid characters.
+                    throw OSCParserError.cantParseTypeTagString
                 }
             }
         }
@@ -213,28 +229,48 @@ public enum OSCParser {
         } while buffer < size
         return elements
     }
-    
+
+    /// ASCII Characters that are either valid or invalid when parsing an OSC string.
+    enum OSCCharacters {
+        /// A collection of valid ASCII characters.
+        case valid(bytes: Set<UInt8>)
+        /// A collection of invalid ASCII characters.
+        case invalid(bytes: Set<UInt8>)
+    }
+
     /// Parse OSC string data.
     /// - Parameters:
     ///   - data: The `Data` to parse.
     ///   - startIndex: The index of where to start parsing from in the `Data`.
     /// - Returns: A `String` or nil if an OSC string could not be parsed with the given data.
-    private static func parse(string data: Data, startIndex: inout Int) -> String? {
+    private static func parse(string data: Data, startIndex: inout Int, characters: OSCCharacters? = nil) -> String? {
         // Read the data from the start index until you hit a zero, the part before will be the string data.
-        for (index, byte) in data[startIndex...].enumerated() where byte == 0x0 {
-            guard let result = String(data: data[startIndex..<(startIndex + index)],
-                                      encoding: .utf8) else { return nil }
-             // An OSC String is a sequence of non-null ASCII characters followed by a null,
-             // followed by 0-3 additional null characters to make the total number
-             // of bits a multiple of 32 Bits, 4 Bytes.
-            let bytesRead = startIndex + index + 1 // Include the Null bytes we found.
-            if bytesRead.isMultiple(of: 4) {
-                startIndex = bytesRead
-            } else {
-                let number = (Double(bytesRead) / 4.0).rounded(.up)
-                startIndex = Int(4.0 * number)
+        for (index, byte) in data[startIndex...].enumerated() {
+            if byte == 0x0 {
+                guard let result = String(data: data[startIndex..<(startIndex + index)],
+                                          encoding: .utf8) else { return nil }
+                 // An OSC String is a sequence of non-null ASCII characters followed by a null,
+                 // followed by 0-3 additional null characters to make the total number
+                 // of bits a multiple of 32 Bits, 4 Bytes.
+                let bytesRead = startIndex + index + 1 // Include the Null bytes we found.
+                if bytesRead.isMultiple(of: 4) {
+                    startIndex = bytesRead
+                } else {
+                    let number = (Double(bytesRead) / 4.0).rounded(.up)
+                    startIndex = Int(4.0 * number)
+                }
+                return result
+
+            } else if let characters = characters {
+                switch characters {
+                case .valid(let bytes):
+                    // ,sifbtTFNI are the only characters valid in an OSC Type Tag string.
+                    if !bytes.contains(byte) { return nil }
+                case .invalid(let bytes):
+                    // Space and Hash characters are invalid in an OSC Address Pattern.
+                    if bytes.contains(byte) { return nil }
+                }
             }
-            return result
         }
         return nil
     }

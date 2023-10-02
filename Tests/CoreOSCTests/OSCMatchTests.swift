@@ -68,6 +68,18 @@ final class OSCMatchTests: XCTestCase {
                        OSCPatternMatch(match: .fullMatch,
                                        patternCharactersMatched: "/*/*/*".count,
                                        addressCharactersMatched: "/abc/def/hij".count))
+
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/*",
+                                      address: "/abc/def"),
+                       OSCPatternMatch(match: .fullMatch,
+                                       patternCharactersMatched: "/abc/*".count,
+                                       addressCharactersMatched: "/abc/def".count))
+
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*cd",
+                                      address: "/a/bcd"),
+                       OSCPatternMatch(match: .fullMatch,
+                                       patternCharactersMatched: "/a/*cd".count,
+                                       addressCharactersMatched: "/a/bcd".count))
     }
     
     func testAsteriskPartialAddressMatch() {
@@ -85,15 +97,23 @@ final class OSCMatchTests: XCTestCase {
                                        patternCharactersMatched: "/a/b/c".count,
                                        addressCharactersMatched: "/a/b/c".count))
     }
-    
+
     func testAsteriskUnmatched() {
         XCTAssertEqual(OSCMatch.match(addressPattern: "/*/abc",
                                       address: "/abc/def"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/*/".count,
                                        addressCharactersMatched: "/abc/".count))
+
+// TODO: Match patterns backwards if the last character before the "/" is not a "*"
+// OSCMatch.swift:156
+//        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*cd",
+//                                      address: "/a/bef"),
+//                       OSCPatternMatch(match: .unmatched,
+//                                       patternCharactersMatched: "/a/*".count,
+//                                       addressCharactersMatched: "/a/b".count))
     }
-    
+
     // MARK: - Question Mark Wildcard OSC Address Pattern Tests
     
     func testQuestionMarkFullMatch() {
@@ -257,7 +277,21 @@ final class OSCMatchTests: XCTestCase {
                                        patternCharactersMatched: "/abc/[!d-f]".count,
                                        addressCharactersMatched: "/abc/".count))
     }
-    
+
+    func testInvalidSquareBracketsNotClosed() {
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[d-",
+                                      address: "/abc/d"),
+                       OSCPatternMatch(match: .unmatched,
+                                       patternCharactersMatched: "/abc/[".count,
+                                       addressCharactersMatched: "/abc/".count))
+
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/[!d-",
+                                      address: "/abc/d"),
+                       OSCPatternMatch(match: .unmatched,
+                                       patternCharactersMatched: "/abc/[!".count,
+                                       addressCharactersMatched: "/abc/".count))
+    }
+
     // MARK: - Curly Braces Wildcard OSC Address Pattern Tests
     
     func testCurlyBracesFullMatch() {
@@ -284,14 +318,34 @@ final class OSCMatchTests: XCTestCase {
                                        addressCharactersMatched: "/abc".count))
     }
     
-    func testCurlyBraceUnmatched() {
+    func testCurlyBracesUnmatched() {
         XCTAssertEqual(OSCMatch.match(addressPattern: "/{abc,def}/{ghi,jkl}",
                                       address: "/abc/mno"),
                        OSCPatternMatch(match: .unmatched,
                                        patternCharactersMatched: "/{abc,def}/".count,
                                        addressCharactersMatched: "/abc/".count))
     }
-    
+
+    func testInvalidCurlyBracesNotClosed() {
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/{d",
+                                      address: "/abc/d"),
+                       OSCPatternMatch(match: .unmatched,
+                                       patternCharactersMatched: "/abc/".count,
+                                       addressCharactersMatched: "/abc/".count))
+
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/abc/{d/ghi",
+                                      address: "/abc/d/g"),
+                       OSCPatternMatch(match: .unmatched,
+                                       patternCharactersMatched: "/abc/".count,
+                                       addressCharactersMatched: "/abc/".count))
+
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/{a}/{d/g",
+                                      address: "/a/d/g"),
+                       OSCPatternMatch(match: .unmatched,
+                                       patternCharactersMatched: "/{a}/".count,
+                                       addressCharactersMatched: "/a/".count))
+    }
+
     // MARK: - All Wildcards OSC Address Pattern Tests
     
     func testAllWildcardsFullMatch() {

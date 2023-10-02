@@ -1,4 +1,4 @@
-Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+Copyright © 2023 Sam Smallman. https://github.com/SammySmallman
 
 This file is part of CoreOSC
 

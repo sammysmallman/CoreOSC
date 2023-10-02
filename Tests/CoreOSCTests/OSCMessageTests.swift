@@ -52,14 +52,14 @@ class OSCMessageTests: XCTestCase {
     
     func testInitializingOSCMessageWithStringSucceeds() throws {
         let message = try OSCMessage(with: "/core/osc", arguments: [Int32(1),
-                                                              Float32(3.142),
-                                                              "Core OSC",
-                                                              OSCTimeTag.immediate,
-                                                              true,
-                                                              false,
-                                                              Data([0x01, 0x01]),
-                                                              OSCArgument.nil,
-                                                              OSCArgument.impulse])
+                                                                    Float32(3.142),
+                                                                    "Core OSC",
+                                                                    OSCTimeTag.immediate,
+                                                                    true,
+                                                                    false,
+                                                                    Data([0x01, 0x01]),
+                                                                    OSCArgument.nil,
+                                                                    OSCArgument.impulse])
         XCTAssertEqual(message.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message.typeTagString, "ifstTFbNI")
         XCTAssertEqual(message.arguments.count, 9)
@@ -81,14 +81,14 @@ class OSCMessageTests: XCTestCase {
     func testInitializingOSCMessageWithOSCAddressPatternSucceeds() throws {
         let addressPattern = try OSCAddressPattern("/core/osc")
         let message = OSCMessage(with: addressPattern, arguments: [Int32(1),
-                                                             Float32(3.142),
-                                                             "Core OSC",
-                                                             OSCTimeTag.immediate,
-                                                             true,
-                                                             false,
-                                                             Data([0x01, 0x01]),
-                                                             OSCArgument.nil,
-                                                             OSCArgument.impulse])
+                                                                   Float32(3.142),
+                                                                   "Core OSC",
+                                                                   OSCTimeTag.immediate,
+                                                                   true,
+                                                                   false,
+                                                                   Data([0x01, 0x01]),
+                                                                   OSCArgument.nil,
+                                                                   OSCArgument.impulse])
         XCTAssertEqual(message.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message.typeTagString, "ifstTFbNI")
         XCTAssertEqual(message.arguments.count, 9)
@@ -149,7 +149,25 @@ class OSCMessageTests: XCTestCase {
         XCTAssertEqual(packet!.arguments[7] as! OSCArgument, message.arguments[7] as! OSCArgument)
         XCTAssertEqual(packet!.arguments[8] as! OSCArgument, message.arguments[8] as! OSCArgument)
     }
-    
+
+    func testInvalidMessageDataParsing() throws {
+        // Invalid space character
+        let message1 = OSCMessage(raw: "/core/osc/[0- 1]")
+        let data1 = message1.data()
+
+        XCTAssertThrowsError(try OSCParser.packet(from: data1) as? OSCMessage) { error in
+            XCTAssertEqual(error as! OSCParserError, OSCParserError.cantParseAddressPattern)
+        }
+
+        // Invalid hash character
+        let message2 = OSCMessage(raw: "/core/osc/#")
+        let data2 = message2.data()
+
+        XCTAssertThrowsError(try OSCParser.packet(from: data2) as? OSCMessage) { error in
+            XCTAssertEqual(error as! OSCParserError, OSCParserError.cantParseAddressPattern)
+        }
+    }
+
     func testPatternMatchingSucceeds() {
         let message = try! OSCMessage(with: "/core/osc")
         let address = try! OSCAddress("/core/osc")
@@ -167,7 +185,7 @@ class OSCMessageTests: XCTestCase {
         
         XCTAssertEqual(message.arguments.count, 1)
         let license1 = message.arguments[0] as! String
-        XCTAssertTrue(license1.hasPrefix("Copyright © 2022 Sam Smallman. https://github.com/SammySmallman"))
+        XCTAssertTrue(license1.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
         XCTAssertTrue(license1.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\n"))
         
         let parsedPacket = try OSCParser.packet(from: message.data())
@@ -175,7 +193,7 @@ class OSCMessageTests: XCTestCase {
         
         XCTAssertEqual(parsedMessage.arguments.count, 1)
         let license2 = parsedMessage.arguments[0] as! String
-        XCTAssertTrue(license2.hasPrefix("Copyright © 2022 Sam Smallman. https://github.com/SammySmallman"))
+        XCTAssertTrue(license2.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
         XCTAssertTrue(license2.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\n"))
     }
 
