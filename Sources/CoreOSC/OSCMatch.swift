@@ -140,37 +140,19 @@ public enum OSCMatch {
                                       patternCharacterOffset: inout String.Index,
                                       address: String,
                                       addressCharacterOffset: inout String.Index) -> Bool {
-        var numberOfAsterisks = 0
         if addressCharacterOffset == address.endIndex { return false }
+        // Move address index up to next "/"
         while addressCharacterOffset != address.endIndex &&
               address[addressCharacterOffset] != "/" {
             addressCharacterOffset = address.index(after: addressCharacterOffset)
         }
+        // Move pattern index up to next "/"
         while patternCharacterOffset != pattern.endIndex &&
               pattern[patternCharacterOffset] != "/" {
-            if pattern[patternCharacterOffset] == "*" {
-                numberOfAsterisks += 1
-            }
             patternCharacterOffset = pattern.index(after: patternCharacterOffset)
         }
 
-        patternCharacterOffset = pattern.index(before: patternCharacterOffset)
-        addressCharacterOffset = address.index(before: addressCharacterOffset)
-        switch numberOfAsterisks {
-        case 1:
-            var casePatternCharacterOffset: String.Index = patternCharacterOffset
-            var caseAddressCharacterOffsetStart: String.Index = addressCharacterOffset
-            while pattern[casePatternCharacterOffset] != "*" {
-                if matchCharacters(pattern: pattern,
-                                   patternCharacterOffset: &casePatternCharacterOffset,
-                                   address: address,
-                                   addressCharacterOffset: &caseAddressCharacterOffsetStart) == false {
-                    return false
-                }
-            }
-            break
-        default: return false
-        }
+        // TODO: Match patterns backwards if the last character before the "/" is not a "*"
         return true
     }
     
