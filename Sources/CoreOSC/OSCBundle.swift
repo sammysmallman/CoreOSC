@@ -24,7 +24,7 @@
 import Foundation
 
 /// An OSC Bundle.
-public struct OSCBundle: OSCPacket {
+public struct OSCBundle: OSCPacket, Equatable {
 
     /// The bundles time tag used to indicate
     ///when it's contained elements should be invoked
@@ -32,15 +32,34 @@ public struct OSCBundle: OSCPacket {
     
     /// The bundles elements. The contents are either `OSCMessage` or `OSCBundle`.
     /// Note that a bundle may contain bundles.
-    public var elements: [OSCPacket]
+    public var elements: [any OSCPacket]
     
     /// An OSC Bundle.
     /// - Parameters:
     ///   - elements: The elements contained by the bundle.
     ///   - timeTag: The bundles `OSCTimeTag`.
-    public init(_ elements: [OSCPacket] = [], timeTag: OSCTimeTag = .immediate) {
+    public init(_ elements: [any OSCPacket] = [], timeTag: OSCTimeTag = .immediate) {
         self.timeTag = timeTag
         self.elements = elements
+    }
+
+    public static func == (lhs: OSCBundle, rhs: OSCBundle) -> Bool {
+        guard lhs.timeTag == rhs.timeTag,
+              lhs.elements.count == rhs.elements.count
+        else { return false }
+        for (index, element) in lhs.elements.enumerated() {
+            if let lhsMessage = element as? OSCMessage {
+                guard let rhsMessage = rhs.elements[index] as? OSCMessage else { return false }
+                guard lhsMessage == rhsMessage else { return false }
+                continue
+            }
+            if let lhsBundle = element as? OSCBundle {
+                guard let rhsBundle = rhs.elements[index] as? OSCBundle else { return false }
+                guard lhsBundle == rhsBundle else { return false }
+                continue
+            }
+        }
+        return true
     }
 
     /// The OSC Packet data for the bundle.

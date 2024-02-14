@@ -30,7 +30,7 @@ public enum OSCParser {
     /// - Parameter data: The `Data` to process.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `OSCPacket`.
-    public static func packet(from data: Data) throws -> OSCPacket {
+    public static func packet(from data: Data) throws -> any OSCPacket {
         guard let string = String(data: data.prefix(upTo: 1), encoding: .utf8) else {
             throw OSCParserError.unrecognisedData
         }
@@ -47,7 +47,7 @@ public enum OSCParser {
     /// - Parameter data: The `Data` to process.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `OSCPacket`.
-    private static func process(message data: Data) throws -> OSCPacket {
+    private static func process(message data: Data) throws -> any OSCPacket {
         var startIndex = 0
         return try parseOSCMessage(with: data, startIndex: &startIndex)
     }
@@ -56,7 +56,7 @@ public enum OSCParser {
     /// - Parameter data: The `Data` to process.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `OSCPacket`.
-    private static func process(bundle data: Data) throws -> OSCPacket {
+    private static func process(bundle data: Data) throws -> any OSCPacket {
         return try parseOSCBundle(with: data)
     }
 
@@ -185,8 +185,8 @@ public enum OSCParser {
     ///   - size: The size of the `OSCBundle` containing the elements.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `Array` of `OSCPacket`s representing the elements the `OSCBundle` contains.
-    private static func parseBundleElements(with index: Int, data: Data, size: Int32) throws -> [OSCPacket] {
-        var elements: [OSCPacket] = []
+    private static func parseBundleElements(with index: Int, data: Data, size: Int32) throws -> [any OSCPacket] {
+        var elements: [any OSCPacket] = []
         var startIndex = 0
         var buffer: Int32 = 0
         repeat {

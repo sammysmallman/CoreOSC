@@ -46,7 +46,7 @@ public struct OSCMessage: OSCPacket, Equatable {
     /// - Parameters:
     ///   - addressPattern: The message's OSC Address Pattern.
     ///   - arguments: The message's `Array` of arguments.
-    internal init(raw addressPattern: String, arguments: [OSCArgumentProtocol] = []) {
+    public init(raw addressPattern: String, arguments: [OSCArgumentProtocol] = []) {
         let fullPath = OSCAddressPattern(raw: addressPattern)
         self.addressPattern = fullPath
         self.arguments = arguments

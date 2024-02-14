@@ -24,7 +24,7 @@
 import Foundation
 
 /// An object that represents the full path to one or more OSC Methods through pattern matching.
-public struct OSCAddressPattern: Hashable, Equatable {
+public struct OSCAddressPattern: Hashable, Equatable, Sendable {
     
     /// The full path to one or more OSC Methods.
     public let fullPath: String
