@@ -186,7 +186,7 @@ class OSCMessageTests: XCTestCase {
         XCTAssertEqual(message.arguments.count, 1)
         let license1 = message.arguments[0] as! String
         XCTAssertTrue(license1.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
-        XCTAssertTrue(license1.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\n"))
+        XCTAssertTrue(license1.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\r\n"))
         
         let parsedPacket = try OSCParser.packet(from: message.data())
         let parsedMessage = parsedPacket as! OSCMessage
@@ -194,7 +194,7 @@ class OSCMessageTests: XCTestCase {
         XCTAssertEqual(parsedMessage.arguments.count, 1)
         let license2 = parsedMessage.arguments[0] as! String
         XCTAssertTrue(license2.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
-        XCTAssertTrue(license2.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\n"))
+        XCTAssertTrue(license2.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\r\n"))
     }
 
 }
