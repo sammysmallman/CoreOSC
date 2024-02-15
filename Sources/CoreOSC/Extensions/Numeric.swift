@@ -26,11 +26,20 @@
 
 import Foundation
 
-extension Numeric {
+extension UInt32 {
 
-    internal var data: Data {
+    var data: Data {
         var source = self
-        return Data(bytes: &source, count: MemoryLayout<Self>.size)
+        return Data(bytes: &source, count: MemoryLayout<UInt32>.size)
+    }
+
+}
+
+extension Int32 {
+
+    var data: Data {
+        var source = self
+        return Data(bytes: &source, count: MemoryLayout<Int32>.size)
     }
 
 }
