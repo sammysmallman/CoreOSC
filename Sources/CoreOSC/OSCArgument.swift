@@ -25,7 +25,7 @@ import Foundation
 import CoreGraphics
 
 /// An OSC Argument.
-public protocol OSCArgumentProtocol {
+public protocol OSCArgumentProtocol: Sendable {
     
     /// The OSC data representation for the argument conforming to the protocol.
     var oscData: Data { get }

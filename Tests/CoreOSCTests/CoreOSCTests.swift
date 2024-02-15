@@ -36,7 +36,7 @@ class CoreOSCTests: XCTestCase {
     func testLicense() {
         let license = CoreOSC.license
         XCTAssertTrue(license.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
-        XCTAssertTrue(license.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\n"))
+        XCTAssertTrue(license.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\r\n"))
     }
     
 }
