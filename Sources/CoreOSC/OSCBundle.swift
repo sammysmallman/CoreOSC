@@ -24,7 +24,7 @@
 import Foundation
 
 /// An OSC Bundle.
-public struct OSCBundle: OSCPacket, Equatable {
+public struct OSCBundle: OSCPacket {
 
     /// The bundles time tag used to indicate
     ///when it's contained elements should be invoked
@@ -52,11 +52,12 @@ public struct OSCBundle: OSCPacket, Equatable {
                 guard let rhsMessage = rhs.elements[index] as? OSCMessage else { return false }
                 guard lhsMessage == rhsMessage else { return false }
                 continue
-            }
-            if let lhsBundle = element as? OSCBundle {
+            } else if let lhsBundle = element as? OSCBundle {
                 guard let rhsBundle = rhs.elements[index] as? OSCBundle else { return false }
                 guard lhsBundle == rhsBundle else { return false }
                 continue
+            } else {
+                return false
             }
         }
         return true
@@ -73,8 +74,7 @@ public struct OSCBundle: OSCPacket, Equatable {
                 result.append(size)
                 result.append(data)
                 continue
-            }
-            if let bundle = element as? OSCBundle {
+            } else if let bundle = element as? OSCBundle {
                 let data = bundle.data()
                 let size = withUnsafeBytes(of: Int32(data.count).bigEndian) { Data($0) }
                 result.append(size)

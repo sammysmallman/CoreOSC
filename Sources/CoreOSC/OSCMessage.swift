@@ -24,7 +24,7 @@
 import Foundation
 
 /// An OSC Message.
-public struct OSCMessage: OSCPacket, Equatable {
+public struct OSCMessage: OSCPacket {
 
     public static func == (lhs: OSCMessage, rhs: OSCMessage) -> Bool {
         lhs.addressPattern == rhs.addressPattern &&
@@ -42,7 +42,7 @@ public struct OSCMessage: OSCPacket, Equatable {
     /// The `Array` of arguments associated with the message.
     public let arguments: [OSCArgumentProtocol]
     
-    /// An OSC Message from a raw OSC Address Pattern.
+    /// An OSC Message from a raw, not evaluated, OSC Address Pattern.
     /// - Parameters:
     ///   - addressPattern: The message's OSC Address Pattern.
     ///   - arguments: The message's `Array` of arguments.
