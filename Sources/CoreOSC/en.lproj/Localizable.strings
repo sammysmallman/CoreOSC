@@ -1,7 +1,7 @@
-/* OSC Address Error */
-
 /* OSC Version */
-"OSC_VERSION" = "1.3.1";
+"OSC_VERSION" = "2.0.0";
+
+/* OSC Address Error */
 
 /* OSC Address Error: Invalid Address */
 "OSC_ADDRESS_ERROR_INVALID_ADDRESS" = "Invalid address";
@@ -79,3 +79,8 @@
 
 /* OSC Parser Error: Can't parse bundle element */
 "OSC_PARSER_ERROR_CANT_PARSE_ELEMENT" = "The parser could not parse a bundles element.";
+
+/* OSC Argument Error */
+
+/* OSC Argument Error: Invalid Argument */
+"OSC_ARGUMENT_ERROR_INVALID_ARGUMENT" = "Invalid argument";

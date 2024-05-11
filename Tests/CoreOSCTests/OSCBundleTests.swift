@@ -34,7 +34,7 @@ final class OSCABundleTests: XCTestCase {
                 try! OSCMessage(with: "/core/osc/3")
         ]
         let bundle = OSCBundle(
-            messages,
+            messages.map { .message($0) },
             timeTag: .immediate
         )
         XCTAssertEqual(bundle.flatten(), messages)
@@ -43,26 +43,26 @@ final class OSCABundleTests: XCTestCase {
     func testRecursiveFlatten() throws {
         let bundle = OSCBundle(
             [
-                try! OSCMessage(with: "/core/osc/1"),
-                try! OSCMessage(with: "/core/osc/2"),
-                try! OSCMessage(with: "/core/osc/3"),
-                OSCBundle(
+                .message(try! OSCMessage(with: "/core/osc/1")),
+                .message(try! OSCMessage(with: "/core/osc/2")),
+                .message(try! OSCMessage(with: "/core/osc/3")),
+                .bundle(OSCBundle(
                     [
-                        try! OSCMessage(with: "/core/osc/4"),
-                        try! OSCMessage(with: "/core/osc/5"),
-                        try! OSCMessage(with: "/core/osc/6"),
-                        OSCBundle(
+                        .message(try! OSCMessage(with: "/core/osc/4")),
+                        .message(try! OSCMessage(with: "/core/osc/5")),
+                        .message(try! OSCMessage(with: "/core/osc/6")),
+                        .bundle(OSCBundle(
                             [
-                                try! OSCMessage(with: "/core/osc/7"),
-                                try! OSCMessage(with: "/core/osc/8"),
-                                try! OSCMessage(with: "/core/osc/9"),
+                                .message(try! OSCMessage(with: "/core/osc/7")),
+                                .message(try! OSCMessage(with: "/core/osc/8")),
+                                .message(try! OSCMessage(with: "/core/osc/9")),
 
                             ],
                             timeTag: .immediate
-                        )
+                        ))
                     ],
                     timeTag: .immediate
-                )
+                ))
             ],
             timeTag: .immediate
         )

@@ -3,7 +3,7 @@
 //  CoreOSC
 //
 //  Created by Sam Smallman on 22/07/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -88,7 +88,7 @@ public struct OSCAnnotation {
             // There should only be one match. Range at index 1 will always be the address pattern.
             // If there are arguments these will be found at index 2,
             // prefaced with "=" and index 3 if there are more than one argument.
-            var arguments: [OSCArgumentProtocol] = []
+            var arguments: [OSCArgument] = []
             guard let match = matches.first, match.range == annotation.nsrange,
                   let address = annotation.substring(with: match.range(at: 1)) else { return nil }
             if var argumentString = annotation.substring(with: match.range(at: 2)) {
@@ -102,22 +102,22 @@ public struct OSCAnnotation {
                     if let decimal = Decimal(string: argument, locale: Locale(identifier: "en_US")) {
                         if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0),
                            let int = Int32(argument) {
-                            arguments.append(int)
+                            arguments.append(.int32(int))
                         } else if let float = Float32(argument) {
-                            arguments.append(float)
+                            arguments.append(.float32(float))
                         } else {
-                            arguments.append(argument)
+                            arguments.append(.string(argument))
                         }
                     } else {
                         switch argument {
                         case "true":
-                            arguments.append(true)
+                            arguments.append(.true)
                         case "false":
-                            arguments.append(false)
+                            arguments.append(.false)
                         case "nil":
-                            arguments.append(OSCArgument.nil)
+                            arguments.append(.nil)
                         case "impulse":
-                            arguments.append(OSCArgument.impulse)
+                            arguments.append(.impulse)
                         default:
                             // If the argument is prefaced with quotation marks,
                             // the regex dictates the argument should close with them.
@@ -126,9 +126,9 @@ public struct OSCAnnotation {
                                 var quoationMarkArgument = argument
                                 quoationMarkArgument.removeFirst()
                                 quoationMarkArgument.removeLast()
-                                arguments.append(quoationMarkArgument)
+                                arguments.append(.string(quoationMarkArgument))
                             } else {
-                                arguments.append(argument)
+                                arguments.append(.string(argument))
                             }
                         }
 
@@ -151,7 +151,7 @@ public struct OSCAnnotation {
                          range: annotation.nsrange)
             // There should only be one match. Range at index 1 will always be the address pattern.
             // Range at index 2 will be the argument string prefaced with " "
-            var arguments: [OSCArgumentProtocol] = []
+            var arguments: [OSCArgument] = []
             guard let match = matches.first, match.range == annotation.nsrange,
                   let address = annotation.substring(with: match.range(at: 1)),
                   let argumentString = annotation.substring(with: match.range(at: 2)) else {
@@ -176,22 +176,22 @@ public struct OSCAnnotation {
                 if argument.quoted == false,
                    let decimal = Decimal(string: argument.string, locale: Locale(identifier: "en_US")) {
                     if decimal.isZero || (decimal.isNormal && decimal.exponent >= 0), let int = Int32(argument.string) {
-                        arguments.append(int)
+                        arguments.append(.int32(int))
                     } else if let float = Float32(argument.string) {
-                        arguments.append(float)
+                        arguments.append(.float32(float))
                     } else {
-                        arguments.append(argument.string)
+                        arguments.append(.string(argument.string))
                     }
                 } else {
                     switch argument.string {
                     case "true":
-                        argument.quoted ? arguments.append("true") : arguments.append(true)
+                        argument.quoted ? arguments.append(.string("true")) : arguments.append(.true)
                     case "false":
-                        argument.quoted ? arguments.append("false") : arguments.append(false)
+                        argument.quoted ? arguments.append(.string("false")) : arguments.append(.false)
                     case "nil":
-                        argument.quoted ? arguments.append("nil") : arguments.append(OSCArgument.nil)
+                        argument.quoted ? arguments.append(.string("nil")) : arguments.append(.nil)
                     case "impulse":
-                        argument.quoted ? arguments.append("impulse") : arguments.append(OSCArgument.impulse)
+                        argument.quoted ? arguments.append(.string("impulse")) : arguments.append(.impulse)
                     default:
                         // If the argument is prefaced with quotation marks,
                         // the regex dictates the argument should close with them.
@@ -200,9 +200,9 @@ public struct OSCAnnotation {
                             var quoationMarkArgument = argument.string
                             quoationMarkArgument.removeFirst()
                             quoationMarkArgument.removeLast()
-                            arguments.append(quoationMarkArgument)
+                            arguments.append(.string(quoationMarkArgument))
                         } else {
-                            arguments.append(argument.string)
+                            arguments.append(.string(argument.string))
                         }
                     }
                 }

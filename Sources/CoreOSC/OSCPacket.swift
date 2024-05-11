@@ -3,7 +3,7 @@
 //  CoreOSC
 //
 //  Created by Sam Smallman on 22/07/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -24,9 +24,20 @@
 import Foundation
 
 /// An OSC Packet, either an `OSCMessage` or `OSCBundle`.
-public protocol OSCPacket: Sendable, Equatable {
+@frozen public enum OSCPacket: Sendable, Equatable {
+    /// An OSC Message.
+    case message(OSCMessage)
+    /// An OSC Bundle.
+    case bundle(OSCBundle)
 
-    /// The OSC data representation for the packet conforming to the protocol.
-    func data() -> Data
+    /// The OSC data representation for the packet.
+    public func data() -> Data {
+        switch self {
+        case let .message(message):
+            return message.data()
+        case let .bundle(bundle):
+            return bundle.data()
+        }
+    }
 
 }

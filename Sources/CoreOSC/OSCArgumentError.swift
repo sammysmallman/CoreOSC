@@ -1,9 +1,9 @@
 //
-//  CoreOSC.swift
+//  OSCArgumentError.swift
 //  CoreOSC
 //
-//  Created by Sam Smallman on 03/02/2022.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Created by Sam Smallman on 26/02/2024.
+//  Copyright © 2024 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -23,16 +23,16 @@
 
 import Foundation
 
-public enum CoreOSC {
-    
-    /// This package's semantic version number, mirrored also in git history as a `git tag`.
-    public static let version: String = "2.0.0"
-    
-    /// The license agreement this repository is licensed under.
-    public static let license: String = {
-        let url = Bundle.module.url(forResource: "LICENSE", withExtension: "md")
-        let data = try! Data(contentsOf: url!)
-        return String(decoding: data, as: UTF8.self)
-    }()
-
+public enum OSCArgumentError: Error {
+    case invalidArgument
 }
+
+extension OSCArgumentError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .invalidArgument:
+            return NSLocalizedString("OSC_ARGUMENT_ERROR_INVALID_ARGUMENT", bundle: .module, comment: "OSC Argument Error: Invalid Argument")
+        }
+    }
+}
+

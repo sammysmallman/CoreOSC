@@ -3,7 +3,7 @@
 //  CoreOSC
 //
 //  Created by Sam Smallman on 22/07/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -30,7 +30,7 @@ public enum OSCParser {
     /// - Parameter data: The `Data` to process.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `OSCPacket`.
-    public static func packet(from data: Data) throws -> any OSCPacket {
+    public static func packet(from data: Data) throws -> OSCPacket {
         guard let string = String(data: data.prefix(upTo: 1), encoding: .utf8) else {
             throw OSCParserError.unrecognisedData
         }
@@ -47,7 +47,7 @@ public enum OSCParser {
     /// - Parameter data: The `Data` to process.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `OSCPacket`.
-    private static func process(message data: Data) throws -> any OSCPacket {
+    private static func process(message data: Data) throws -> OSCPacket {
         var startIndex = 0
         return try parseOSCMessage(with: data, startIndex: &startIndex)
     }
@@ -56,7 +56,7 @@ public enum OSCParser {
     /// - Parameter data: The `Data` to process.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `OSCPacket`.
-    private static func process(bundle data: Data) throws -> any OSCPacket {
+    private static func process(bundle data: Data) throws -> OSCPacket {
         return try parseOSCBundle(with: data)
     }
 
@@ -66,7 +66,7 @@ public enum OSCParser {
     ///   - startIndex: The index of where to start parsing the `Data` from.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `OSCMessage`.
-    private static func parseOSCMessage(with data: Data, startIndex: inout Int) throws -> OSCMessage {
+    private static func parseOSCMessage(with data: Data, startIndex: inout Int) throws -> OSCPacket {
         guard let addressPattern = parse(string: data,
                                          startIndex: &startIndex,
                                          characters: .invalid(bytes: [
@@ -94,7 +94,7 @@ public enum OSCParser {
 
         // If the Type Tag String starts with "," and has 1 or more characters after,
         // we possibly have some arguments.
-        var arguments: [OSCArgumentProtocol] = []
+        var arguments: [OSCArgument] = []
         if typeTagString.first == "," && typeTagString.count > 1 {
             // Remove "," as we will iterate over the different type of tags.
             typeTagString.removeFirst()
@@ -105,46 +105,46 @@ public enum OSCParser {
                                                      startIndex: &startIndex) else {
                         throw OSCParserError.cantParseString
                     }
-                    arguments.append(stringArgument)
-                case .oscTypeTagInt:
+                    arguments.append(.string(stringArgument))
+                case .oscTypeTagInt32:
                     guard let intArgument = parse(int32: data,
                                                   startIndex: &startIndex) else {
                         throw OSCParserError.cantParseInt32
                     }
-                    arguments.append(intArgument)
-                case .oscTypeTagFloat:
+                    arguments.append(.int32(intArgument))
+                case .oscTypeTagFloat32:
                     guard let floatArgument = parse(float32: data,
                                                     startIndex: &startIndex) else {
                         throw OSCParserError.cantParseFloat32
                     }
-                    arguments.append(floatArgument)
+                    arguments.append(.float32(floatArgument))
                 case .oscTypeTagBlob:
                     guard let blobArgument = parse(blob: data,
                                                    startIndex: &startIndex) else {
                         throw OSCParserError.cantParseBlob
                     }
-                    arguments.append(blobArgument)
+                    arguments.append(.blob(blobArgument))
                 case .oscTypeTagTimeTag:
                     guard let timeTagArgument = parse(timeTag: data,
                                                       startIndex: &startIndex) else {
                         throw OSCParserError.cantParseTimeTag
                     }
-                    arguments.append(timeTagArgument)
+                    arguments.append(.timeTag(timeTagArgument))
                 case .oscTypeTagTrue:
-                    arguments.append(true)
+                    arguments.append(.true)
                 case .oscTypeTagFalse:
-                    arguments.append(false)
+                    arguments.append(.false)
                 case .oscTypeTagNil:
-                    arguments.append(OSCArgument.nil)
+                    arguments.append(.nil)
                 case .oscTypeTagImpulse:
-                    arguments.append(OSCArgument.impulse)
+                    arguments.append(.impulse)
                 default:
                     // We shouldn't ever get here as we've checked the type tag string for invalid characters.
                     throw OSCParserError.cantParseTypeTagString
                 }
             }
         }
-        return OSCMessage(raw: addressPattern, arguments: arguments)
+        return .message(OSCMessage(raw: addressPattern, arguments: arguments))
     }
     
     /// Parse `OSCBundle` data.
@@ -152,7 +152,7 @@ public enum OSCParser {
     ///   - data: The `Data` to parse.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `OSCBundle`.
-    private static func parseOSCBundle(with data: Data) throws -> OSCBundle {
+    private static func parseOSCBundle(with data: Data) throws -> OSCPacket  {
         // Check the Bundle has a string prefix of "#bundle"
         if "#bundle".oscData == data.subdata(in: Range(0...7)) {
             var startIndex = 8
@@ -168,10 +168,10 @@ public enum OSCParser {
                 let elements = try parseBundleElements(with: 0,
                                                        data: bundleData,
                                                        size: size)
-                return OSCBundle(elements,
-                                 timeTag: timeTag)
+                return .bundle(OSCBundle(elements,
+                                 timeTag: timeTag))
             } else {
-                return OSCBundle(timeTag: timeTag)
+                return .bundle(OSCBundle(timeTag: timeTag))
             }
         } else {
             throw OSCParserError.unrecognisedData
@@ -185,8 +185,8 @@ public enum OSCParser {
     ///   - size: The size of the `OSCBundle` containing the elements.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `Array` of `OSCPacket`s representing the elements the `OSCBundle` contains.
-    private static func parseBundleElements(with index: Int, data: Data, size: Int32) throws -> [any OSCPacket] {
-        var elements: [any OSCPacket] = []
+    private static func parseBundleElements(with index: Int, data: Data, size: Int32) throws -> [OSCPacket] {
+        var elements: [OSCPacket] = []
         var startIndex = 0
         var buffer: Int32 = 0
         repeat {
@@ -216,10 +216,10 @@ public enum OSCParser {
                     let bundleElements = try parseBundleElements(with: index,
                                                                     data: bundleData,
                                                                     size: Int32(bundleData.count))
-                    elements.append(OSCBundle(bundleElements,
-                                              timeTag: timeTag))
+                    elements.append(.bundle(OSCBundle(bundleElements,
+                                              timeTag: timeTag)))
                 } else {
-                    elements.append(OSCBundle(timeTag: timeTag))
+                    elements.append(.bundle(OSCBundle(timeTag: timeTag)))
                 }
             } else {
                 throw OSCParserError.unrecognisedData

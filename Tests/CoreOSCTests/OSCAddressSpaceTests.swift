@@ -3,7 +3,7 @@
 //  CoreOSCTests
 //
 //  Created by Sam Smallman on 11/08/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -30,31 +30,28 @@ class OSCAddressSpaceTests: XCTestCase {
         let address1 = try! OSCAddress("/core/osc/1")
         var value1: Bool = false
         let method1 = OSCMethod(with: address1, invokedAction: { message, _ in
-            let boolValue = message.arguments.first as! Bool
-            value1 = boolValue
+            value1 =  message.arguments.first == .true
         })
         let address2 = try! OSCAddress("/core/osc/2")
         var value2: Bool = false
         let method2 = OSCMethod(with: address2, invokedAction: { message, _ in
-            let boolValue = message.arguments.first as! Bool
-            value2 = boolValue
+            value2 = message.arguments.first == .true
         })
         let address3 = try! OSCAddress("/core/osc/3")
         var value3: Bool = false
         let method3 = OSCMethod(with: address3, invokedAction: { message, _ in
-            let boolValue = message.arguments.first as! Bool
-            value3 = boolValue
+            value3 = message.arguments.first == .true
         })
         
         let addressSpace = OSCAddressSpace(methods: [method1, method2, method3])
         
-        addressSpace.invoke(with: OSCMessage(raw: "/core/osc/1", arguments: [true]))
+        addressSpace.invoke(with: OSCMessage(raw: "/core/osc/1", arguments: [.true]))
         XCTAssertEqual(value1, true)
         
-        addressSpace.invoke(with: OSCMessage(raw: "/core/osc/2", arguments: [true]))
+        addressSpace.invoke(with: OSCMessage(raw: "/core/osc/2", arguments: [.true]))
         XCTAssertEqual(value2, true)
         
-        addressSpace.invoke(with: OSCMessage(raw: "/core/osc/3", arguments: [true]))
+        addressSpace.invoke(with: OSCMessage(raw: "/core/osc/3", arguments: [.true]))
         XCTAssertEqual(value3, true)
     }
 

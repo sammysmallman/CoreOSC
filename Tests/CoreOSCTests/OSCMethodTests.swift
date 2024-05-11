@@ -3,7 +3,7 @@
 //  CoreOSCTests
 //
 //  Created by Sam Smallman on 10/08/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -33,10 +33,9 @@ class OSCMethodTests: XCTestCase {
         let method = OSCMethod(with: address, invokedAction: { message, _ in
             XCTAssertEqual(message.addressPattern.fullPath, addressString)
             XCTAssertEqual(message.arguments.count, 1)
-            let boolValue = message.arguments.first as! Bool
-            value = boolValue
+            value = message.arguments.first == .true
         })
-        let message = OSCMessage(raw: addressString, arguments: [true])
+        let message = OSCMessage(raw: addressString, arguments: [.true])
         method.invoke(message, nil)
         XCTAssertEqual(value, true)
     }
@@ -47,10 +46,9 @@ class OSCMethodTests: XCTestCase {
         var value: Bool = false
         let method = OSCMethod(with: address, invokedAction: { message, _ in
             XCTAssertEqual(message.arguments.count, 1)
-            let boolValue = message.arguments.first as! Bool
-            value = boolValue
+            value = message.arguments.first == .true
         })
-        let message = OSCMessage(raw: addressString, arguments: [true])
+        let message = OSCMessage(raw: addressString, arguments: [.true])
         XCTAssertEqual(method.invoke(with: message), true)
         XCTAssertEqual(value, true)
     }
@@ -60,10 +58,9 @@ class OSCMethodTests: XCTestCase {
         var value: Bool = false
         let method = OSCMethod(with: address, invokedAction: { message, _ in
             XCTAssertEqual(message.arguments.count, 1)
-            let boolValue = message.arguments.first as! Bool
-            value = boolValue
+            value = message.arguments.first == .true
         })
-        let message = OSCMessage(raw: "/core/test", arguments: [true])
+        let message = OSCMessage(raw: "/core/test", arguments: [.true])
         XCTAssertEqual(method.invoke(with: message), false)
         XCTAssertEqual(value, false)
     }
@@ -75,7 +72,7 @@ class OSCMethodTests: XCTestCase {
             XCTAssertEqual(userInfo?["bool"] as! Bool, true)
             XCTAssertEqual(userInfo?["string"] as! String, "test")
         })
-        let message = OSCMessage(raw: addressString, arguments: [true])
+        let message = OSCMessage(raw: addressString, arguments: [.true])
         XCTAssertEqual(method.invoke(with: message, userInfo: ["bool":true, "string":"test"]), true)
     }
 

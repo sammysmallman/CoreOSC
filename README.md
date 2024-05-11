@@ -84,7 +84,7 @@ let message1 = try! OSCMessage(with: "/core/osc/1")
 let message2 = try! OSCMessage(with: "/core/osc/2")
 let message3 = try! OSCMessage(with: "/core/osc/3")
     
-let bundle = OSCBundle([message1, message2, message3], 
+let bundle = OSCBundle([.message(message1), .message(message2), .message(message3)], 
                        timetag: .immediate)
 ```
 

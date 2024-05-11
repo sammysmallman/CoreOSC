@@ -3,7 +3,7 @@
 //  CoreOSCTests
 //
 //  Created by Sam Smallman on 13/08/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -33,10 +33,9 @@ class OSCFilterMethodTests: XCTestCase {
         let method = OSCFilterMethod(with: address, invokedAction: { message, _ in
             XCTAssertEqual(message.addressPattern.fullPath, addressString)
             XCTAssertEqual(message.arguments.count, 1)
-            let boolValue = message.arguments.first as! Bool
-            value = boolValue
+            value = message.arguments.first == .true
         })
-        let message = OSCMessage(raw: addressString, arguments: [true])
+        let message = OSCMessage(raw: addressString, arguments: [.true])
         method.invoke(message, nil)
         XCTAssertEqual(value, true)
     }
@@ -47,10 +46,9 @@ class OSCFilterMethodTests: XCTestCase {
         var value: Bool = false
         let method = OSCFilterMethod(with: address, invokedAction: { message, _ in
             XCTAssertEqual(message.arguments.count, 1)
-            let boolValue = message.arguments.first as! Bool
-            value = boolValue
+            value = message.arguments.first == .true
         })
-        let message = OSCMessage(raw: addressString, arguments: [true])
+        let message = OSCMessage(raw: addressString, arguments: [.true])
         method.invoke(message, nil)
         XCTAssertEqual(value, true)
     }
@@ -62,7 +60,7 @@ class OSCFilterMethodTests: XCTestCase {
             XCTAssertEqual(userInfo?["bool"] as! Bool, true)
             XCTAssertEqual(userInfo?["string"] as! String, "test")
         })
-        let message = OSCMessage(raw: addressString, arguments: [true])
+        let message = OSCMessage(raw: addressString, arguments: [.true])
         method.invoke(message, ["bool":true, "string":"test"])
     }
 

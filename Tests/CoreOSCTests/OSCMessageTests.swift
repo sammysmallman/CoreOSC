@@ -3,7 +3,7 @@
 //  CoreOSCTests
 //
 //  Created by Sam Smallman on 05/08/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -27,51 +27,61 @@ import XCTest
 class OSCMessageTests: XCTestCase {
 
     func testInitializingRawOSCMessageSucceeds() {
-        let message = OSCMessage(raw: "/core/osc", arguments: [Int32(1),
-                                                               Float32(3.142),
-                                                               "Core OSC",
-                                                               OSCTimeTag.immediate,
-                                                               true,
-                                                               false,
-                                                               Data([0x01, 0x01]),
-                                                               OSCArgument.nil,
-                                                               OSCArgument.impulse])
+        let message = OSCMessage(
+            raw: "/core/osc",
+            arguments: [
+                .int32(1),
+                .float32(3.142),
+                .string("Core OSC"),
+                .timeTag(.immediate),
+                .true,
+                .false,
+                .blob(Data([0x01, 0x01])),
+                .nil,
+                .impulse
+            ]
+        )
         XCTAssertEqual(message.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message.typeTagString, "ifstTFbNI")
         XCTAssertEqual(message.arguments.count, 9)
-        XCTAssertEqual(message.arguments[0] as! Int32, 1)
-        XCTAssertEqual(message.arguments[1] as! Float32, 3.142)
-        XCTAssertEqual(message.arguments[2] as! String, "Core OSC")
-        XCTAssertEqual(message.arguments[3] as! OSCTimeTag, OSCTimeTag.immediate)
-        XCTAssertEqual(message.arguments[4] as! Bool, true)
-        XCTAssertEqual(message.arguments[5] as! Bool, false)
-        XCTAssertEqual(message.arguments[6] as! Data, Data([0x01, 0x01]))
-        XCTAssertEqual(message.arguments[7] as! OSCArgument, OSCArgument.nil)
-        XCTAssertEqual(message.arguments[8] as! OSCArgument, OSCArgument.impulse)
+        XCTAssertEqual(message.arguments[0], .int32(1))
+        XCTAssertEqual(message.arguments[1], .float32(3.142))
+        XCTAssertEqual(message.arguments[2], .string("Core OSC"))
+        XCTAssertEqual(message.arguments[3], .timeTag(OSCTimeTag.immediate))
+        XCTAssertEqual(message.arguments[4], .true)
+        XCTAssertEqual(message.arguments[5], .false)
+        XCTAssertEqual(message.arguments[6], .blob(Data([0x01, 0x01])))
+        XCTAssertEqual(message.arguments[7], .nil)
+        XCTAssertEqual(message.arguments[8], .impulse)
     }
     
     func testInitializingOSCMessageWithStringSucceeds() throws {
-        let message = try OSCMessage(with: "/core/osc", arguments: [Int32(1),
-                                                                    Float32(3.142),
-                                                                    "Core OSC",
-                                                                    OSCTimeTag.immediate,
-                                                                    true,
-                                                                    false,
-                                                                    Data([0x01, 0x01]),
-                                                                    OSCArgument.nil,
-                                                                    OSCArgument.impulse])
+        let message = try OSCMessage(
+            with: "/core/osc",
+            arguments: [
+                .int32(1),
+                .float32(3.142),
+                .string("Core OSC"),
+                .timeTag(.immediate),
+                .true,
+                .false,
+                .blob(Data([0x01, 0x01])),
+                .nil,
+                .impulse
+            ]
+        )
         XCTAssertEqual(message.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message.typeTagString, "ifstTFbNI")
         XCTAssertEqual(message.arguments.count, 9)
-        XCTAssertEqual(message.arguments[0] as! Int32, 1)
-        XCTAssertEqual(message.arguments[1] as! Float32, 3.142)
-        XCTAssertEqual(message.arguments[2] as! String, "Core OSC")
-        XCTAssertEqual(message.arguments[3] as! OSCTimeTag, OSCTimeTag.immediate)
-        XCTAssertEqual(message.arguments[4] as! Bool, true)
-        XCTAssertEqual(message.arguments[5] as! Bool, false)
-        XCTAssertEqual(message.arguments[6] as! Data, Data([0x01, 0x01]))
-        XCTAssertEqual(message.arguments[7] as! OSCArgument, OSCArgument.nil)
-        XCTAssertEqual(message.arguments[8] as! OSCArgument, OSCArgument.impulse)
+        XCTAssertEqual(message.arguments[0], .int32(1))
+        XCTAssertEqual(message.arguments[1], .float32(3.142))
+        XCTAssertEqual(message.arguments[2], .string("Core OSC"))
+        XCTAssertEqual(message.arguments[3], .timeTag(OSCTimeTag.immediate))
+        XCTAssertEqual(message.arguments[4], .true)
+        XCTAssertEqual(message.arguments[5], .false)
+        XCTAssertEqual(message.arguments[6], .blob(Data([0x01, 0x01])))
+        XCTAssertEqual(message.arguments[7], .nil)
+        XCTAssertEqual(message.arguments[8], .impulse)
     }
     
     func testInitializingOSCMessageWithStringFails() throws {
@@ -80,27 +90,32 @@ class OSCMessageTests: XCTestCase {
     
     func testInitializingOSCMessageWithOSCAddressPatternSucceeds() throws {
         let addressPattern = try OSCAddressPattern("/core/osc")
-        let message = OSCMessage(with: addressPattern, arguments: [Int32(1),
-                                                                   Float32(3.142),
-                                                                   "Core OSC",
-                                                                   OSCTimeTag.immediate,
-                                                                   true,
-                                                                   false,
-                                                                   Data([0x01, 0x01]),
-                                                                   OSCArgument.nil,
-                                                                   OSCArgument.impulse])
+        let message = OSCMessage(
+            with: addressPattern,
+            arguments: [
+                .int32(1),
+                .float32(3.142),
+                .string("Core OSC"),
+                .timeTag(.immediate),
+                .true,
+                .false,
+                .blob(Data([0x01, 0x01])),
+                .nil,
+                .impulse
+            ]
+        )
         XCTAssertEqual(message.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message.typeTagString, "ifstTFbNI")
         XCTAssertEqual(message.arguments.count, 9)
-        XCTAssertEqual(message.arguments[0] as! Int32, 1)
-        XCTAssertEqual(message.arguments[1] as! Float32, 3.142)
-        XCTAssertEqual(message.arguments[2] as! String, "Core OSC")
-        XCTAssertEqual(message.arguments[3] as! OSCTimeTag, OSCTimeTag.immediate)
-        XCTAssertEqual(message.arguments[4] as! Bool, true)
-        XCTAssertEqual(message.arguments[5] as! Bool, false)
-        XCTAssertEqual(message.arguments[6] as! Data, Data([0x01, 0x01]))
-        XCTAssertEqual(message.arguments[7] as! OSCArgument, OSCArgument.nil)
-        XCTAssertEqual(message.arguments[8] as! OSCArgument, OSCArgument.impulse)
+        XCTAssertEqual(message.arguments[0], .int32(1))
+        XCTAssertEqual(message.arguments[1], .float32(3.142))
+        XCTAssertEqual(message.arguments[2], .string("Core OSC"))
+        XCTAssertEqual(message.arguments[3], .timeTag(OSCTimeTag.immediate))
+        XCTAssertEqual(message.arguments[4], .true)
+        XCTAssertEqual(message.arguments[5], .false)
+        XCTAssertEqual(message.arguments[6], .blob(Data([0x01, 0x01])))
+        XCTAssertEqual(message.arguments[7], .nil)
+        XCTAssertEqual(message.arguments[8], .impulse)
     }
     
     func testReaddressWithStringSucceeds() throws {
@@ -122,32 +137,39 @@ class OSCMessageTests: XCTestCase {
     }
     
     func testMessageDataAndParsing() throws {
-        let message = OSCMessage(raw: "/core/osc", arguments: [Int32(1),
-                                                               Float32(3.142),
-                                                               "Core OSC",
-                                                               OSCTimeTag.immediate,
-                                                               true,
-                                                               false,
-                                                               Data([0x01, 0x01, 0x01]),
-                                                               OSCArgument.nil,
-                                                               OSCArgument.impulse])
+        let message = OSCMessage(
+            raw: "/core/osc",
+            arguments: [
+                .int32(1),
+                .float32(3.142),
+                .string("Core OSC"),
+                .timeTag(.immediate),
+                .true,
+                .false,
+                .blob(Data([0x01, 0x01, 0x01])),
+                .nil,
+                .impulse
+            ]
+        )
         let data = message.data()
         
-        let packet = try OSCParser.packet(from: data) as? OSCMessage
-        
-        XCTAssertNotNil(packet)
-        XCTAssertEqual(packet!.addressPattern.fullPath, message.addressPattern.fullPath)
-        XCTAssertEqual(packet!.typeTagString, message.typeTagString)
-        XCTAssertEqual(packet!.arguments.count, message.arguments.count)
-        XCTAssertEqual(packet!.arguments[0] as! Int32, message.arguments[0] as! Int32)
-        XCTAssertEqual(packet!.arguments[1] as! Float32, message.arguments[1] as! Float32)
-        XCTAssertEqual(packet!.arguments[2] as! String, message.arguments[2] as! String)
-        XCTAssertEqual(packet!.arguments[3] as! OSCTimeTag, message.arguments[3] as! OSCTimeTag)
-        XCTAssertEqual(packet!.arguments[4] as! Bool, message.arguments[4] as! Bool)
-        XCTAssertEqual(packet!.arguments[5] as! Bool, message.arguments[5] as! Bool)
-        XCTAssertEqual(packet!.arguments[6] as! Data, message.arguments[6] as! Data)
-        XCTAssertEqual(packet!.arguments[7] as! OSCArgument, message.arguments[7] as! OSCArgument)
-        XCTAssertEqual(packet!.arguments[8] as! OSCArgument, message.arguments[8] as! OSCArgument)
+        guard case let .message(packet) = try OSCParser.packet(from: data) else {
+            XCTFail()
+            return
+        }
+
+        XCTAssertEqual(packet.addressPattern.fullPath, message.addressPattern.fullPath)
+        XCTAssertEqual(packet.typeTagString, message.typeTagString)
+        XCTAssertEqual(packet.arguments.count, message.arguments.count)
+        XCTAssertEqual(packet.arguments[0], message.arguments[0])
+        XCTAssertEqual(packet.arguments[1], message.arguments[1])
+        XCTAssertEqual(packet.arguments[2], message.arguments[2])
+        XCTAssertEqual(packet.arguments[3], message.arguments[3])
+        XCTAssertEqual(packet.arguments[4], message.arguments[4])
+        XCTAssertEqual(packet.arguments[5], message.arguments[5])
+        XCTAssertEqual(packet.arguments[6], message.arguments[6])
+        XCTAssertEqual(packet.arguments[7], message.arguments[7])
+        XCTAssertEqual(packet.arguments[8], message.arguments[8])
     }
 
     func testInvalidMessageDataParsing() throws {
@@ -155,7 +177,7 @@ class OSCMessageTests: XCTestCase {
         let message1 = OSCMessage(raw: "/core/osc/[0- 1]")
         let data1 = message1.data()
 
-        XCTAssertThrowsError(try OSCParser.packet(from: data1) as? OSCMessage) { error in
+        XCTAssertThrowsError(try OSCParser.packet(from: data1)) { error in
             XCTAssertEqual(error as! OSCParserError, OSCParserError.cantParseAddressPattern)
         }
 
@@ -163,7 +185,7 @@ class OSCMessageTests: XCTestCase {
         let message2 = OSCMessage(raw: "/core/osc/#")
         let data2 = message2.data()
 
-        XCTAssertThrowsError(try OSCParser.packet(from: data2) as? OSCMessage) { error in
+        XCTAssertThrowsError(try OSCParser.packet(from: data2)) { error in
             XCTAssertEqual(error as! OSCParserError, OSCParserError.cantParseAddressPattern)
         }
     }
@@ -184,15 +206,23 @@ class OSCMessageTests: XCTestCase {
         let message = try! OSCMessage(with: "/core", arguments: [CoreOSC.license])
         
         XCTAssertEqual(message.arguments.count, 1)
-        let license1 = message.arguments[0] as! String
+        guard case let .string(license1) = message.arguments[0] else {
+            fatalError("Missing LIcense")
+        }
         XCTAssertTrue(license1.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
         XCTAssertTrue(license1.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\r\n"))
         
         let parsedPacket = try OSCParser.packet(from: message.data())
-        let parsedMessage = parsedPacket as! OSCMessage
-        
+
+        guard case let .message(parsedMessage) = parsedPacket else {
+            XCTFail()
+            return
+        }
+
         XCTAssertEqual(parsedMessage.arguments.count, 1)
-        let license2 = parsedMessage.arguments[0] as! String
+        guard case let .string(license2) = parsedMessage.arguments[0] else {
+            fatalError("Missing LIcense")
+        }
         XCTAssertTrue(license2.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
         XCTAssertTrue(license2.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\r\n"))
     }
