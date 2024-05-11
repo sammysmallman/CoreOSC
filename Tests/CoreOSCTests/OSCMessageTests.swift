@@ -209,8 +209,8 @@ class OSCMessageTests: XCTestCase {
         guard case let .string(license1) = message.arguments[0] else {
             fatalError("Missing LIcense")
         }
-        XCTAssertTrue(license1.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
-        XCTAssertTrue(license1.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\r\n"))
+        XCTAssertTrue(license1.hasPrefix("Copyright © 2021 Sam Smallman. https://github.com/SammySmallman"))
+        XCTAssertTrue(license1.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\n"))
         
         let parsedPacket = try OSCParser.packet(from: message.data())
 
@@ -223,8 +223,8 @@ class OSCMessageTests: XCTestCase {
         guard case let .string(license2) = parsedMessage.arguments[0] else {
             fatalError("Missing LIcense")
         }
-        XCTAssertTrue(license2.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
-        XCTAssertTrue(license2.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\r\n"))
+        XCTAssertTrue(license2.hasPrefix("Copyright © 2021 Sam Smallman. https://github.com/SammySmallman"))
+        XCTAssertTrue(license2.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\n"))
     }
 
 }
