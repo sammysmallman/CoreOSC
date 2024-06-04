@@ -1,13 +1,13 @@
 Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 
-This file is part of OSCKit
+This file is part of CoreOSC
 
-OSCKit is free software: you can redistribute it and/or modify
+CoreOSC is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-OSCKit is distributed in the hope that it will be useful
+CoreOSC is distributed in the hope that it will be useful
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
