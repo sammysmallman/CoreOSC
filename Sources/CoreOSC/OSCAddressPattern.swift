@@ -3,7 +3,7 @@
 //  CoreOSC
 //
 //  Created by Sam Smallman on 29/07/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -24,7 +24,7 @@
 import Foundation
 
 /// An object that represents the full path to one or more OSC Methods through pattern matching.
-public struct OSCAddressPattern: Hashable, Equatable {
+public struct OSCAddressPattern: Hashable, Equatable, Sendable {
     
     /// The full path to one or more OSC Methods.
     public let fullPath: String

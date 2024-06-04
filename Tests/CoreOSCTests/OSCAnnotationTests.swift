@@ -3,7 +3,7 @@
 //  CoreOSCTests
 //
 //  Created by Sam Smallman on 26/07/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -137,16 +137,11 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 5)
-        let argument1 = message?.arguments[0] as? Int32
-        XCTAssertEqual(argument1, 1)
-        let argument2 = message?.arguments[1] as? Float32
-        XCTAssertEqual(argument2, 3.142)
-        let argument3 = message?.arguments[2] as? String
-        XCTAssertEqual(argument3, "a string with spaces")
-        let argument4 = message?.arguments[3] as? String
-        XCTAssertEqual(argument4, "string")
-        let argument5 = message?.arguments[4] as? Bool
-        XCTAssertEqual(argument5, true)
+        XCTAssertEqual(message?.arguments[0], .int32(1))
+        XCTAssertEqual(message?.arguments[1], .float32(3.142))
+        XCTAssertEqual(message?.arguments[2], .string("a string with spaces"))
+        XCTAssertEqual(message?.arguments[3], .string("string"))
+        XCTAssertEqual(message?.arguments[4], .true)
     }
 
     func testAnnotationToMessageEqualsCommaStyle() {
@@ -156,16 +151,11 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 5)
-        let argument1 = message?.arguments[0] as? Int32
-        XCTAssertEqual(argument1, 1)
-        let argument2 = message?.arguments[1] as? Float32
-        XCTAssertEqual(argument2, 3.142)
-        let argument3 = message?.arguments[2] as? String
-        XCTAssertEqual(argument3, "a string with spaces")
-        let argument4 = message?.arguments[3] as? String
-        XCTAssertEqual(argument4, "string")
-        let argument5 = message?.arguments[4] as? Bool
-        XCTAssertEqual(argument5, true)
+        XCTAssertEqual(message?.arguments[0], .int32(1))
+        XCTAssertEqual(message?.arguments[1], .float32(3.142))
+        XCTAssertEqual(message?.arguments[2], .string("a string with spaces"))
+        XCTAssertEqual(message?.arguments[3], .string("string"))
+        XCTAssertEqual(message?.arguments[4], .true)
     }
 
     func testAnnotationToMessageSpaceStyleSingleStringWithSpacesArgument() {
@@ -175,8 +165,7 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 1)
-        let argument = message?.arguments[0] as? String
-        XCTAssertEqual(argument, "this should be a single string argument")
+        XCTAssertEqual(message?.arguments[0], .string("this should be a single string argument"))
     }
 
     func testAnnotationToMessageEqualsCommaStyleSingleStringWithSpacesArgument() {
@@ -186,8 +175,7 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 1)
-        let argument = message?.arguments[0] as? String
-        XCTAssertEqual(argument, "this should be a single string argument")
+        XCTAssertEqual(message?.arguments[0], .string("this should be a single string argument"))
     }
     
     func testAnnotationToMessageSpaceStyleQuotedTypes() {
@@ -197,30 +185,18 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 12)
-        let argument1 = message?.arguments[0] as? Int32
-        XCTAssertEqual(argument1, 1)
-        let argument2 = message?.arguments[1] as? String
-        XCTAssertEqual(argument2, "1")
-        let argument3 = message?.arguments[2] as? Float32
-        XCTAssertEqual(argument3, 3.142)
-        let argument4 = message?.arguments[3] as? String
-        XCTAssertEqual(argument4, "3.142")
-        let argument5 = message?.arguments[4] as? Bool
-        XCTAssertEqual(argument5, true)
-        let argument6 = message?.arguments[5] as? String
-        XCTAssertEqual(argument6, "true")
-        let argument7 = message?.arguments[6] as? Bool
-        XCTAssertEqual(argument7, false)
-        let argument8 = message?.arguments[7] as? String
-        XCTAssertEqual(argument8, "false")
-        let argument9 = message?.arguments[8] as? OSCArgument
-        XCTAssertEqual(argument9, OSCArgument.nil)
-        let argument10 = message?.arguments[9] as? String
-        XCTAssertEqual(argument10, "nil")
-        let argument11 = message?.arguments[10] as? OSCArgument
-        XCTAssertEqual(argument11, OSCArgument.impulse)
-        let argument12 = message?.arguments[11] as? String
-        XCTAssertEqual(argument12, "impulse")
+        XCTAssertEqual(message?.arguments[0], .int32(1))
+        XCTAssertEqual(message?.arguments[1], .string("1"))
+        XCTAssertEqual(message?.arguments[2], .float32(3.142))
+        XCTAssertEqual(message?.arguments[3], .string("3.142"))
+        XCTAssertEqual(message?.arguments[4], .true)
+        XCTAssertEqual(message?.arguments[5], .string("true"))
+        XCTAssertEqual(message?.arguments[6], .false)
+        XCTAssertEqual(message?.arguments[7], .string("false"))
+        XCTAssertEqual(message?.arguments[8], .nil)
+        XCTAssertEqual(message?.arguments[9], .string("nil"))
+        XCTAssertEqual(message?.arguments[10], .impulse)
+        XCTAssertEqual(message?.arguments[11], .string("impulse"))
     }
     
     func testAnnotationToMessageEqualsCommaStyleQuotedTypes() {
@@ -230,30 +206,18 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 12)
-        let argument1 = message?.arguments[0] as? Int32
-        XCTAssertEqual(argument1, 1)
-        let argument2 = message?.arguments[1] as? String
-        XCTAssertEqual(argument2, "1")
-        let argument3 = message?.arguments[2] as? Float32
-        XCTAssertEqual(argument3, 3.142)
-        let argument4 = message?.arguments[3] as? String
-        XCTAssertEqual(argument4, "3.142")
-        let argument5 = message?.arguments[4] as? Bool
-        XCTAssertEqual(argument5, true)
-        let argument6 = message?.arguments[5] as? String
-        XCTAssertEqual(argument6, "true")
-        let argument7 = message?.arguments[6] as? Bool
-        XCTAssertEqual(argument7, false)
-        let argument8 = message?.arguments[7] as? String
-        XCTAssertEqual(argument8, "false")
-        let argument9 = message?.arguments[8] as? OSCArgument
-        XCTAssertEqual(argument9, OSCArgument.nil)
-        let argument10 = message?.arguments[9] as? String
-        XCTAssertEqual(argument10, "nil")
-        let argument11 = message?.arguments[10] as? OSCArgument
-        XCTAssertEqual(argument11, OSCArgument.impulse)
-        let argument12 = message?.arguments[11] as? String
-        XCTAssertEqual(argument12, "impulse")
+        XCTAssertEqual(message?.arguments[0], .int32(1))
+        XCTAssertEqual(message?.arguments[1], .string("1"))
+        XCTAssertEqual(message?.arguments[2], .float32(3.142))
+        XCTAssertEqual(message?.arguments[3], .string("3.142"))
+        XCTAssertEqual(message?.arguments[4], .true)
+        XCTAssertEqual(message?.arguments[5], .string("true"))
+        XCTAssertEqual(message?.arguments[6], .false)
+        XCTAssertEqual(message?.arguments[7], .string("false"))
+        XCTAssertEqual(message?.arguments[8], .nil)
+        XCTAssertEqual(message?.arguments[9], .string("nil"))
+        XCTAssertEqual(message?.arguments[10], .impulse)
+        XCTAssertEqual(message?.arguments[11], .string("impulse"))
     }
     
     func testAnnotationToMessageSpaceStyleWithSingleDecimalStringArgument() {
@@ -263,8 +227,7 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 1)
-        let argument2 = message?.arguments[0] as? String
-        XCTAssertEqual(argument2, "127.0.0.1")
+        XCTAssertEqual(message?.arguments[0], .string("127.0.0.1"))
     }
     
     func testAnnotationToMessageEqualsCommaStyleWithSingleDecimalStringArgument() {
@@ -274,8 +237,7 @@ final class OSCAnnotationTests: XCTestCase {
         XCTAssertNotNil(message)
         XCTAssertEqual(message?.addressPattern.fullPath, "/core/osc")
         XCTAssertEqual(message?.arguments.count, 1)
-        let argument2 = message?.arguments[0] as? String
-        XCTAssertEqual(argument2, "127.0.0.1")
+        XCTAssertEqual(message?.arguments[0], .string("127.0.0.1"))
     }
 
 }

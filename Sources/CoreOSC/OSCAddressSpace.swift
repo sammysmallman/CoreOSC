@@ -3,7 +3,7 @@
 //  CoreOSC
 //
 //  Created by Sam Smallman on 10/08/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //

@@ -3,7 +3,7 @@
 //  CoreOSC
 //
 //  Created by Sam Smallman on 22/07/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -24,8 +24,8 @@
 import Foundation
 
 /// An OSC Time Tag.
-public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
-    
+public struct OSCTimeTag: OSCArgumentProtocol, Equatable, CustomStringConvertible, Sendable {
+
     /// The OSC data representation for the argument.
     public var oscData: Data { Data(seconds.bigEndian.data + fraction.bigEndian.data) }
 
@@ -36,7 +36,11 @@ public struct OSCTimeTag: OSCArgumentProtocol, Equatable {
     public func oscAnnotation(withType type: Bool = true) -> String {
         "\(self.hex())\(type ? "(\(oscTypeTag))" : "")"
     }
-    
+
+    public var description: String {
+        "\(self.hex())"
+    }
+
     /// Creates an OSC Time Tag initialized to immediately.
     public static let immediate: OSCTimeTag = OSCTimeTag()
 

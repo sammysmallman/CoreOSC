@@ -3,7 +3,7 @@
 //  CoreOSCTests
 //
 //  Created by Sam Smallman on 03/02/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -29,13 +29,13 @@ import XCTest
 class CoreOSCTests: XCTestCase {
 
     func testVersion() {
-        XCTAssertEqual(CoreOSC.version, "1.3.1")
+        XCTAssertEqual(CoreOSC.version, "2.0.0")
         XCTAssertEqual(NSLocalizedString("OSC_VERSION", bundle: .module, comment: "OSC Version"), CoreOSC.version)
     }
     
     func testLicense() {
         let license = CoreOSC.license
-        XCTAssertTrue(license.hasPrefix("Copyright © 2023 Sam Smallman. https://github.com/SammySmallman"))
+        XCTAssertTrue(license.hasPrefix("Copyright © 2021 Sam Smallman. https://github.com/SammySmallman"))
         XCTAssertTrue(license.hasSuffix("<https://www.gnu.org/licenses/why-not-lgpl.html>.\n"))
     }
     

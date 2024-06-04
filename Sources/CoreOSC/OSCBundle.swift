@@ -3,7 +3,7 @@
 //  CoreOSC
 //
 //  Created by Sam Smallman on 22/07/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -24,16 +24,17 @@
 import Foundation
 
 /// An OSC Bundle.
-public struct OSCBundle: OSCPacket {
+public struct OSCBundle: Sendable, Equatable {
 
     /// The bundles time tag used to indicate
     ///when it's contained elements should be invoked
     public var timeTag: OSCTimeTag
-    
+
     /// The bundles elements. The contents are either `OSCMessage` or `OSCBundle`.
-    /// Note that a bundle may contain bundles.
+    ///
+    /// - Note: A bundle may contain bundles.
     public var elements: [OSCPacket]
-    
+
     /// An OSC Bundle.
     /// - Parameters:
     ///   - elements: The elements contained by the bundle.
@@ -43,24 +44,41 @@ public struct OSCBundle: OSCPacket {
         self.elements = elements
     }
 
+    public static func == (lhs: OSCBundle, rhs: OSCBundle) -> Bool {
+        guard lhs.timeTag == rhs.timeTag,
+              lhs.elements.count == rhs.elements.count
+        else { return false }
+        for (index, element) in lhs.elements.enumerated() {
+            switch element {
+            case let .message(lhsMessage):
+                guard case let .message(rhsMessage) = rhs.elements[index],
+                      lhsMessage == rhsMessage else { return false }
+                continue
+            case let .bundle(lhsBundle):
+                guard case let .bundle(rhsBundle) = rhs.elements[index],
+                      lhsBundle == rhsBundle else { return false }
+                continue
+            }
+        }
+        return true
+    }
+
     /// The OSC Packet data for the bundle.
     public func data() -> Data {
         var result = "#bundle".oscData
         result.append(timeTag.oscData)
         for element in elements {
-            if let message = element as? OSCMessage {
+            switch element {
+            case let .message(message):
                 let data = message.data()
                 let size = withUnsafeBytes(of: Int32(data.count).bigEndian) { Data($0) }
                 result.append(size)
                 result.append(data)
-                continue
-            }
-            if let bundle = element as? OSCBundle {
+            case let .bundle(bundle):
                 let data = bundle.data()
                 let size = withUnsafeBytes(of: Int32(data.count).bigEndian) { Data($0) }
                 result.append(size)
                 result.append(data)
-                continue
             }
         }
         return result
@@ -70,12 +88,11 @@ public struct OSCBundle: OSCPacket {
     /// - Returns: An array of `OSCMessage`'s.
     public func flatten() -> [OSCMessage] {
         elements.reduce([OSCMessage]()) {
-            if let message = $1 as? OSCMessage {
+            switch $1 {
+            case let .message(message):
                 return $0 + [message]
-            } else if let bundle = $1 as? OSCBundle {
+            case let .bundle(bundle):
                 return $0 + bundle.flatten()
-            } else {
-                return $0
             }
         }
     }

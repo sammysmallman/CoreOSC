@@ -3,7 +3,7 @@
 //  CoreOSC
 //
 //  Created by Sam Smallman on 26/07/2021.
-//  Copyright © 2022 Sam Smallman. https://github.com/SammySmallman
+//  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
 // This file is part of CoreOSC
 //
@@ -25,7 +25,7 @@ import Foundation
 import CoreGraphics
 
 /// An OSC Argument.
-public protocol OSCArgumentProtocol {
+public protocol OSCArgumentProtocol: Sendable {
     
     /// The OSC data representation for the argument conforming to the protocol.
     var oscData: Data { get }
@@ -38,29 +38,90 @@ public protocol OSCArgumentProtocol {
     
 }
 
-public enum OSCArgument: OSCArgumentProtocol, CustomStringConvertible {
+public enum OSCArgument: OSCArgumentProtocol, CustomStringConvertible, Equatable {
 
+    case int32(Int32)
+    case float32(Float32)
+    case string(String)
+    case blob(Data)
+    case `true`
+    case `false`
     case `nil`
     case impulse
+    case timeTag(OSCTimeTag)
 
     public var description: String {
         switch self {
+        case let .int32(value): return value.description
+        case let .float32(value): return value.description
+        case let .string(value): return value
+        case let .blob(value): return value.description
+        case .true: return "true"
+        case .false: return "false"
         case .nil: return "nil"
         case .impulse: return "impulse"
+        case let .timeTag(value): return value.description
         }
     }
 
-    public var oscData: Data { Data() }
+    public var oscData: Data {
+        switch self {
+        case .int32(let value):
+            return value.oscData
+        case .float32(let value):
+            return value.oscData
+        case .string(let value):
+            return value.oscData
+        case .blob(let value):
+            return value.oscData
+        case .true:
+            return Data()
+        case .false:
+            return Data()
+        case .nil:
+            return Data()
+        case .impulse:
+            return Data()
+        case let .timeTag(value):
+            return value.oscData
+        }
+    }
 
     public var oscTypeTag: Character {
         switch self {
+        case .int32: return .oscTypeTagInt32
+        case .float32: return .oscTypeTagFloat32
+        case .string: return .oscTypeTagString
+        case .blob: return .oscTypeTagBlob
+        case .true: return .oscTypeTagTrue
+        case .false: return .oscTypeTagFalse
         case .nil: return .oscTypeTagNil
         case .impulse: return .oscTypeTagImpulse
+        case .timeTag: return .oscTypeTagTimeTag
         }
     }
 
     public func oscAnnotation(withType type: Bool) -> String {
-        "\(self)\(type ? "(\(oscTypeTag))" : "")"
+        switch self {
+        case let .int32(int32):
+            return int32.oscAnnotation(withType: type)
+        case let .float32(float32):
+            return float32.oscAnnotation(withType: type)
+        case let .string(string):
+            return string.oscAnnotation(withType: type)
+        case let .blob(data):
+            return data.oscAnnotation(withType: type)
+        case .true:
+            return "true\(type ? "(\(Character.oscTypeTagTrue))" : "")"
+        case .false:
+            return "false\(type ? "(\(Character.oscTypeTagFalse))" : "")"
+        case .nil:
+            return "nil\(type ? "(\(Character.oscTypeTagNil))" : "")"
+        case .impulse:
+            return "impulse\(type ? "(\(Character.oscTypeTagImpulse))" : "")"
+        case let .timeTag(timeTag):
+            return timeTag.oscAnnotation(withType: type)
+        }
     }
 
 }
@@ -69,7 +130,7 @@ extension Int32: OSCArgumentProtocol {
 
     public var oscData: Data { self.bigEndian.data }
 
-    public var oscTypeTag: Character { .oscTypeTagInt }
+    public var oscTypeTag: Character { .oscTypeTagInt32 }
 
     public func oscAnnotation(withType type: Bool = true) -> String {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
@@ -86,7 +147,7 @@ extension Int: OSCArgumentProtocol {
         return int.bigEndian.data
     }
 
-    public var oscTypeTag: Character { .oscTypeTagInt }
+    public var oscTypeTag: Character { .oscTypeTagInt32 }
 
     public func oscAnnotation(withType type: Bool = true) -> String {
         let int = Int32(exactly: self) ?? 0
@@ -108,7 +169,7 @@ extension Float32: OSCArgumentProtocol {
         return Data(result)
     }
 
-    public var oscTypeTag: Character { .oscTypeTagFloat }
+    public var oscTypeTag: Character { .oscTypeTagFloat32 }
 
     public func oscAnnotation(withType type: Bool = true) -> String {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
@@ -130,7 +191,7 @@ extension Double: OSCArgumentProtocol {
         return Data(result)
     }
 
-    public var oscTypeTag: Character { .oscTypeTagFloat }
+    public var oscTypeTag: Character { .oscTypeTagFloat32 }
 
     public func oscAnnotation(withType type: Bool = true) -> String {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
@@ -152,7 +213,7 @@ extension CGFloat: OSCArgumentProtocol {
         return Data(result)
     }
     
-    public var oscTypeTag: Character { .oscTypeTagFloat }
+    public var oscTypeTag: Character { .oscTypeTagFloat32 }
     
     public func oscAnnotation(withType type: Bool = true) -> String {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
