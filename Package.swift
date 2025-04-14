@@ -14,8 +14,10 @@ let package = Package(
             name: "CoreOSC",
             dependencies: [],
             resources: [
-                .process("LICENSE.md")
-            ]),
+                .process("LICENSE.md"),
+                .copy("PrivacyInfo.xcprivacy")
+            ]
+        ),
         .testTarget(
             name: "CoreOSCTests",
             dependencies: ["CoreOSC"])

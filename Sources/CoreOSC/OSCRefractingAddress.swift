@@ -5,20 +5,20 @@
 //  Created by Sam Smallman on 29/07/2021.
 //  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
-// This file is part of CoreOSC
+//  This file is part of CoreOSC
 //
-// CoreOSC is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+//  CoreOSC is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
 //
-// CoreOSC is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
+//  CoreOSC is distributed in the hope that it will be useful
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
 //
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
 import Foundation
@@ -65,7 +65,7 @@ public struct OSCRefractingAddress: Hashable, Equatable {
             throw OSCAddressError.invalidAddress
         }
     }
-    
+
     /// Refract an OSC Address.
     /// - Parameter address: An OSC Address to be refracted.
     /// - Throws: A `OSCAddressError` if the given address can not be refracted.
@@ -98,7 +98,7 @@ public struct OSCRefractingAddress: Hashable, Equatable {
             return try OSCAddressPattern(fullPath)
         }
     }
-    
+
     /// Evaluate an OSC Refracting Address.
     /// - Parameter address: A `String` to be validated.
     /// - Returns: A `Result` that represents either the given string is valid, returning success,
@@ -111,4 +111,5 @@ public struct OSCRefractingAddress: Hashable, Equatable {
         }
         return .success(address)
     }
+
 }

@@ -5,20 +5,20 @@
 //  Created by Sam Smallman on 13/08/2021.
 //  Copyright © 2021 Sam Smallman. https://github.com/SammySmallman
 //
-// This file is part of CoreOSC
+//  This file is part of CoreOSC
 //
-// CoreOSC is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+//  CoreOSC is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
 //
-// CoreOSC is distributed in the hope that it will be useful
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
+//  CoreOSC is distributed in the hope that it will be useful
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Affero General Public License for more details.
 //
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
 import Foundation
@@ -68,7 +68,17 @@ public struct OSCFilterAddress: Hashable, Equatable {
             throw OSCAddressError.invalidAddress
         }
     }
-    
+
+    /// A raw OSC Filter Address.
+    /// - Parameter filterAddress: The full path to an OSC Filter Method.
+    public init(raw filterAddress: String) {
+        self.fullPath = filterAddress
+        var addressParts = filterAddress.components(separatedBy: "/")
+        addressParts.removeFirst()
+        self.parts = addressParts
+        self.methodName = addressParts.last ?? ""
+    }
+
     /// Evaluate an OSC Filter Address.
     /// - Parameter address: A `String` to be validated.
     /// - Returns: A `Result` that represents either the given string is valid, returning success,
@@ -80,5 +90,37 @@ public struct OSCFilterAddress: Hashable, Equatable {
             guard character != " " else { return .failure(.space) }
         }
         return .success(address)
+    }
+
+    /// Match an `OSCAddressPattern`'s part against the corresponding part of the methods `OSCFilterAddress`.
+    /// - Parameters:
+    ///   - part: The `OSCAddressPatterns` part to match against.
+    ///   - index: The index of the `OSCFilterAddress`'s part to match against.
+    /// - Returns: A `OSCFilterPatternMatch` indicating the result of the match.
+    internal func match(part: String, index: Int) -> OSCFilterPatternMatch {
+        guard parts.indices.contains(index) else { return .different }
+        let match = parts[index]
+        switch match {
+        case part: return .string
+        case "#": return .wildcard
+        default: return .different
+        }
+    }
+}
+
+extension OSCFilterAddress {
+
+    /// The result of matching an `OSCAddressPattern`'s part against the corresponding
+    /// `OSCFilterAddress`'s part.
+    internal enum OSCFilterPatternMatch {
+        /// The `OSCAddressPattern`'s part matches fully against the
+        /// `OSCFilterAddress`'s part.
+        case string
+        /// The `OSCAddressPattern`'s part matches against the
+        /// `OSCFilterAddress`'s part with the wildcard "#".
+        case wildcard
+        /// The `OSCAddressPattern`'s part does the match against
+        /// `OSCFilterAddress`'s part.
+        case different
     }
 }
