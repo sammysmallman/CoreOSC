@@ -33,20 +33,20 @@ class OSCAddressStoreTests: XCTestCase {
 
         let store = OSCAddressStore(addresses: [address1, address2, address3])
 
-        var message = OSCMessage(raw: "/core/osc/1")
-        XCTAssertEqual(store.filter(with: message), [address1])
-        XCTAssertEqual(store.count(with: message), 1)
+        var addressPattern = OSCAddressPattern(raw: "/core/osc/1")
+        XCTAssertEqual(store.filter(with: addressPattern), [address1])
+        XCTAssertEqual(store.count(with: addressPattern), 1)
 
-        message = OSCMessage(raw: "/core/osc/2")
-        XCTAssertEqual(store.filter(with: message), [address2])
-        XCTAssertEqual(store.count(with: message), 1)
+        addressPattern = OSCAddressPattern(raw: "/core/osc/2")
+        XCTAssertEqual(store.filter(with: addressPattern), [address2])
+        XCTAssertEqual(store.count(with: addressPattern), 1)
 
-        message = OSCMessage(raw: "/core/osc/*")
-        let addresses = store.filter(with: message)
+        addressPattern = OSCAddressPattern(raw: "/core/osc/*")
+        let addresses = store.filter(with: addressPattern)
         XCTAssertTrue(addresses.contains(address1))
         XCTAssertTrue(addresses.contains(address2))
         XCTAssertTrue(addresses.contains(address3))
-        XCTAssertEqual(store.count(with: message), 3)
+        XCTAssertEqual(store.count(with: addressPattern), 3)
     }
 
 }

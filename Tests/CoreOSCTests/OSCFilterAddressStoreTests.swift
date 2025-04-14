@@ -31,17 +31,17 @@ class OSCFilterAddressStoreTests: XCTestCase {
 
         let store = OSCFilterAddressStore(addresses: [address])
 
-        var message = OSCMessage(raw: "/core/osc/1")
-        XCTAssertEqual(store.filter(with: message), [address])
-        XCTAssertEqual(store.count(with: message), 1)
+        var addressPattern = OSCAddressPattern(raw: "/core/osc/1")
+        XCTAssertEqual(store.filter(with: addressPattern), [address])
+        XCTAssertEqual(store.count(with: addressPattern), 1)
 
-        message = OSCMessage(raw: "/core/osc/2")
-        XCTAssertEqual(store.filter(with: message), [address])
-        XCTAssertEqual(store.count(with: message), 1)
+        addressPattern = OSCAddressPattern(raw: "/core/osc/2")
+        XCTAssertEqual(store.filter(with: addressPattern), [address])
+        XCTAssertEqual(store.count(with: addressPattern), 1)
 
-        message = OSCMessage(raw: "/core/osc/3")
-        XCTAssertEqual(store.filter(with: message), [address])
-        XCTAssertEqual(store.count(with: message), 1)
+        addressPattern = OSCAddressPattern(raw: "/core/osc/3")
+        XCTAssertEqual(store.filter(with: addressPattern), [address])
+        XCTAssertEqual(store.count(with: addressPattern), 1)
     }
 
     func testOSCFilterAddressStoreStringPriority() {
@@ -52,9 +52,9 @@ class OSCFilterAddressStoreTests: XCTestCase {
         var store = OSCFilterAddressStore(addresses: [address1, address2, address3])
         store.priority = .string
 
-        let message = OSCMessage(raw: "/core/osc/test")
-        XCTAssertEqual(store.filter(with: message), [address2, address3, address1])
-        XCTAssertEqual(store.count(with: message), 3)
+        let addressPattern = OSCAddressPattern(raw: "/core/osc/test")
+        XCTAssertEqual(store.filter(with: addressPattern), [address2, address3, address1])
+        XCTAssertEqual(store.count(with: addressPattern), 3)
     }
 
     func testOSCFilterAddressStoreWildcardPriority() {
@@ -65,9 +65,9 @@ class OSCFilterAddressStoreTests: XCTestCase {
         var store = OSCFilterAddressStore(addresses: [address1, address2, address3])
         store.priority = .wildcard
 
-        let message = OSCMessage(raw: "/core/osc/test")
-        XCTAssertEqual(store.filter(with: message), [address2, address1, address3])
-        XCTAssertEqual(store.count(with: message), 3)
+        let addressPattern = OSCAddressPattern(raw: "/core/osc/test")
+        XCTAssertEqual(store.filter(with: addressPattern), [address2, address1, address3])
+        XCTAssertEqual(store.count(with: addressPattern), 3)
     }
 
 }
