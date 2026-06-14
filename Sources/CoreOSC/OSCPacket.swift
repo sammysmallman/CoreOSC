@@ -24,7 +24,7 @@
 import Foundation
 
 /// An OSC Packet, either an `OSCMessage` or `OSCBundle`.
-@frozen public enum OSCPacket: Sendable, Equatable {
+@frozen public enum OSCPacket: Sendable, Equatable, Codable {
     /// An OSC Message.
     case message(OSCMessage)
     /// An OSC Bundle.
