@@ -38,7 +38,7 @@ public protocol OSCArgumentProtocol: Sendable {
     
 }
 
-public enum OSCArgument: OSCArgumentProtocol, CustomStringConvertible, Equatable {
+public enum OSCArgument: OSCArgumentProtocol, CustomStringConvertible, Equatable, Codable {
 
     case int32(Int32)
     case float32(Float32)

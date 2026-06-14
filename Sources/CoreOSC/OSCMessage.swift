@@ -24,7 +24,7 @@
 import Foundation
 
 /// An OSC Message.
-public struct OSCMessage: Sendable, Equatable {
+public struct OSCMessage: Sendable, Equatable, Codable {
 
     public static func == (lhs: OSCMessage, rhs: OSCMessage) -> Bool {
         lhs.addressPattern == rhs.addressPattern &&

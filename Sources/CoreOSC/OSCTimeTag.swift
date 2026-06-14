@@ -24,7 +24,7 @@
 import Foundation
 
 /// An OSC Time Tag.
-public struct OSCTimeTag: OSCArgumentProtocol, Equatable, CustomStringConvertible, Sendable {
+public struct OSCTimeTag: OSCArgumentProtocol, Equatable, CustomStringConvertible, Sendable, Codable {
 
     /// The OSC data representation for the argument.
     public var oscData: Data { Data(seconds.bigEndian.data + fraction.bigEndian.data) }

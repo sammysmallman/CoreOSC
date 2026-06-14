@@ -24,7 +24,7 @@
 import Foundation
 
 /// An OSC Bundle.
-public struct OSCBundle: Sendable, Equatable {
+public struct OSCBundle: Sendable, Equatable, Codable {
 
     /// The bundles time tag used to indicate
     ///when it's contained elements should be invoked
