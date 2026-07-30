@@ -24,7 +24,7 @@
 import Foundation
 
 /// An object that represents the full path to an OSC Method in an OSC Address Space.
-public struct OSCAddress: Hashable, Equatable {
+public struct OSCAddress: Hashable, Equatable, Sendable, Codable {
 
     /// The full path to an OSC Method.
     public let fullPath: String
@@ -56,16 +56,37 @@ public struct OSCAddress: Hashable, Equatable {
     /// - Parameter address: The full path to an OSC Method.
     /// - Throws: `OSCAddressError` if the format of the given address is invalid.
     public init(_ address: String) throws {
-        let regex = "^\\/(?:(?![ #*,?\\[\\]\\{\\}])[\\x00-\\x7F])+$"
-        if NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: address) {
-            self.fullPath = address
-            var addressParts = address.components(separatedBy: "/")
-            addressParts.removeFirst()
-            self.parts = addressParts
-            self.methodName = addressParts.last ?? ""
-        } else {
+        // Semantics identical to the previous per-init NSPredicate regex
+        // "^\\/(?:(?![ #*,?\\[\\]\\{\\}])[\\x00-\\x7F])+$": a leading "/",
+        // at least one further character, all ASCII, and none of the wildcard
+        // or reserved characters — validated in a single byte pass without
+        // compiling a regular expression.
+        let bytes = address.utf8
+        guard bytes.count >= 2, bytes.first == 0x2F else {
             throw OSCAddressError.invalidAddress
         }
+        for byte in bytes.dropFirst() {
+            guard byte <= 0x7F else { throw OSCAddressError.invalidAddress }
+            switch byte {
+            case 0x20, // Space - ' '
+                 0x23, // Hash - #
+                 0x2A, // Asterisk - *
+                 0x2C, // Comma - ,
+                 0x3F, // Question Mark - ?
+                 0x5B, // Open Bracket - [
+                 0x5D, // Close Bracket - ]
+                 0x7B, // Open Curly Brace - {
+                 0x7D: // Close Curly Brace - }
+                throw OSCAddressError.invalidAddress
+            default:
+                break
+            }
+        }
+        self.fullPath = address
+        var addressParts = address.components(separatedBy: "/")
+        addressParts.removeFirst()
+        self.parts = addressParts
+        self.methodName = addressParts.last ?? ""
     }
     
     /// Evaluate an OSC Address.

@@ -26,18 +26,12 @@ import Foundation
 /// An OSC Message.
 public struct OSCMessage: Sendable, Equatable, Codable {
 
-    public static func == (lhs: OSCMessage, rhs: OSCMessage) -> Bool {
-        lhs.addressPattern == rhs.addressPattern &&
-        lhs.typeTagString == rhs.typeTagString &&
-        lhs.arguments.map { $0.oscData } == rhs.arguments.map { $0.oscData }
-    }
-
     /// The OSC Address Pattern associated with the message that represents the full path to one
     /// or more OSC Methods through pattern matching.
     public private(set) var addressPattern: OSCAddressPattern
 
     /// A sequence of type tag characters corresponding exactly to the sequence of OSC Arguments in the message.
-    public var typeTagString: String { "\(arguments.map { String($0.oscTypeTag) }.joined())" }
+    public var typeTagString: String { String(arguments.map(\.oscTypeTag)) }
 
     /// The `Array` of arguments associated with the message.
     public let arguments: [OSCArgument]
@@ -107,8 +101,11 @@ public struct OSCMessage: Sendable, Equatable, Codable {
     /// The OSC Packet data for the message.
     public func data() -> Data {
         var result = addressPattern.fullPath.oscData
-        result.append(",\(typeTagString)".oscData)
-        arguments.forEach { result.append($0.oscData) }
+        var typeTags = ","
+        typeTags.reserveCapacity(arguments.count + 1)
+        for argument in arguments { typeTags.append(argument.oscTypeTag) }
+        result.append(typeTags.oscData)
+        for argument in arguments { result.append(argument.oscData) }
         return result
     }
 
