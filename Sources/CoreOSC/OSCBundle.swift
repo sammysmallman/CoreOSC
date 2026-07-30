@@ -46,23 +46,36 @@ public struct OSCBundle: Sendable, Equatable, Codable {
 
     /// The OSC Packet data for the bundle.
     public func data() -> Data {
-        var result = "#bundle".oscData
-        result.append(timeTag.oscData)
+        var result = Data(capacity: oscEncodedSize)
+        encode(into: &result)
+        return result
+    }
+
+    /// The number of bytes `encode(into:)` appends for the bundle:
+    /// "#bundle" and the time tag, then a 4-byte size prefix per element.
+    var oscEncodedSize: Int {
+        var size = 16
+        for element in elements { size += 4 + element.oscEncodedSize }
+        return size
+    }
+
+    /// Encodes the bundle's OSC data representation by appending it to the given buffer.
+    ///
+    /// Each element's size prefix is written as a placeholder and patched in
+    /// place once the element's bytes are known, avoiding a size pass per element.
+    /// - Parameter buffer: The buffer to append the bundle's bytes to.
+    func encode(into buffer: inout Data) {
+        "#bundle".encode(into: &buffer)
+        timeTag.encode(into: &buffer)
         for element in elements {
-            switch element {
-            case let .message(message):
-                let data = message.data()
-                let size = withUnsafeBytes(of: Int32(data.count).bigEndian) { Data($0) }
-                result.append(size)
-                result.append(data)
-            case let .bundle(bundle):
-                let data = bundle.data()
-                let size = withUnsafeBytes(of: Int32(data.count).bigEndian) { Data($0) }
-                result.append(size)
-                result.append(data)
+            let sizeIndex = buffer.count
+            buffer.append(contentsOf: [0, 0, 0, 0])
+            element.encode(into: &buffer)
+            let elementSize = Int32(buffer.count - sizeIndex - 4)
+            withUnsafeBytes(of: elementSize.bigEndian) { bytes in
+                buffer.replaceSubrange(sizeIndex ..< sizeIndex + 4, with: bytes.baseAddress!, count: 4)
             }
         }
-        return result
     }
 
     /// Flatten the elements contained by the bundle, ignoring all `OSCTimeTag`'s.

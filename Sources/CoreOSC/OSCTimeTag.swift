@@ -37,6 +37,12 @@ public struct OSCTimeTag: OSCArgumentProtocol, Equatable, CustomStringConvertibl
         "\(self.hex())\(type ? "(\(oscTypeTag))" : "")"
     }
 
+    /// Appends the time tag's seconds and fraction as 8 big-endian bytes to the given buffer.
+    public func encode(into buffer: inout Data) {
+        buffer.append(bigEndian: seconds)
+        buffer.append(bigEndian: fraction)
+    }
+
     public var description: String {
         "\(self.hex())"
     }

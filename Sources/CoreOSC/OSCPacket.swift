@@ -40,4 +40,25 @@ import Foundation
         }
     }
 
+    /// The number of bytes `encode(into:)` appends for the packet.
+    var oscEncodedSize: Int {
+        switch self {
+        case let .message(message):
+            return message.oscEncodedSize
+        case let .bundle(bundle):
+            return bundle.oscEncodedSize
+        }
+    }
+
+    /// Encodes the packet's OSC data representation by appending it to the given buffer.
+    /// - Parameter buffer: The buffer to append the packet's bytes to.
+    func encode(into buffer: inout Data) {
+        switch self {
+        case let .message(message):
+            message.encode(into: &buffer)
+        case let .bundle(bundle):
+            bundle.encode(into: &buffer)
+        }
+    }
+
 }
