@@ -105,13 +105,64 @@ class OSCMatchTests: XCTestCase {
                                        patternCharactersMatched: "/*/".count,
                                        addressCharactersMatched: "/abc/".count))
 
-// TODO: Match patterns backwards if the last character before the "/" is not a "*"
-// OSCMatch.swift:156
-//        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*cd",
-//                                      address: "/a/bef"),
-//                       OSCPatternMatch(match: .unmatched,
-//                                       patternCharactersMatched: "/a/*".count,
-//                                       addressCharactersMatched: "/a/b".count))
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*cd",
+                                      address: "/a/bef"),
+                       OSCPatternMatch(match: .unmatched,
+                                       patternCharactersMatched: "/a/*".count,
+                                       addressCharactersMatched: "/a/b".count))
+    }
+
+    func testAsteriskWithTailFullMatch() {
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*cd",
+                                      address: "/a/bcd").match, .fullMatch)
+        // The asterisk matches zero or more characters.
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*cd",
+                                      address: "/a/cd").match, .fullMatch)
+        // A tail bounded by a "/" leaves later parts unaffected.
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*cd/e",
+                                      address: "/a/bcd/e").match, .fullMatch)
+        // A bare trailing asterisk still matches the whole part.
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*",
+                                      address: "/a/anything").match, .fullMatch)
+        // A mid-part asterisk enforces its tail too.
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/b*cd",
+                                      address: "/a/bxxcd").match, .fullMatch)
+    }
+
+    func testAsteriskWithTailUnmatched() {
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*cd/e",
+                                      address: "/a/bef/e").match, .unmatched)
+        // A tail longer than the address part cannot match.
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*abcdef",
+                                      address: "/a/xy").match, .unmatched)
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/b*cd",
+                                      address: "/a/bxxce").match, .unmatched)
+    }
+
+    func testAsteriskTailWildcards() {
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*x?z",
+                                      address: "/a/QQxyz").match, .fullMatch)
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*[cd]",
+                                      address: "/a/bc").match, .fullMatch)
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*[!c]",
+                                      address: "/a/bc").match, .unmatched)
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*[0-9]",
+                                      address: "/a/cue7").match, .fullMatch)
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*{cd,ef}",
+                                      address: "/a/bef").match, .fullMatch)
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*{cd,ef}",
+                                      address: "/a/bgh").match, .unmatched)
+    }
+
+    func testMultipleAsterisksInOnePart() {
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*b*c",
+                                      address: "/a/xbyc").match, .fullMatch)
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*b*c",
+                                      address: "/a/xy").match, .unmatched)
+        // Only the final asterisk's tail is enforced: bytes between asterisks
+        // are subsumed by the wildcards around them.
+        XCTAssertEqual(OSCMatch.match(addressPattern: "/a/*b*c",
+                                      address: "/a/xc").match, .fullMatch)
     }
 
     // MARK: - Question Mark Wildcard OSC Address Pattern Tests

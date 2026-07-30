@@ -149,6 +149,14 @@ public enum OSCMatch {
     }
 
     /// Matches bytes from the given offsets onwards using the asterisk wildcard.
+    ///
+    /// The asterisk matches any sequence of zero or more bytes, but pattern
+    /// bytes between the final asterisk and the end of the part must still
+    /// match the tail of the address part — "/a/*cd" matches "/a/bcd" and not
+    /// "/a/bef". The tail is matched backwards from the part boundary and may
+    /// contain "?", "[...]" and "{...}" wildcards. With multiple asterisks in
+    /// one part, only the final asterisk's tail is enforced: bytes between
+    /// asterisks are subsumed by the wildcards around them.
     /// - Parameters:
     ///   - pattern: An OSC Address Pattern.
     ///   - patternIndex: The offset of the first byte in the OSC Address Pattern to begin matching from.
@@ -160,19 +168,150 @@ public enum OSCMatch {
                                       address: UnsafeBufferPointer<UInt8>,
                                       addressIndex: inout Int) -> Bool {
         if addressIndex == address.count { return false }
-        // Move address index up to next "/"
-        while addressIndex < address.count &&
-              address[addressIndex] != slash {
-            addressIndex += 1
+        let asteriskIndex = patternIndex
+        let addressPartStart = addressIndex
+        var addressPartEnd = addressIndex
+        while addressPartEnd < address.count &&
+              address[addressPartEnd] != slash {
+            addressPartEnd += 1
         }
-        // Move pattern index up to next "/"
-        while patternIndex < pattern.count &&
-              pattern[patternIndex] != slash {
-            patternIndex += 1
+        var patternPartEnd = patternIndex
+        var lastAsteriskIndex = asteriskIndex
+        while patternPartEnd < pattern.count &&
+              pattern[patternPartEnd] != slash {
+            if pattern[patternPartEnd] == asterisk { lastAsteriskIndex = patternPartEnd }
+            patternPartEnd += 1
         }
+        let tailStart = lastAsteriskIndex + 1
+        if tailStart == patternPartEnd ||
+            matchTailBackwards(pattern: pattern,
+                               tailStart: tailStart,
+                               tailEnd: patternPartEnd,
+                               address: address,
+                               partStart: addressPartStart,
+                               partEnd: addressPartEnd) {
+            patternIndex = patternPartEnd
+            addressIndex = addressPartEnd
+            return true
+        }
+        // The tail disagreed: report the pattern matched through the asterisk
+        // and the address through the first byte the asterisk consumed.
+        patternIndex = asteriskIndex + 1
+        addressIndex = Swift.min(addressPartStart + 1, addressPartEnd)
+        return false
+    }
 
-        // TODO: Match patterns backwards if the last character before the "/" is not a "*"
+    /// Matches the pattern bytes after a part's final asterisk backwards
+    /// against the end of the address part.
+    /// - Parameters:
+    ///   - pattern: An OSC Address Pattern.
+    ///   - tailStart: The offset of the first pattern byte after the asterisk.
+    ///   - tailEnd: The offset one past the last pattern byte of the part.
+    ///   - address: An OSC Address.
+    ///   - partStart: The offset of the first address byte of the part.
+    ///   - partEnd: The offset one past the last address byte of the part.
+    /// - Returns: A boolean value indicating whether the tail matches the end
+    ///   of the address part, leaving zero or more bytes for the asterisk.
+    private static func matchTailBackwards(pattern: UnsafeBufferPointer<UInt8>,
+                                           tailStart: Int,
+                                           tailEnd: Int,
+                                           address: UnsafeBufferPointer<UInt8>,
+                                           partStart: Int,
+                                           partEnd: Int) -> Bool {
+        var patternCursor = tailEnd - 1
+        var addressCursor = partEnd - 1
+        while patternCursor >= tailStart {
+            switch pattern[patternCursor] {
+            case questionMark:
+                guard addressCursor >= partStart else { return false }
+                patternCursor -= 1
+                addressCursor -= 1
+            case closeBracket:
+                var open = patternCursor - 1
+                while open >= tailStart && pattern[open] != openBracket { open -= 1 }
+                guard open >= tailStart,
+                      addressCursor >= partStart,
+                      bracketClass(pattern,
+                                   contentsStart: open + 1,
+                                   contentsEnd: patternCursor,
+                                   matches: address[addressCursor])
+                else { return false }
+                patternCursor = open - 1
+                addressCursor -= 1
+            case closeBrace:
+                var open = patternCursor - 1
+                while open >= tailStart && pattern[open] != openBrace { open -= 1 }
+                guard open >= tailStart else { return false }
+                // Try each comma-separated option against the address bytes
+                // ending at the cursor, in the order they are listed.
+                var matchedLength = -1
+                var optionStart = open + 1
+                var index = open + 1
+                while index <= patternCursor {
+                    if index == patternCursor || pattern[index] == comma {
+                        let length = index - optionStart
+                        let addressStart = addressCursor - length + 1
+                        if addressStart >= partStart,
+                           pattern[optionStart..<index].elementsEqual(address[addressStart..<(addressCursor + 1)]) {
+                            matchedLength = length
+                            break
+                        }
+                        optionStart = index + 1
+                    }
+                    index += 1
+                }
+                guard matchedLength >= 0 else { return false }
+                patternCursor = open - 1
+                addressCursor -= matchedLength
+            default:
+                guard addressCursor >= partStart,
+                      address[addressCursor] == pattern[patternCursor]
+                else { return false }
+                patternCursor -= 1
+                addressCursor -= 1
+            }
+        }
         return true
+    }
+
+    /// Evaluates whether a byte matches a square bracket character class,
+    /// replicating the forward matcher's semantics: literals, "-" ranges in
+    /// ASCII collating sequence, and "!" negation as the first character.
+    /// - Parameters:
+    ///   - pattern: An OSC Address Pattern.
+    ///   - contentsStart: The offset of the first byte inside the brackets.
+    ///   - contentsEnd: The offset of the closing bracket.
+    ///   - byte: The address byte to evaluate.
+    /// - Returns: A boolean value indicating whether the byte matches the class.
+    private static func bracketClass(_ pattern: UnsafeBufferPointer<UInt8>,
+                                     contentsStart: Int,
+                                     contentsEnd: Int,
+                                     matches byte: UInt8) -> Bool {
+        var index = contentsStart
+        var val = true
+        if index < contentsEnd, pattern[index] == exclamationMark {
+            val = false
+            index += 1
+        }
+        var matched = false
+        while index < contentsEnd {
+            if index + 1 < contentsEnd, pattern[index + 1] == minus {
+                if index + 2 < contentsEnd,
+                   byte >= pattern[index],
+                   byte <= pattern[index + 2] {
+                    matched = true
+                    break
+                }
+                index += 3
+            } else {
+                if pattern[index] == byte {
+                    matched = true
+                    break
+                }
+                index += 1
+            }
+        }
+        return matched == val
     }
 
     /// Matches bytes from the given offsets onwards.
