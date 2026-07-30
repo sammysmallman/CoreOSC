@@ -54,7 +54,7 @@ public struct OSCMethod: Hashable, Equatable {
     ///   - dispatch: The way the method may be invoked by a received OSC Address Pattern.
     ///   - invokedAction: A closure that is invoked when the address pattern of an OSC Message matches against the given address. It receives the matched `OSCMessage` and an optional user information dictionary.
     ///
-    /// The user information dictionary stores any additional objects that the invoking action might use.
+    /// The user information dictionary carries per-invocation context that is not part of the OSC Message itself — for example, the destination a reply should be sent to.
     public init(with address: OSCAddress,
                 dispatch: OSCDispatchPolicy = .pattern,
                 invokedAction: @escaping (_ message: OSCMessage,
@@ -75,7 +75,7 @@ public struct OSCMethod: Hashable, Equatable {
     /// Invoke the method.
     /// - Parameters:
     ///   - message:  An OSC Message to invoke the method with.
-    ///   - userInfo: The user information dictionary stores any additional objects that the invoking action might use.
+    ///   - userInfo: Per-invocation context from the call site, passed through to every method the message invokes — for example, the destination a reply should be sent to.
     /// - Returns: A boolean value indicating whether the method has been invoked.
     ///
     /// The message's address pattern is matched according to the method's ``dispatch``

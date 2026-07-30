@@ -41,7 +41,7 @@ public struct OSCAddressSpace {
     /// Invoke the address spaces methods with a message.
     /// - Parameters:
     ///   - message: An OSC Message to invoke the methods with.
-    ///   - userInfo: The user information dictionary stores any additional objects that the invoking action might use.
+    ///   - userInfo: Per-invocation context from the call site, passed through to every method the message invokes — for example, the destination a reply should be sent to.
     ///
     /// Each method's address is matched against the address pattern of the message
     /// according to the method's ``OSCDispatchPolicy``. Matched methods are invoked
