@@ -26,7 +26,7 @@ import Foundation
 public enum CoreOSC {
     
     /// This package's semantic version number, mirrored also in git history as a `git tag`.
-    public static let version: String = "2.3.0"
+    public static let version: String = "2.4.0"
     
     /// The license agreement this repository is licensed under.
     public static let license: String = {
