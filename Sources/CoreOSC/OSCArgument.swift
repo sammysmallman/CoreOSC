@@ -22,7 +22,6 @@
 //
 
 import Foundation
-import CoreGraphics
 
 /// An OSC Argument.
 public protocol OSCArgumentProtocol: Sendable {
@@ -150,17 +149,16 @@ extension Int32: OSCArgumentProtocol {
 
 extension Int: OSCArgumentProtocol {
 
+    /// Values outside the range of `Int32` — OSC's only required integer
+    /// type — are clamped to `Int32.min`/`Int32.max`.
     public var oscData: Data {
-        guard let int = Int32(exactly: self) else {
-            return Int32(0).bigEndian.data
-        }
-        return int.bigEndian.data
+        Int32(clamping: self).bigEndian.data
     }
 
     public var oscTypeTag: Character { .oscTypeTagInt32 }
 
     public func oscAnnotation(withType type: Bool = true) -> String {
-        let int = Int32(exactly: self) ?? 0
+        let int = Int32(clamping: self)
         return "\(int)\(type ? "(\(oscTypeTag))" : "")"
     }
 
@@ -169,14 +167,7 @@ extension Int: OSCArgumentProtocol {
 extension Float32: OSCArgumentProtocol {
 
     public var oscData: Data {
-        var float: CFSwappedFloat32 = CFConvertFloatHostToSwapped(self)
-        let size: Int = MemoryLayout<CFSwappedFloat32>.size
-        let result: [UInt8] = withUnsafePointer(to: &float) {
-            $0.withMemoryRebound(to: UInt8.self, capacity: size) {
-                Array(UnsafeBufferPointer(start: $0, count: size))
-            }
-        }
-        return Data(result)
+        withUnsafeBytes(of: bitPattern.bigEndian) { Data($0) }
     }
 
     public var oscTypeTag: Character { .oscTypeTagFloat32 }
@@ -189,17 +180,9 @@ extension Float32: OSCArgumentProtocol {
 
 extension Double: OSCArgumentProtocol {
 
-    public var oscData: Data {
-        let floatFromDouble = Float32(exactly: self) ?? Float32(0)
-        var float: CFSwappedFloat32 = CFConvertFloatHostToSwapped(floatFromDouble)
-        let size: Int = MemoryLayout<CFSwappedFloat32>.size
-        let result: [UInt8] = withUnsafePointer(to: &float) {
-            $0.withMemoryRebound(to: UInt8.self, capacity: size) {
-                Array(UnsafeBufferPointer(start: $0, count: size))
-            }
-        }
-        return Data(result)
-    }
+    /// The value is truncated to the nearest `Float32` — OSC has no 64-bit
+    /// float in the 1.1 required types.
+    public var oscData: Data { Float32(self).oscData }
 
     public var oscTypeTag: Character { .oscTypeTagFloat32 }
 
@@ -211,17 +194,9 @@ extension Double: OSCArgumentProtocol {
 
 extension CGFloat: OSCArgumentProtocol {
     
-    public var oscData: Data {
-        let floatFromCGFloat = Float32(truncating: NSNumber(value: self))
-        var float: CFSwappedFloat32 = CFConvertFloatHostToSwapped(floatFromCGFloat)
-        let size: Int = MemoryLayout<CFSwappedFloat32>.size
-        let result: [UInt8] = withUnsafePointer(to: &float) {
-            $0.withMemoryRebound(to: UInt8.self, capacity: size) {
-                Array(UnsafeBufferPointer(start: $0, count: size))
-            }
-        }
-        return Data(result)
-    }
+    /// The value is truncated to the nearest `Float32` — OSC has no 64-bit
+    /// float in the 1.1 required types.
+    public var oscData: Data { Float32(self).oscData }
     
     public var oscTypeTag: Character { .oscTypeTagFloat32 }
     
