@@ -24,10 +24,10 @@
 import Foundation
 
 /// A store of OSC Filter Addresses that can be filtered by a server receiving an OSC Message.
-public struct OSCFilterAddressStore {
+public struct OSCFilterAddressStore: Sendable {
 
     /// The priority for which the store orders filtered addresses.
-    public enum FilterPriority {
+    public enum FilterPriority: Sendable {
         /// Parts that match as raw strings are prioritised.
         /// OSC Filter Addresses are sorted by the amount of `String` matches.
         case string
@@ -110,6 +110,20 @@ public struct OSCFilterAddressStore {
             }
         }
         return matchedAddresses.count
+    }
+
+    /// Returns whether any filter address in the store matches against the given address pattern.
+    ///
+    /// Stops at the first match — prefer this over ``count(with:)`` when only
+    /// the existence of a match matters, e.g. when filtering inbound messages.
+    /// - Parameter addressPattern: An OSC Address Pattern to match the store against.
+    public func matches(with addressPattern: OSCAddressPattern) -> Bool {
+        addresses.contains { address in
+            guard address.parts.count == addressPattern.parts.count else { return false }
+            return addressPattern.parts.enumerated().allSatisfy { index, part in
+                address.match(part: part, index: index) != .different
+            }
+        }
     }
 
 }

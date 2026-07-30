@@ -24,7 +24,7 @@
 import Foundation
 
 /// A store of OSC Addresses that can be filtered by a server receiving an OSC Message.
-public struct OSCAddressStore{
+public struct OSCAddressStore: Sendable {
 
     /// A `Set` of OSC Addresses to filter on.
     public var addresses: Set<OSCAddress> = []
@@ -56,6 +56,20 @@ public struct OSCAddressStore{
     /// Each address is matched against the address pattern of the message.
     public func count(with addressPattern: OSCAddressPattern) -> Int {
         filter(with: addressPattern).count
+    }
+
+    /// Returns whether any address in the store matches against the given address pattern.
+    ///
+    /// Stops at the first match — prefer this over ``count(with:)`` when only
+    /// the existence of a match matters, e.g. when filtering inbound messages.
+    /// - Parameter addressPattern: An OSC Address Pattern to match the store against.
+    public func matches(with addressPattern: OSCAddressPattern) -> Bool {
+        addresses.contains {
+            OSCMatch.match(
+                addressPattern: addressPattern.fullPath,
+                address: $0.fullPath
+            ).match == .fullMatch
+        }
     }
 
 }

@@ -44,25 +44,6 @@ public struct OSCBundle: Sendable, Equatable, Codable {
         self.elements = elements
     }
 
-    public static func == (lhs: OSCBundle, rhs: OSCBundle) -> Bool {
-        guard lhs.timeTag == rhs.timeTag,
-              lhs.elements.count == rhs.elements.count
-        else { return false }
-        for (index, element) in lhs.elements.enumerated() {
-            switch element {
-            case let .message(lhsMessage):
-                guard case let .message(rhsMessage) = rhs.elements[index],
-                      lhsMessage == rhsMessage else { return false }
-                continue
-            case let .bundle(lhsBundle):
-                guard case let .bundle(rhsBundle) = rhs.elements[index],
-                      lhsBundle == rhsBundle else { return false }
-                continue
-            }
-        }
-        return true
-    }
-
     /// The OSC Packet data for the bundle.
     public func data() -> Data {
         var result = "#bundle".oscData
@@ -87,12 +68,18 @@ public struct OSCBundle: Sendable, Equatable, Codable {
     /// Flatten the elements contained by the bundle, ignoring all `OSCTimeTag`'s.
     /// - Returns: An array of `OSCMessage`'s.
     public func flatten() -> [OSCMessage] {
-        elements.reduce([OSCMessage]()) {
-            switch $1 {
+        var messages: [OSCMessage] = []
+        appendMessages(into: &messages)
+        return messages
+    }
+
+    private func appendMessages(into messages: inout [OSCMessage]) {
+        for element in elements {
+            switch element {
             case let .message(message):
-                return $0 + [message]
+                messages.append(message)
             case let .bundle(bundle):
-                return $0 + bundle.flatten()
+                bundle.appendMessages(into: &messages)
             }
         }
     }

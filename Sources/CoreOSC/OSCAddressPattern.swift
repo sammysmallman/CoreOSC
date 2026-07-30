@@ -64,16 +64,24 @@ public struct OSCAddressPattern: Hashable, Equatable, Sendable, Codable {
     /// - Parameter addressPattern: The full path to one or more OSC Methods.
     /// - Throws: `OSCAddressError` if the format of the given address pattern is invalid.
     public init(_ addressPattern: String) throws {
-        let regex = "^\\/(?:(?![ #])[\\x00-\\x7F])+$"
-        if NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: addressPattern) {
-            self.fullPath = addressPattern
-            var addressParts = addressPattern.components(separatedBy: "/")
-            addressParts.removeFirst()
-            self.parts = addressParts
-            self.methodName = addressParts.last ?? ""
-        } else {
+        // Semantics identical to the previous per-init NSPredicate regex
+        // "^\\/(?:(?![ #])[\\x00-\\x7F])+$": a leading "/", at least one
+        // further character, all ASCII, no space or hash — validated in a
+        // single byte pass without compiling a regular expression.
+        let bytes = addressPattern.utf8
+        guard bytes.count >= 2, bytes.first == 0x2F else {
             throw OSCAddressError.invalidAddress
         }
+        for byte in bytes.dropFirst() {
+            guard byte <= 0x7F, byte != 0x20, byte != 0x23 else {
+                throw OSCAddressError.invalidAddress
+            }
+        }
+        self.fullPath = addressPattern
+        var addressParts = addressPattern.components(separatedBy: "/")
+        addressParts.removeFirst()
+        self.parts = addressParts
+        self.methodName = addressParts.last ?? ""
     }
 
     /// A raw OSC Address Pattern.

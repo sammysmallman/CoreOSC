@@ -24,7 +24,7 @@
 import Foundation
 
 /// An object that represents an OSC Address Pattern to be filtered.
-public struct OSCFilterAddress: Hashable, Equatable {
+public struct OSCFilterAddress: Hashable, Equatable, Sendable, Codable {
 
     /// The full path to an OSC Method, including the filter wildcard.
     public let fullPath: String
@@ -56,9 +56,15 @@ public struct OSCFilterAddress: Hashable, Equatable {
     ///
     /// - Parameter filterAddress: The full path to an OSC Filter Method.
     /// - Throws: `OSCAddressError` if the format of the given address is invalid.
+    /// The validation expression, compiled once — NSPredicate compiled it per
+    /// initialisation, and its format matching is unimplemented on Linux.
+    private static let validationRegex = try! NSRegularExpression(
+        pattern: "^\\/(?:(?:(?![ #])[\\x00-\\x7F])+|(?:(?<=\\/)#)(?=\\/|$))+$"
+    )
+
     public init(_ filterAddress: String) throws {
-        let regex = "^\\/(?:(?:(?![ #])[\\x00-\\x7F])+|(?:(?<=\\/)#)(?=\\/|$))+$"
-        if NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: filterAddress) {
+        let range = NSRange(location: 0, length: filterAddress.utf16.count)
+        if Self.validationRegex.firstMatch(in: filterAddress, range: range)?.range == range {
             self.fullPath = filterAddress
             var addressParts = filterAddress.components(separatedBy: "/")
             addressParts.removeFirst()

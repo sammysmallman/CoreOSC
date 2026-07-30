@@ -24,10 +24,10 @@
 import Foundation
 
 /// An object that represents the result of matching an OSC Address Pattern against an OSC Address.
-public struct OSCPatternMatch: Equatable {
+public struct OSCPatternMatch: Equatable, Sendable {
 
     /// The result of matching an OSC Address Pattern with an OSC Address.
-    public enum Matching: Int {
+    public enum Matching: Int, Sendable {
 
         /// The pattern and address failed to match.
         case unmatched

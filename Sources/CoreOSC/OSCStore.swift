@@ -22,7 +22,7 @@
 //
 
 /// A store of addresses that can be filtered by a server receiving an OSC Message.
-@frozen public enum OSCStore {
+@frozen public enum OSCStore: Sendable {
     /// A store of OSC Addresses that can be filtered by a server receiving an OSC Message.
     case address(OSCAddressStore)
     /// A store of OSC Filter Addresses that can be filtered by a server receiving an OSC Message.
@@ -48,6 +48,20 @@
             store.count(with: addressPattern)
         case let .filter(store):
             store.count(with: addressPattern)
+        }
+    }
+
+    /// Returns whether any address in the store matches against the given address pattern.
+    ///
+    /// Stops at the first match — prefer this over ``count(with:)`` when only
+    /// the existence of a match matters, e.g. when filtering inbound messages.
+    /// - Parameter addressPattern: An OSC Address Pattern to match the store against.
+    public func matches(with addressPattern: OSCAddressPattern) -> Bool {
+        switch self {
+        case let .address(store):
+            store.matches(with: addressPattern)
+        case let .filter(store):
+            store.matches(with: addressPattern)
         }
     }
 

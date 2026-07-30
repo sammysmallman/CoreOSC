@@ -24,7 +24,7 @@
 import Foundation
 
 /// An object that represents an OSC Address Pattern to be refracted.
-public struct OSCRefractingAddress: Hashable, Equatable {
+public struct OSCRefractingAddress: Hashable, Equatable, Sendable, Codable {
 
     /// The full path to an OSC Method, including the refracting wildcard.
     public let fullPath: String
@@ -53,9 +53,15 @@ public struct OSCRefractingAddress: Hashable, Equatable {
     /// 
     /// - Parameter refractingAddress: The full path to an OSC Method.
     /// - Throws: `OSCAddressError` if the format of the given address is invalid.
+    /// The validation expression, compiled once — NSPredicate compiled it per
+    /// initialisation, and its format matching is unimplemented on Linux.
+    private static let validationRegex = try! NSRegularExpression(
+        pattern: "^\\/(?:(?:(?![ #])[\\x00-\\x7F])+|(?:(?<=\\/)#\\d?[1-9]|[1-9]0)(?=\\/|$))+$"
+    )
+
     public init(_ refractingAddress: String) throws {
-        let regex = "^\\/(?:(?:(?![ #])[\\x00-\\x7F])+|(?:(?<=\\/)#\\d?[1-9]|[1-9]0)(?=\\/|$))+$"
-        if NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: refractingAddress) {
+        let range = NSRange(location: 0, length: refractingAddress.utf16.count)
+        if Self.validationRegex.firstMatch(in: refractingAddress, range: range)?.range == range {
             self.fullPath = refractingAddress
             var addressParts = refractingAddress.components(separatedBy: "/")
             addressParts.removeFirst()

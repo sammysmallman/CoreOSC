@@ -210,10 +210,8 @@ extension String: OSCArgumentProtocol {
 
     public var oscData: Data {
         var argumentData = data(using: .utf8)!
-        for _ in 1...4 - argumentData.count % 4 {
-            var null = UInt8(0)
-            argumentData.append(&null, count: 1)
-        }
+        // 1-4 null bytes: at least one terminator, padded to a 4-byte boundary.
+        argumentData.append(contentsOf: repeatElement(0, count: 4 - argumentData.count % 4))
         return argumentData
     }
 
