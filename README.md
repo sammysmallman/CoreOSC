@@ -26,7 +26,7 @@ Add the package dependency to your Xcode project or `Package.swift` using the re
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sammysmallman/CoreOSC", .upToNextMajor(from: "2.2.2"))
+    .package(url: "https://github.com/sammysmallman/CoreOSC", .upToNextMajor(from: "2.3.0"))
 ]
 ```
 
