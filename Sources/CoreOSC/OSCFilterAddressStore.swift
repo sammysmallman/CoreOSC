@@ -50,10 +50,10 @@ public struct OSCFilterAddressStore: Sendable {
         self.addresses = addresses
     }
 
-    /// Returns a `Set` of `OSCFilterAddress`s that match against the given `OSCMessage`.
-    /// - Parameter message: An OSC Message to filter the store with.
+    /// Returns the `OSCFilterAddress`s that match against the given OSC Address Pattern.
+    /// - Parameter addressPattern: An OSC Address Pattern to filter the store with.
     ///
-    /// Each filter address is matched against the address pattern of the message.
+    /// Each filter address is matched against the given address pattern.
     /// - Returns: An `Array` of `OSCFilterAddress` ordered by priority.
     public func filter(with addressPattern: OSCAddressPattern) -> [OSCFilterAddress] {
         var matchedAddresses = addresses.map { OSCFilterStoreMatch(address: $0) }
@@ -90,10 +90,10 @@ public struct OSCFilterAddressStore: Sendable {
         }
     }
     
-    /// Returns the number of addresses that match against the given `OSCMessage`.
-    /// - Parameter message: An OSC Message to filter the store with.
+    /// Returns the number of addresses that match against the given OSC Address Pattern.
+    /// - Parameter addressPattern: An OSC Address Pattern to filter the store with.
     ///
-    /// Each filter address is matched against the address pattern of the message.
+    /// Each filter address is matched against the given address pattern.
     public func count(with addressPattern: OSCAddressPattern) -> Int {
         var matchedAddresses = addresses
         // 1. The OSC Filter Address and the OSC Address Pattern contain the same number of parts; and
