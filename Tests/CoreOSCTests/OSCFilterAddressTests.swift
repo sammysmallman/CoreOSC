@@ -32,13 +32,13 @@ class OSCFilterAddressTests: XCTestCase {
         XCTAssertNoThrow(try OSCFilterAddress("//#"))
         XCTAssertNoThrow(try OSCFilterAddress("//#/"))
         XCTAssertNoThrow(try OSCFilterAddress("/core/osc/"))
-        XCTAssertNoThrow(try OSCFilterAddress("/core/osc/*"))
+        XCTAssertThrowsError(try OSCFilterAddress("/core/osc/*"))
         XCTAssertNoThrow(try OSCFilterAddress("/core/osc/,"))
-        XCTAssertNoThrow(try OSCFilterAddress("/core/osc/?"))
-        XCTAssertNoThrow(try OSCFilterAddress("/core/osc/["))
-        XCTAssertNoThrow(try OSCFilterAddress("/core/osc/]"))
-        XCTAssertNoThrow(try OSCFilterAddress("/core/osc/{"))
-        XCTAssertNoThrow(try OSCFilterAddress("/core/osc/}"))
+        XCTAssertThrowsError(try OSCFilterAddress("/core/osc/?"))
+        XCTAssertThrowsError(try OSCFilterAddress("/core/osc/["))
+        XCTAssertThrowsError(try OSCFilterAddress("/core/osc/]"))
+        XCTAssertThrowsError(try OSCFilterAddress("/core/osc/{"))
+        XCTAssertThrowsError(try OSCFilterAddress("/core/osc/}"))
     }
 
     func testInitializingOSCFilterAddressFails() {
@@ -69,6 +69,27 @@ class OSCFilterAddressTests: XCTestCase {
         XCTAssertEqual(OSCFilterAddress.evaluate(with: "/🥺"), .failure(.ascii))
         XCTAssertEqual(OSCFilterAddress.evaluate(with: "/ "), .failure(.space))
         XCTAssertEqual(OSCFilterAddress.evaluate(with: "/core/osc"), .success("/core/osc"))
+    }
+
+    func testWildcardCharactersRejectedByInit() {
+        // OSC Address Pattern wildcards are not filter wildcards: a filter
+        // matches parts as literal strings or with "#", so these characters
+        // would be inert and the filter could never match anything.
+        XCTAssertThrowsError(try OSCFilterAddress("/cue/*/fire"))
+        XCTAssertThrowsError(try OSCFilterAddress("/cue/[12]/fire"))
+        XCTAssertThrowsError(try OSCFilterAddress("/cue/{a,b}/fire"))
+        XCTAssertThrowsError(try OSCFilterAddress("/cue/?/fire"))
+        XCTAssertNoThrow(try OSCFilterAddress("/cue/#/fire"))
+    }
+
+    func testEvaluateRejectsWildcardCharacters() {
+        XCTAssertEqual(OSCFilterAddress.evaluate(with: "/cue/*/fire"), .failure(.asterisk))
+        XCTAssertEqual(OSCFilterAddress.evaluate(with: "/cue/?/fire"), .failure(.questionMark))
+        XCTAssertEqual(OSCFilterAddress.evaluate(with: "/cue/[/fire"), .failure(.openBracket))
+        XCTAssertEqual(OSCFilterAddress.evaluate(with: "/cue/]/fire"), .failure(.closeBracket))
+        XCTAssertEqual(OSCFilterAddress.evaluate(with: "/cue/{/fire"), .failure(.openCurlyBrace))
+        XCTAssertEqual(OSCFilterAddress.evaluate(with: "/cue/}/fire"), .failure(.closeCurlyBrace))
+        XCTAssertEqual(OSCFilterAddress.evaluate(with: "/cue/#/fire"), .success("/cue/#/fire"))
     }
 
 }

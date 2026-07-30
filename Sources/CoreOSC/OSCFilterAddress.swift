@@ -43,6 +43,18 @@ public struct OSCFilterAddress: Hashable, Equatable, Sendable, Codable {
     ///
     /// Printable ASCII characters not allowed in names of OSC Methods or OSC Containers:
     /// - ' ' - Space
+    /// - \# - Hash, other than as a whole part, where it is the filter wildcard
+    /// - \* - Asterisk
+    /// - ? - Question Mark
+    /// - [ - Open Bracket
+    /// - ] - Close Bracket
+    /// - { - Open Curly Brace
+    /// - } - Close Curly Brace
+    ///
+    /// The OSC Address Pattern wildcard characters are rejected because a filter
+    /// address matches parts either as literal strings or with its own "#"
+    /// wildcard — pattern wildcards would be accepted as syntax yet matched as
+    /// literal text, producing a filter that can never match anything.
     ///
     /// Filtering allows for multiple OSC Address Patterns to invoke a single method when they match against an OSC Filter Address.
     /// An OSC Filter Address uses the "#" wildcard to omit certain parts from the match. Instead of building an OSC Address Space that
@@ -59,7 +71,7 @@ public struct OSCFilterAddress: Hashable, Equatable, Sendable, Codable {
     /// The validation expression, compiled once — NSPredicate compiled it per
     /// initialisation, and its format matching is unimplemented on Linux.
     private static let validationRegex = try! NSRegularExpression(
-        pattern: "^\\/(?:(?:(?![ #])[\\x00-\\x7F])+|(?:(?<=\\/)#)(?=\\/|$))+$"
+        pattern: "^\\/(?:(?:(?![ #*?\\[\\]{}])[\\x00-\\x7F])+|(?:(?<=\\/)#)(?=\\/|$))+$"
     )
 
     public init(_ filterAddress: String) throws {
@@ -94,6 +106,12 @@ public struct OSCFilterAddress: Hashable, Equatable, Sendable, Codable {
         for character in address {
             guard character.isASCII == true else { return .failure(.ascii) }
             guard character != " " else { return .failure(.space) }
+            guard character != "*" else { return .failure(.asterisk) }
+            guard character != "?" else { return .failure(.questionMark) }
+            guard character != "[" else { return .failure(.openBracket) }
+            guard character != "]" else { return .failure(.closeBracket) }
+            guard character != "{" else { return .failure(.openCurlyBrace) }
+            guard character != "}" else { return .failure(.closeCurlyBrace) }
         }
         return .success(address)
     }
