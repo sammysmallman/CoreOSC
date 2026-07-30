@@ -23,7 +23,8 @@
 
 import Foundation
 
-/// An object that represents an OSC Address Pattern to be filtered.
+/// An object that represents the full path to an OSC Filter Method in an OSC Address Filter,
+/// where a "#" part matches any corresponding part of a received OSC Address Pattern.
 public struct OSCFilterAddress: Hashable, Equatable, Sendable, Codable {
 
     /// The full path to an OSC Method, including the filter wildcard.

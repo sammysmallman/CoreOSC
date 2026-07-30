@@ -23,7 +23,10 @@
 
 import Foundation
 
-/// A tree structure containing a set of OSC Methods to be invoked by a client.
+/// A set of OSC Methods invoked by matching received messages against their addresses.
+///
+/// Wildcards in a received message's address pattern — "*", "?", "[]", "{}" — are pattern
+/// matched against each method's fixed `OSCAddress`; every method that fully matches is invoked.
 public struct OSCAddressSpace {
     
     /// A `Set` of OSC Methods to be invoked by a client.
@@ -37,7 +40,7 @@ public struct OSCAddressSpace {
     
     /// Invoke the address spaces methods with a message.
     /// - Parameters:
-    ///   - message: An OSC Message to ivoke the methods with.
+    ///   - message: An OSC Message to invoke the methods with.
     ///   - userInfo: The user information dictionary stores any additional objects that the invoking action might use.
     ///   
     /// Each methods address is pattern matched against the address pattern of the message.

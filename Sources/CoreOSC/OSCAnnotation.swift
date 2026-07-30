@@ -23,7 +23,7 @@
 
 import Foundation
 
-/// A human readable/writable representation of an OSC Packet.
+/// A human readable/writable representation of an OSC Message.
 public struct OSCAnnotation {
 
     /// An OSC annotation style.

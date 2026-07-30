@@ -225,7 +225,7 @@ OSCAnnotation.annotation(for: message, style: .spaces, type: true)
 
 ### Address Filters
 
-An `OSCAddressFilter` is kind of the reverse of an `OSCAddressSpace`. Where an address space allows for an address pattern to invoke multiple predefined methods, an address filter allows for a single method to be invoked by multiple loosely formatted address patterns by using a "#" wildcard character. Think of an address filter as a container for blocks of code that can be dispatched when a message is received with an address pattern that matches against a filter method's `OSCFilterAddress`.
+An `OSCAddressFilter` is the mirror image of an `OSCAddressSpace`. In an address space, wildcards arrive in the message's address pattern and match against your fixed addresses; in an address filter, the wildcard lives in the registered `OSCFilterAddress` — "#" matches any single part — so one method can respond to a whole family of addresses, such as "/cue/#/fired" for every cue number.
 
 #### Filter Methods
 

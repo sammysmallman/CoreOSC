@@ -23,7 +23,8 @@
 
 import Foundation
 
-/// An object that represents an OSC Address Pattern to be refracted.
+/// An object that refracts an OSC Address Pattern into a new one: a part written "#n" is
+/// replaced by the nth part of the given address pattern, other parts pass through unchanged.
 public struct OSCRefractingAddress: Hashable, Equatable, Sendable, Codable {
 
     /// The full path to an OSC Method, including the refracting wildcard.

@@ -29,7 +29,7 @@ public struct OSCTimeTag: OSCArgumentProtocol, Equatable, CustomStringConvertibl
     /// The OSC data representation for the argument.
     public var oscData: Data { Data(seconds.bigEndian.data + fraction.bigEndian.data) }
 
-    /// The OSC type tag chracter for the argument.
+    /// The OSC type tag character for the argument.
     public var oscTypeTag: Character { Character.oscTypeTagTimeTag }
 
     /// The OSC annotation for the argument.

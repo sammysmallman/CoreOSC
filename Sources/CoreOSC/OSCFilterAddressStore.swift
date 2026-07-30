@@ -34,7 +34,7 @@ public struct OSCFilterAddressStore: Sendable {
         /// Parts that match with the wildcard "#" are prioritised.
         /// OSC Filter Addresses sorted by the amount of "#" matches.
         case wildcard
-        /// There is no prioritization.
+        /// There is no prioritisation.
         case none
     }
 

@@ -23,7 +23,8 @@
 
 import Foundation
 
-/// The potential destination of an OSC Message and a point of control made available by invoking the method.
+/// A closure paired with the OSC Filter Address needed to invoke it: the potential destination
+/// of a whole family of OSC Messages and a point of control made available by invoking the method.
 public struct OSCFilterMethod: Hashable, Equatable {
     
     /// An object that represents the full path to this OSC Method in an OSC Address Filter.
