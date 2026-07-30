@@ -100,13 +100,28 @@ public struct OSCMessage: Sendable, Equatable, Codable {
 
     /// The OSC Packet data for the message.
     public func data() -> Data {
-        var result = addressPattern.fullPath.oscData
+        var result = Data(capacity: oscEncodedSize)
+        encode(into: &result)
+        return result
+    }
+
+    /// The number of bytes `encode(into:)` appends for the message.
+    var oscEncodedSize: Int {
+        let typeTagCount = 1 + arguments.count
+        var size = addressPattern.fullPath.oscEncodedSize + typeTagCount + 4 - typeTagCount % 4
+        for argument in arguments { size += argument.oscEncodedSize }
+        return size
+    }
+
+    /// Encodes the message's OSC data representation by appending it to the given buffer.
+    /// - Parameter buffer: The buffer to append the message's bytes to.
+    func encode(into buffer: inout Data) {
+        addressPattern.fullPath.encode(into: &buffer)
         var typeTags = ","
         typeTags.reserveCapacity(arguments.count + 1)
         for argument in arguments { typeTags.append(argument.oscTypeTag) }
-        result.append(typeTags.oscData)
-        for argument in arguments { result.append(argument.oscData) }
-        return result
+        typeTags.encode(into: &buffer)
+        for argument in arguments { argument.encode(into: &buffer) }
     }
 
     /// Pattern match the message against an OSC Address.

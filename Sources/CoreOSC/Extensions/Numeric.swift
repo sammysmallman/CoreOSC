@@ -40,3 +40,16 @@ extension Int32 {
     }
 
 }
+
+extension Data {
+
+    /// Appends the big-endian representation of the given integer without
+    /// allocating an intermediate `Data`.
+    /// - Parameter value: The integer whose big-endian bytes to append.
+    mutating func append<Value: FixedWidthInteger>(bigEndian value: Value) {
+        Swift.withUnsafeBytes(of: value.bigEndian) { bytes in
+            append(bytes.bindMemory(to: UInt8.self))
+        }
+    }
+
+}

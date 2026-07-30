@@ -25,16 +25,29 @@ import Foundation
 
 /// An OSC Argument.
 public protocol OSCArgumentProtocol: Sendable {
-    
+
     /// The OSC data representation for the argument conforming to the protocol.
     var oscData: Data { get }
-    
+
     /// The OSC type tag chracter for the argument conforming to the protocol.
     var oscTypeTag: Character { get }
-    
+
     /// The OSC annotation for the argument conforming to the protocol.
     func oscAnnotation(withType type: Bool) -> String
-    
+
+    /// Encodes the argument's OSC data representation by appending it to the given buffer.
+    /// - Parameter buffer: The buffer to append the argument's bytes to.
+    func encode(into buffer: inout Data)
+
+}
+
+extension OSCArgumentProtocol {
+
+    /// Appends the argument's `oscData` to the given buffer.
+    public func encode(into buffer: inout Data) {
+        buffer.append(oscData)
+    }
+
 }
 
 public enum OSCArgument: OSCArgumentProtocol, CustomStringConvertible, Equatable, Codable {
@@ -83,6 +96,41 @@ public enum OSCArgument: OSCArgumentProtocol, CustomStringConvertible, Equatable
             return Data()
         case let .timeTag(value):
             return value.oscData
+        }
+    }
+
+    /// Encodes the argument's OSC data representation by appending it to the given buffer.
+    /// - Parameter buffer: The buffer to append the argument's bytes to.
+    public func encode(into buffer: inout Data) {
+        switch self {
+        case let .int32(value):
+            value.encode(into: &buffer)
+        case let .float32(value):
+            value.encode(into: &buffer)
+        case let .string(value):
+            value.encode(into: &buffer)
+        case let .blob(value):
+            value.encode(into: &buffer)
+        case .true, .false, .nil, .impulse:
+            break
+        case let .timeTag(value):
+            value.encode(into: &buffer)
+        }
+    }
+
+    /// The number of bytes `encode(into:)` appends for the argument.
+    var oscEncodedSize: Int {
+        switch self {
+        case .int32, .float32:
+            return 4
+        case let .string(value):
+            return value.oscEncodedSize
+        case let .blob(value):
+            return 4 + (value.count + 3) / 4 * 4
+        case .true, .false, .nil, .impulse:
+            return 0
+        case .timeTag:
+            return 8
         }
     }
 
@@ -145,6 +193,11 @@ extension Int32: OSCArgumentProtocol {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
     }
 
+    /// Appends the integer's 4 big-endian bytes to the given buffer.
+    public func encode(into buffer: inout Data) {
+        buffer.append(bigEndian: self)
+    }
+
 }
 
 extension Int: OSCArgumentProtocol {
@@ -162,6 +215,11 @@ extension Int: OSCArgumentProtocol {
         return "\(int)\(type ? "(\(oscTypeTag))" : "")"
     }
 
+    /// Appends the clamped `Int32` value's 4 big-endian bytes to the given buffer.
+    public func encode(into buffer: inout Data) {
+        buffer.append(bigEndian: Int32(clamping: self))
+    }
+
 }
 
 extension Float32: OSCArgumentProtocol {
@@ -174,6 +232,11 @@ extension Float32: OSCArgumentProtocol {
 
     public func oscAnnotation(withType type: Bool = true) -> String {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
+    }
+
+    /// Appends the float's 4 big-endian bytes to the given buffer.
+    public func encode(into buffer: inout Data) {
+        buffer.append(bigEndian: bitPattern)
     }
 
 }
@@ -190,20 +253,30 @@ extension Double: OSCArgumentProtocol {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
     }
 
+    /// Appends the truncated `Float32` value's 4 big-endian bytes to the given buffer.
+    public func encode(into buffer: inout Data) {
+        Float32(self).encode(into: &buffer)
+    }
+
 }
 
 extension CGFloat: OSCArgumentProtocol {
-    
+
     /// The value is truncated to the nearest `Float32` — OSC has no 64-bit
     /// float in the 1.1 required types.
     public var oscData: Data { Float32(self).oscData }
-    
+
     public var oscTypeTag: Character { .oscTypeTagFloat32 }
-    
+
     public func oscAnnotation(withType type: Bool = true) -> String {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
     }
-    
+
+    /// Appends the truncated `Float32` value's 4 big-endian bytes to the given buffer.
+    public func encode(into buffer: inout Data) {
+        Float32(self).encode(into: &buffer)
+    }
+
 }
 
 extension String: OSCArgumentProtocol {
@@ -223,6 +296,25 @@ extension String: OSCArgumentProtocol {
         } else {
             return "\(self)\(type ? "(\(oscTypeTag))" : "")"
         }
+    }
+
+    /// Appends the string's UTF-8 bytes and 1-4 null bytes of padding to the given buffer.
+    public func encode(into buffer: inout Data) {
+        let utf8View = utf8
+        let appended: Void? = utf8View.withContiguousStorageIfAvailable { bytes in
+            buffer.append(bytes)
+        }
+        if appended == nil {
+            buffer.append(contentsOf: utf8View)
+        }
+        buffer.append(contentsOf: repeatElement(0, count: 4 - utf8View.count % 4))
+    }
+
+    /// The number of bytes `encode(into:)` appends: the UTF-8 bytes plus
+    /// 1-4 null bytes of padding.
+    var oscEncodedSize: Int {
+        let utf8Count = utf8.count
+        return utf8Count + 4 - utf8Count % 4
     }
 
 }
@@ -247,6 +339,17 @@ extension Data: OSCArgumentProtocol {
         "\(self.count)\(type ? "(\(oscTypeTag))" : "")"
     }
 
+    /// Appends the blob's 4-byte big-endian length, its bytes, and 0-3 null
+    /// bytes of padding to the given buffer.
+    public func encode(into buffer: inout Data) {
+        buffer.append(bigEndian: UInt32(count))
+        buffer.append(self)
+        let remainder = count % 4
+        if remainder != 0 {
+            buffer.append(contentsOf: repeatElement(0, count: 4 - remainder))
+        }
+    }
+
 }
 
 extension Bool: OSCArgumentProtocol {
@@ -258,5 +361,8 @@ extension Bool: OSCArgumentProtocol {
     public func oscAnnotation(withType type: Bool = true) -> String {
         "\(self)\(type ? "(\(oscTypeTag))" : "")"
     }
+
+    /// Appends nothing: booleans are encoded entirely by their type tag.
+    public func encode(into buffer: inout Data) {}
 
 }
