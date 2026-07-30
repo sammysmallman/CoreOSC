@@ -39,6 +39,7 @@ The package is transport-agnostic — it produces and consumes the `Data` an OSC
 
 - ``OSCAddressSpace``
 - ``OSCMethod``
+- ``OSCDispatchPolicy``
 - ``OSCAddressFilter``
 - ``OSCFilterMethod``
 - ``OSCFilterAddress``
