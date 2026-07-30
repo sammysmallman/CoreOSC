@@ -24,91 +24,115 @@
 import Foundation
 
 /// A helper object for OSC Address Pattern and OSC Address matching operations.
+///
+/// Matching operates on UTF-8 bytes with bounds-checked integer indices: the OSC
+/// address namespace is defined as ASCII, byte comparison preserves literal
+/// semantics for any input, and malformed patterns or addresses — unterminated
+/// brackets or braces, non-ASCII bytes, length mismatches — fail the match
+/// rather than trapping. The character counts reported by ``OSCPatternMatch``
+/// are UTF-8 byte counts, which are identical to character counts for the
+/// ASCII inputs the OSC specification allows.
 public enum OSCMatch {
-    
+
+    private static let asterisk = UInt8(ascii: "*")
+    private static let slash = UInt8(ascii: "/")
+    private static let questionMark = UInt8(ascii: "?")
+    private static let openBracket = UInt8(ascii: "[")
+    private static let closeBracket = UInt8(ascii: "]")
+    private static let openBrace = UInt8(ascii: "{")
+    private static let closeBrace = UInt8(ascii: "}")
+    private static let exclamationMark = UInt8(ascii: "!")
+    private static let minus = UInt8(ascii: "-")
+    private static let comma = UInt8(ascii: ",")
+
     /// Match an OSC Address Pattern against an OSC Address.
     /// - Parameters:
     ///   - addressPattern: An OSC Address Pattern.
     ///   - address: An OSC Address.
-    /// - Returns: A `OSCPatchMatch` indicating whether the two given values match and to what extent.
+    /// - Returns: A `OSCPatternMatch` indicating whether the two given values match and to what extent.
     public static func match(addressPattern: String, address: String) -> OSCPatternMatch {
-        
-        if addressPattern.compare(address, options: .literal) == .orderedSame {
+        var patternString = addressPattern
+        var addressString = address
+        // withUTF8 exposes the string's UTF-8 bytes without copying for
+        // natively stored strings - matching allocates nothing.
+        return patternString.withUTF8 { pattern in
+            addressString.withUTF8 { target in
+                match(pattern: pattern, target: target)
+            }
+        }
+    }
+
+    private static func match(pattern: UnsafeBufferPointer<UInt8>,
+                              target: UnsafeBufferPointer<UInt8>) -> OSCPatternMatch {
+        if pattern.count == target.count,
+           pattern.count == 0 || memcmp(pattern.baseAddress!, target.baseAddress!, pattern.count) == 0 {
             return OSCPatternMatch(match: .fullMatch,
-                                   patternCharactersMatched: addressPattern.count,
-                                   addressCharactersMatched: address.count)
+                                   patternCharactersMatched: pattern.count,
+                                   addressCharactersMatched: target.count)
         }
 
-        var patternCharacterOffset: String.Index = address.startIndex
-        var addressCharacterOffset: String.Index = addressPattern.startIndex
-        while patternCharacterOffset != addressPattern.endIndex &&
-              addressCharacterOffset != address.endIndex {
-            if addressPattern[patternCharacterOffset] == "*" {
-                if matchAsterisk(pattern: addressPattern,
-                                 patternCharacterOffset: &patternCharacterOffset,
-                                 address: address,
-                                 addressCharacterOffset: &addressCharacterOffset) == false {
+        var patternIndex = 0
+        var addressIndex = 0
+        while patternIndex < pattern.count && addressIndex < target.count {
+            if pattern[patternIndex] == asterisk {
+                if matchAsterisk(pattern: pattern,
+                                 patternIndex: &patternIndex,
+                                 address: target,
+                                 addressIndex: &addressIndex) == false {
                     return OSCPatternMatch(match: .unmatched,
-                                           patternCharactersMatched: addressPattern.distance(from: addressPattern.startIndex,
-                                                                                             to: patternCharacterOffset),
-                                           addressCharactersMatched: address.distance(from: address.startIndex,
-                                                                                      to: addressCharacterOffset))
+                                           patternCharactersMatched: patternIndex,
+                                           addressCharactersMatched: addressIndex)
                 }
-                while patternCharacterOffset != addressPattern.endIndex &&
-                      addressPattern[patternCharacterOffset] != "/" {
-                    patternCharacterOffset = addressPattern.index(after: patternCharacterOffset)
+                while patternIndex < pattern.count &&
+                      pattern[patternIndex] != slash {
+                    patternIndex += 1
                 }
-                while addressCharacterOffset != address.endIndex &&
-                      address[addressCharacterOffset] != "/" {
-                    addressCharacterOffset = address.index(after: addressCharacterOffset)
+                while addressIndex < target.count &&
+                      target[addressIndex] != slash {
+                    addressIndex += 1
                 }
-            } else if address[addressCharacterOffset] == "*" {
-                while patternCharacterOffset != addressPattern.endIndex &&
-                      addressPattern[patternCharacterOffset] != "/" {
-                    patternCharacterOffset = addressPattern.index(after: patternCharacterOffset)
+            } else if target[addressIndex] == asterisk {
+                while patternIndex < pattern.count &&
+                      pattern[patternIndex] != slash {
+                    patternIndex += 1
                 }
-                while addressCharacterOffset != address.endIndex &&
-                      address[addressCharacterOffset] != "/" {
-                    addressCharacterOffset = address.index(after: addressCharacterOffset)
+                while addressIndex < target.count &&
+                      target[addressIndex] != slash {
+                    addressIndex += 1
                 }
             } else {
-                let match = matchCharacters(pattern: addressPattern,
-                                            patternCharacterOffset: &patternCharacterOffset,
-                                            address: address,
-                                            addressCharacterOffset: &addressCharacterOffset)
+                let match = matchBytes(pattern: pattern,
+                                       patternIndex: &patternIndex,
+                                       address: target,
+                                       addressIndex: &addressIndex)
                 if match == false {
-                    if patternCharacterOffset != addressPattern.endIndex &&
-                        addressPattern.index(after: patternCharacterOffset) == addressPattern.endIndex &&
-                        addressPattern[patternCharacterOffset] == "]" {
+                    if patternIndex + 1 == pattern.count &&
+                        pattern[patternIndex] == closeBracket {
                         return OSCPatternMatch(match: .unmatched,
-                                               patternCharactersMatched: addressPattern.distance(from: addressPattern.startIndex,
-                                                                                                 to: addressPattern.endIndex),
-                                               addressCharactersMatched: address.distance(from: address.startIndex,
-                                                                                          to: addressCharacterOffset))
+                                               patternCharactersMatched: pattern.count,
+                                               addressCharactersMatched: addressIndex)
                     } else {
                         return OSCPatternMatch(match: .unmatched,
-                                               patternCharactersMatched: addressPattern.distance(from: addressPattern.startIndex,
-                                                                                                 to: patternCharacterOffset),
-                                               addressCharactersMatched: address.distance(from: address.startIndex,
-                                                                                          to: addressCharacterOffset))
+                                               patternCharactersMatched: patternIndex,
+                                               addressCharactersMatched: addressIndex)
                     }
                 }
-                if patternCharacterOffset != addressPattern.endIndex  {
-                    patternCharacterOffset = addressPattern.index(after: patternCharacterOffset)
+                if patternIndex < pattern.count {
+                    patternIndex += 1
                 }
-                if addressCharacterOffset != address.endIndex {
-                    addressCharacterOffset = address.index(after: addressCharacterOffset)
+                if addressIndex < target.count {
+                    addressIndex += 1
                 }
             }
         }
 
         var match = OSCPatternMatch.Matching.unmatched.rawValue
-        
-        if addressCharacterOffset == address.endIndex {
+
+        if addressIndex == target.count {
             match |= OSCPatternMatch.Matching.partialAddress.rawValue
         }
-    
-        if patternCharacterOffset == addressPattern.endIndex {
+
+        if patternIndex == pattern.count {
             match |= OSCPatternMatch.Matching.partialPattern.rawValue
         }
 
@@ -119,166 +143,172 @@ public enum OSCMatch {
                                    addressCharactersMatched: 0)
         }
         return OSCPatternMatch(match: matching,
-                               patternCharactersMatched:
-                                addressPattern.distance(from: addressPattern.startIndex,
-                                                        to: patternCharacterOffset),
+                               patternCharactersMatched: patternIndex,
                                addressCharactersMatched:
-                                matching == .fullMatch ?
-                                address.count :
-                                address.distance(from: address.startIndex,
-                                                 to: addressCharacterOffset))
+                                matching == .fullMatch ? target.count : addressIndex)
     }
-    
-    /// Matches characters from the given offsets onwards using the asterisk wildcard.
+
+    /// Matches bytes from the given offsets onwards using the asterisk wildcard.
     /// - Parameters:
     ///   - pattern: An OSC Address Pattern.
-    ///   - patternCharacterOffset: A `String.Index` of the first character in the OSC Address Pattern to begin matching from.
+    ///   - patternIndex: The offset of the first byte in the OSC Address Pattern to begin matching from.
     ///   - address: An OSC Address.
-    ///   - addressCharacterOffset: A `String.Index` of the first character in the OSC Address to begin matching from.
+    ///   - addressIndex: The offset of the first byte in the OSC Address to begin matching from.
     /// - Returns: A boolean value indicating whether the pattern from the given offset matches using an asterisk wildcard up to the next forward slash, or end of string.
-    private static func matchAsterisk(pattern: String,
-                                      patternCharacterOffset: inout String.Index,
-                                      address: String,
-                                      addressCharacterOffset: inout String.Index) -> Bool {
-        if addressCharacterOffset == address.endIndex { return false }
+    private static func matchAsterisk(pattern: UnsafeBufferPointer<UInt8>,
+                                      patternIndex: inout Int,
+                                      address: UnsafeBufferPointer<UInt8>,
+                                      addressIndex: inout Int) -> Bool {
+        if addressIndex == address.count { return false }
         // Move address index up to next "/"
-        while addressCharacterOffset != address.endIndex &&
-              address[addressCharacterOffset] != "/" {
-            addressCharacterOffset = address.index(after: addressCharacterOffset)
+        while addressIndex < address.count &&
+              address[addressIndex] != slash {
+            addressIndex += 1
         }
         // Move pattern index up to next "/"
-        while patternCharacterOffset != pattern.endIndex &&
-              pattern[patternCharacterOffset] != "/" {
-            patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+        while patternIndex < pattern.count &&
+              pattern[patternIndex] != slash {
+            patternIndex += 1
         }
 
         // TODO: Match patterns backwards if the last character before the "/" is not a "*"
         return true
     }
-    
-    /// Matches characters from the given offsets onwards.
+
+    /// Matches bytes from the given offsets onwards.
     /// - Parameters:
     ///   - pattern: An OSC Address Pattern.
-    ///   - patternCharacterOffset: A `String.Index` of the first character in the OSC Address Pattern to begin matching from.
+    ///   - patternIndex: The offset of the first byte in the OSC Address Pattern to begin matching from.
     ///   - address: An OSC Address.
-    ///   - addressCharacterOffset: A `String.Index` of the first character in the OSC Address to begin matching from.
+    ///   - addressIndex: The offset of the first byte in the OSC Address to begin matching from.
     /// - Returns: A boolean value indicating whether the pattern from the given offset matches against the given OSC Address from the given offset.
-    private static func matchCharacters(pattern: String,
-                                        patternCharacterOffset: inout String.Index,
-                                        address: String,
-                                        addressCharacterOffset: inout String.Index) -> Bool {
-        switch pattern[patternCharacterOffset] {
-        case "[":
+    private static func matchBytes(pattern: UnsafeBufferPointer<UInt8>,
+                                   patternIndex: inout Int,
+                                   address: UnsafeBufferPointer<UInt8>,
+                                   addressIndex: inout Int) -> Bool {
+        switch pattern[patternIndex] {
+        case openBracket:
             return matchSquareBracket(pattern: pattern,
-                                      patternCharacterOffset: &patternCharacterOffset,
+                                      patternIndex: &patternIndex,
                                       address: address,
-                                      addressCharacterOffset: &addressCharacterOffset)
-        case "{":
+                                      addressIndex: &addressIndex)
+        case openBrace:
             return matchCurlyBrace(pattern: pattern,
-                                   patternCharacterOffset: &patternCharacterOffset,
+                                   patternIndex: &patternIndex,
                                    address: address,
-                                   addressCharacterOffset: &addressCharacterOffset)
-        case "?": return true
+                                   addressIndex: &addressIndex)
+        case questionMark: return true
         default:
-            return pattern[patternCharacterOffset] == address[addressCharacterOffset]
+            return pattern[patternIndex] == address[addressIndex]
         }
     }
-    
-    /// Matches characters from the given offsets onwards using the square brackets wildcards.
+
+    /// Matches bytes from the given offsets onwards using the square brackets wildcards.
     /// - Parameters:
     ///   - pattern: An OSC Address Pattern.
-    ///   - patternCharacterOffset: A `String.Index` of the first character in the OSC Address Pattern to begin matching from.
+    ///   - patternIndex: The offset of the first byte in the OSC Address Pattern to begin matching from.
     ///   - address: An OSC Address.
-    ///   - addressCharacterOffset: A `String.Index` of the first character in the OSC Address to begin matching from.
+    ///   - addressIndex: The offset of the first byte in the OSC Address to begin matching from.
     /// - Returns: A boolean value indicating whether the pattern from the given offset matches against the given OSC Address from the given offset.
-    private static func matchSquareBracket(pattern: String,
-                                           patternCharacterOffset: inout String.Index,
-                                           address: String,
-                                           addressCharacterOffset: inout String.Index) -> Bool {
-        patternCharacterOffset = pattern.index(after: patternCharacterOffset)
-        var val: Bool = true
-        if pattern[patternCharacterOffset] == "!" {
-            patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+    private static func matchSquareBracket(pattern: UnsafeBufferPointer<UInt8>,
+                                           patternIndex: inout Int,
+                                           address: UnsafeBufferPointer<UInt8>,
+                                           addressIndex: inout Int) -> Bool {
+        patternIndex += 1
+        guard patternIndex < pattern.count else { return false }
+        var val = true
+        if pattern[patternIndex] == exclamationMark {
+            patternIndex += 1
             val = false
+            guard patternIndex < pattern.count else { return false }
         }
-        var matched: Bool = !val
-        while patternCharacterOffset != pattern.endIndex &&
-              pattern[patternCharacterOffset] != "]" {
-            if pattern[pattern.index(after: patternCharacterOffset)] == "-" {
-                if address[addressCharacterOffset].asciiValue! >= pattern[patternCharacterOffset].asciiValue!,
-                   let index = pattern.index(patternCharacterOffset, offsetBy: 2, limitedBy: pattern.index(before: pattern.endIndex)),
-                   address[addressCharacterOffset].asciiValue! <= pattern[index].asciiValue! {
+        var matched = !val
+        while patternIndex < pattern.count &&
+              pattern[patternIndex] != closeBracket {
+            if patternIndex + 1 < pattern.count &&
+               pattern[patternIndex + 1] == minus {
+                // Two bytes separated by a minus sign indicate a range,
+                // e.g. "[a-z]", compared in ASCII collating sequence.
+                if patternIndex + 2 < pattern.count,
+                   address[addressIndex] >= pattern[patternIndex],
+                   address[addressIndex] <= pattern[patternIndex + 2] {
                     matched = val
-                    while patternCharacterOffset != pattern.endIndex &&
-                          pattern[patternCharacterOffset] != "]" {
-                        patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+                    while patternIndex < pattern.count &&
+                          pattern[patternIndex] != closeBracket {
+                        patternIndex += 1
                     }
                     break
-                } else if let index = pattern.index(patternCharacterOffset, offsetBy: 3, limitedBy: pattern.index(before: pattern.endIndex)) {
-                    patternCharacterOffset = index
+                } else if patternIndex + 3 < pattern.count {
+                    patternIndex += 3
                 } else {
                     return false
                 }
             } else {
-                if pattern[patternCharacterOffset] == address[addressCharacterOffset] {
+                if pattern[patternIndex] == address[addressIndex] {
                     matched = val
-                    while patternCharacterOffset != pattern.endIndex &&
-                          pattern[patternCharacterOffset] != "]" {
-                        patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+                    while patternIndex < pattern.count &&
+                          pattern[patternIndex] != closeBracket {
+                        patternIndex += 1
                     }
                     break
                 }
-                patternCharacterOffset = pattern.index(after: patternCharacterOffset)
+                patternIndex += 1
             }
         }
+        // A bracketed list that never closes is malformed and cannot match.
+        guard patternIndex < pattern.count else { return false }
         return matched
     }
-    
-    /// Matches characters from the given offsets onwards using the curly braces wildcards.
+
+    /// Matches bytes from the given offsets onwards using the curly braces wildcards.
     /// - Parameters:
     ///   - pattern: An OSC Address Pattern.
-    ///   - patternCharacterOffset: A `String.Index` of the first character in the OSC Address Pattern to begin matching from.
+    ///   - patternIndex: The offset of the first byte in the OSC Address Pattern to begin matching from.
     ///   - address: An OSC Address.
-    ///   - addressCharacterOffset: A `String.Index` of the first character in the OSC Address to begin matching from.
+    ///   - addressIndex: The offset of the first byte in the OSC Address to begin matching from.
     /// - Returns: A boolean value indicating whether the pattern from the given offset matches against the given OSC Address from the given offset.
-    private static func matchCurlyBrace(pattern: String,
-                                        patternCharacterOffset: inout String.Index,
-                                        address: String,
-                                        addressCharacterOffset: inout String.Index) -> Bool {
-        let startIndex = patternCharacterOffset
-        patternCharacterOffset = pattern.index(after: patternCharacterOffset)
-        var offset = patternCharacterOffset
-        while offset != pattern.endIndex &&
-              pattern[offset] != "}" &&
-              pattern[offset] != "/" {
-            while offset != pattern.endIndex &&
-                  pattern[offset] != "}" &&
-                  pattern[offset] != "/" &&
-                  pattern[offset] != "," {
-                offset = pattern.index(after: offset)
+    private static func matchCurlyBrace(pattern: UnsafeBufferPointer<UInt8>,
+                                        patternIndex: inout Int,
+                                        address: UnsafeBufferPointer<UInt8>,
+                                        addressIndex: inout Int) -> Bool {
+        let startIndex = patternIndex
+        patternIndex += 1
+        var offset = patternIndex
+        while offset < pattern.count &&
+              pattern[offset] != closeBrace &&
+              pattern[offset] != slash {
+            while offset < pattern.count &&
+                  pattern[offset] != closeBrace &&
+                  pattern[offset] != slash &&
+                  pattern[offset] != comma {
+                offset += 1
             }
-            let distance = pattern.distance(from: patternCharacterOffset, to: offset)
-            let subPattern = pattern[patternCharacterOffset..<pattern.index(patternCharacterOffset, offsetBy: distance)]
-            let subAddress = address[addressCharacterOffset..<address.index(addressCharacterOffset, offsetBy: distance)]
-            if subPattern == subAddress {
-                while offset != pattern.endIndex &&
-                      pattern[offset] != "}" &&
-                      pattern[offset] != "/" {
-                    offset = pattern.index(after: offset)
+            let length = offset - patternIndex
+            // An option longer than the remaining address cannot match;
+            // move on and try the next option in the list.
+            if addressIndex + length <= address.count,
+               pattern[patternIndex..<offset].elementsEqual(address[addressIndex..<addressIndex + length]) {
+                while offset < pattern.count &&
+                      pattern[offset] != closeBrace &&
+                      pattern[offset] != slash {
+                    offset += 1
                 }
-                if pattern.endIndex == pattern.index(patternCharacterOffset, offsetBy: distance) || pattern[offset] != "}" {
-                    patternCharacterOffset = startIndex
+                // A braced list that never closes is malformed and cannot match.
+                if patternIndex + length == pattern.count ||
+                    offset == pattern.count ||
+                    pattern[offset] != closeBrace {
+                    patternIndex = startIndex
                     return false
                 }
-                addressCharacterOffset = address.index(addressCharacterOffset, offsetBy: distance - 1)
-                patternCharacterOffset = offset
+                addressIndex += length - 1
+                patternIndex = offset
                 return true
             } else {
-                offset = pattern.index(after: offset)
-                patternCharacterOffset = offset
+                offset += 1
+                patternIndex = offset
             }
         }
-        patternCharacterOffset = startIndex
+        patternIndex = startIndex
         return false
     }
 
