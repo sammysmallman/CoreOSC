@@ -84,3 +84,4 @@
 
 /* OSC Argument Error: Invalid Argument */
 "OSC_ARGUMENT_ERROR_INVALID_ARGUMENT" = "Invalid argument";
+"OSC_PARSER_ERROR_BUNDLE_TOO_DEEP" = "The bundle is nested more deeply than the parser allows.";

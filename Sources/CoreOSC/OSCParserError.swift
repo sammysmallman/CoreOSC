@@ -35,6 +35,7 @@ public enum OSCParserError: Error {
     case cantParseSizeOfElement
     case cantParseTypeOfElement
     case cantParseBundleElement
+    case bundleTooDeep
 }
 
 extension OSCParserError: LocalizedError {
@@ -56,6 +57,8 @@ extension OSCParserError: LocalizedError {
             return NSLocalizedString("OSC_PARSER_ERROR_CANT_PARSE_ARGUMENT_BLOB", bundle: .module, comment: "OSC Parser Error: Can't parse Blob")
         case .cantParseTimeTag:
             return NSLocalizedString("OSC_PARSER_ERROR_CANT_PARSE_ARGUMENT_TIMETAG", bundle: .module, comment: "OSC Parser Error: Can't parse Time Tag")
+        case .bundleTooDeep:
+            return NSLocalizedString("OSC_PARSER_ERROR_BUNDLE_TOO_DEEP", bundle: .module, comment: "OSC Parser Error: Bundle nested too deeply")
         case .cantParseSizeOfElement:
             return NSLocalizedString("OSC_PARSER_ERROR_CANT_PARSE_ELEMENT_SIZE", bundle: .module, comment: "OSC Parser Error: Can't parse size of element")
         case .cantParseTypeOfElement:

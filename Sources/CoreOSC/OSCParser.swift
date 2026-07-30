@@ -31,17 +31,20 @@ public enum OSCParser {
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `OSCPacket`.
     public static func packet(from data: Data) throws -> OSCPacket {
-        guard let string = String(data: data.prefix(upTo: 1), encoding: .utf8) else {
-            throw OSCParserError.unrecognisedData
-        }
-        if string == "/" { // OSC Messages begin with /
+        switch data.first {
+        case 0x2F: // OSC Messages begin with /
             return try process(message: data)
-        } else if string == "#" { // OSC Bundles begin with #
+        case 0x23: // OSC Bundles begin with #
             return try process(bundle: data)
-        } else {
+        default:
             throw OSCParserError.unrecognisedData
         }
     }
+
+    /// The deepest bundle nesting the parser will follow before throwing
+    /// ``OSCParserError/bundleTooDeep`` — recursion into hostile input must
+    /// not exhaust the stack.
+    public static let maximumBundleDepth = 128
 
     /// Returns an `OSCMessage` as an `OSCPacket` from `Data`.
     /// - Parameter data: The `Data` to process.
@@ -154,7 +157,7 @@ public enum OSCParser {
     /// - Returns: An `OSCBundle`.
     private static func parseOSCBundle(with data: Data) throws -> OSCPacket  {
         // Check the Bundle has a string prefix of "#bundle"
-        if "#bundle".oscData == data.subdata(in: Range(0...7)) {
+        if data.count >= 8, "#bundle".oscData == data.subdata(in: 0..<8) {
             var startIndex = 8
             // All Bundles have a Time Tag, even if its just immedietly - Seconds 0, Fractions 1.
             guard let timeTag = parse(timeTag: data,
@@ -167,7 +170,8 @@ public enum OSCParser {
                 let size = Int32(data.count - startIndex)
                 let elements = try parseBundleElements(with: 0,
                                                        data: bundleData,
-                                                       size: size)
+                                                       size: size,
+                                                       depth: 0)
                 return .bundle(OSCBundle(elements,
                                  timeTag: timeTag))
             } else {
@@ -185,25 +189,29 @@ public enum OSCParser {
     ///   - size: The size of the `OSCBundle` containing the elements.
     /// - Throws: An `OSCParserError` if the `Data` could not be parsed.
     /// - Returns: An `Array` of `OSCPacket`s representing the elements the `OSCBundle` contains.
-    private static func parseBundleElements(with index: Int, data: Data, size: Int32) throws -> [OSCPacket] {
+    private static func parseBundleElements(with index: Int, data: Data, size: Int32, depth: Int) throws -> [OSCPacket] {
+        guard depth <= maximumBundleDepth else {
+            throw OSCParserError.bundleTooDeep
+        }
         var elements: [OSCPacket] = []
         var startIndex = 0
-        var buffer: Int32 = 0
+        var buffer = 0
         repeat {
             guard let elementSize = parse(int32: data,
-                                          startIndex: &startIndex) else {
+                                          startIndex: &startIndex),
+                  elementSize >= 0 else {
                 throw OSCParserError.cantParseSizeOfElement
             }
             buffer += 4
-            guard let string = String(data: data.subdata(in: startIndex..<data.endIndex).prefix(upTo: 1),
-                                      encoding: .utf8) else {
+            guard startIndex < data.count else {
                 throw OSCParserError.cantParseTypeOfElement
             }
-            if string == "/" { // OSC Messages begin with /
+            let firstByte = data[data.startIndex + startIndex]
+            if firstByte == 0x2F { // OSC Messages begin with /
                 let newElement = try parseOSCMessage(with: data,
                                                      startIndex: &startIndex)
                 elements.append(newElement)
-            } else if string == "#" { // OSC Bundles begin with #
+            } else if firstByte == 0x23 { // OSC Bundles begin with #
                 // #bundle takes up 8 bytes
                 startIndex += 8
                 // All Bundles have a Time Tag, even if its just immedietly - Seconds 0, Fractions 1.
@@ -211,11 +219,19 @@ public enum OSCParser {
                                           startIndex: &startIndex) else {
                     throw OSCParserError.cantParseTimeTag
                 }
-                if startIndex < size {
-                    let bundleData = data.subdata(in: startIndex..<startIndex + Int(elementSize) - 16)
+                if startIndex < Int(size) {
+                    // The element size counts the 16 bytes of "#bundle" and
+                    // time tag already consumed; what remains is the content.
+                    let contentSize = Int(elementSize) - 16
+                    guard contentSize >= 0,
+                          startIndex + contentSize <= data.count else {
+                        throw OSCParserError.cantParseBundleElement
+                    }
+                    let bundleData = data.subdata(in: startIndex..<startIndex + contentSize)
                     let bundleElements = try parseBundleElements(with: index,
                                                                     data: bundleData,
-                                                                    size: Int32(bundleData.count))
+                                                                    size: Int32(bundleData.count),
+                                                                    depth: depth + 1)
                     elements.append(.bundle(OSCBundle(bundleElements,
                                               timeTag: timeTag)))
                 } else {
@@ -224,9 +240,9 @@ public enum OSCParser {
             } else {
                 throw OSCParserError.unrecognisedData
             }
-            buffer += elementSize
-            startIndex = index + Int(buffer)
-        } while buffer < size
+            buffer += Int(elementSize)
+            startIndex = index + buffer
+        } while buffer < Int(size)
         return elements
     }
 
@@ -244,8 +260,9 @@ public enum OSCParser {
     ///   - startIndex: The index of where to start parsing from in the `Data`.
     /// - Returns: A `String` or nil if an OSC string could not be parsed with the given data.
     private static func parse(string data: Data, startIndex: inout Int, characters: OSCCharacters? = nil) -> String? {
+        guard startIndex >= 0, startIndex < data.count else { return nil }
         // Read the data from the start index until you hit a zero, the part before will be the string data.
-        for (index, byte) in data[startIndex...].enumerated() {
+        for (index, byte) in data[(data.startIndex + startIndex)...].enumerated() {
             if byte == 0x0 {
                 guard let result = String(data: data[startIndex..<(startIndex + index)],
                                           encoding: .utf8) else { return nil }
@@ -282,6 +299,7 @@ public enum OSCParser {
     /// - Returns: A `Int32` or nil if a integer 32 could not be parsed with the given data.
     private static func parse(int32 data: Data, startIndex: inout Int) -> Int32? {
         // An OSC Int is a 32-bit big-endian two's complement integer.
+        guard startIndex >= 0, startIndex + 4 <= data.count else { return nil }
         let result = data.subdata(in: startIndex..<startIndex + 4)
             .withUnsafeBytes { $0.load(as: Int32.self) }
             .bigEndian
@@ -296,8 +314,9 @@ public enum OSCParser {
     /// - Returns: A `Float32` or nil if a float 32 could not be parsed with the given data.
     private static func parse(float32 data: Data, startIndex: inout Int) -> Float32? {
         // An OSC Float is a 32-bit big-endian IEEE 754 floating point number.
+        guard startIndex >= 0, startIndex + 4 <= data.count else { return nil }
         let result = data.subdata(in: startIndex..<startIndex + 4)
-            .withUnsafeBytes { CFConvertFloat32SwappedToHost($0.load(as: CFSwappedFloat32.self)) }
+            .withUnsafeBytes { Float32(bitPattern: $0.load(as: UInt32.self).bigEndian) }
         startIndex += 4
         return result
     }
@@ -312,6 +331,9 @@ public enum OSCParser {
          // followed by 0-3 additional zero bytes to make the total number of bits a multiple of 32, 4 bytes
         guard let size = parse(int32: data, startIndex: &startIndex) else { return nil }
         let intSize = Int(size)
+        // The size is wire-controlled: it must be non-negative and fit within
+        // the remaining data before it is used to slice.
+        guard intSize >= 0, startIndex + intSize <= data.count else { return nil }
         let result = data.subdata(in: startIndex..<startIndex + intSize)
         let total = startIndex + intSize
         if total.isMultiple(of: 4) {
@@ -329,7 +351,8 @@ public enum OSCParser {
     ///   - startIndex: The index of where to start parsing from in the `Data`.
     /// - Returns: A `OSCTimeTag` or nil if one could not be parsed with the given data.
     private static func parse(timeTag data: Data, startIndex: inout Int) -> OSCTimeTag? {
-        let timeTagData = data[startIndex..<startIndex + 8]
+        guard startIndex >= 0, startIndex + 8 <= data.count else { return nil }
+        let timeTagData = data[(data.startIndex + startIndex)..<(data.startIndex + startIndex + 8)]
         startIndex += 8
         return OSCTimeTag(data: timeTagData)
     }

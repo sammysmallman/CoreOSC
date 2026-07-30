@@ -140,7 +140,10 @@ public struct OSCMessage: Sendable, Equatable, Codable {
                 if let value = argument as? Int32 {
                     return .int32(value)
                 } else if let value = argument as? Int {
-                    return .int32(Int32(value))
+                    guard let converted = Int32(exactly: value) else {
+                        throw OSCArgumentError.invalidArgument
+                    }
+                    return .int32(converted)
                 }
                 throw OSCArgumentError.invalidArgument
             case .oscTypeTagFloat32:
