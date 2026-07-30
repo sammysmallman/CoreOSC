@@ -26,7 +26,7 @@ Add the package dependency to your Xcode project or `Package.swift` using the re
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sammysmallman/CoreOSC", .upToNextMajor(from: "2.3.0"))
+    .package(url: "https://github.com/sammysmallman/CoreOSC", .upToNextMajor(from: "2.4.0"))
 ]
 ```
 
@@ -166,6 +166,38 @@ let addressSpace = OSCAddressSpace(methods: [method])
 let message = try OSCMessage(with: "/object/coords", arguments: [.float32(3), .float32(5)])
 addressSpace.invoke(with: message)
 // Prints "Received /object/coords, x: 3.0, y: 5.0"
+```
+
+#### Dispatch Policy
+
+By default a method is invoked by any matching address pattern, wildcards included. Methods that represent mutually exclusive commands can opt out of wildcard dispatch with `.exact`, so they are only invoked when addressed literally:
+
+```swift
+let start = OSCMethod(with: try OSCAddress("/record/start"), dispatch: .exact) { _, _ in
+    startRecording()
+}
+let stop = OSCMethod(with: try OSCAddress("/record/stop"), dispatch: .exact) { _, _ in
+    stopRecording()
+}
+
+let addressSpace = OSCAddressSpace(methods: [start, stop])
+addressSpace.invoke(with: OSCMessage(raw: "/record/*"))     // Invokes nothing.
+addressSpace.invoke(with: OSCMessage(raw: "/record/start")) // Starts recording.
+```
+
+When more than one method matches, the methods are invoked in ascending order of their full path.
+
+#### User Info
+
+`invoke(with:userInfo:)` accepts an optional dictionary that is passed through to every invoked method — per-invocation context that is not part of the OSC message itself, most commonly the destination a reply should be sent to on the receive path:
+
+```swift
+let method = OSCMethod(with: try OSCAddress("/settings/1")) { message, userInfo in
+    guard let connection = userInfo?["connection"] as? Connection else { return }
+    connection.send(reply(for: message))
+}
+
+addressSpace.invoke(with: message, userInfo: ["connection": connection])
 ```
 
 ## Extensions

@@ -23,6 +23,18 @@
 
 import Foundation
 
+/// The way an OSC Method may be invoked by a received OSC Address Pattern.
+public enum OSCDispatchPolicy: Sendable {
+    /// Invoked by any matching address pattern, wildcards included — the OSC 1.0
+    /// behaviour and the default.
+    case pattern
+    /// Invoked only when the received address pattern is literally equal to the
+    /// method's address — wildcards never reach the method. Suited to imperative
+    /// methods such as "/record/start", where a wildcard fanning out across
+    /// mutually exclusive commands would leave the application in an unknown state.
+    case exact
+}
+
 /// A closure paired with the OSC Address needed to invoke it: the potential destination
 /// of an OSC Message and a point of control made available by invoking the method.
 public struct OSCMethod: Hashable, Equatable {
@@ -30,19 +42,25 @@ public struct OSCMethod: Hashable, Equatable {
     /// An object that represents the full path to this OSC Method in an OSC Address Space.
     public let address: OSCAddress
 
+    /// The way the method may be invoked by a received OSC Address Pattern.
+    public let dispatch: OSCDispatchPolicy
+
     /// A closure that is invoked by passing in an OSC Message.
     internal let invoke: (OSCMessage, [AnyHashable : Any]?) -> Void
 
     /// An OSC Method that can be invoked by an OSC Message.
     /// - Parameters:
     ///   - address: The full path to this OSC Method.
+    ///   - dispatch: The way the method may be invoked by a received OSC Address Pattern.
     ///   - invokedAction: A closure that is invoked when the address pattern of an OSC Message matches against the given address. It receives the matched `OSCMessage` and an optional user information dictionary.
     ///
-    /// The user information dictionary stores any additional objects that the invoking action might use.
+    /// The user information dictionary carries per-invocation context that is not part of the OSC Message itself — for example, the destination a reply should be sent to.
     public init(with address: OSCAddress,
+                dispatch: OSCDispatchPolicy = .pattern,
                 invokedAction: @escaping (_ message: OSCMessage,
                                           _ userInfo: [AnyHashable : Any]?) -> Void) {
         self.address = address
+        self.dispatch = dispatch
         self.invoke = invokedAction
     }
 
@@ -57,13 +75,23 @@ public struct OSCMethod: Hashable, Equatable {
     /// Invoke the method.
     /// - Parameters:
     ///   - message:  An OSC Message to invoke the method with.
-    ///   - userInfo: The user information dictionary stores any additional objects that the invoking action might use.
+    ///   - userInfo: Per-invocation context from the call site, passed through to every method the message invokes — for example, the destination a reply should be sent to.
     /// - Returns: A boolean value indicating whether the method has been invoked.
+    ///
+    /// The message's address pattern is matched according to the method's ``dispatch``
+    /// policy: pattern matched for `.pattern`, compared for literal equality for `.exact`.
     public func invoke(with message: OSCMessage, userInfo: [AnyHashable : Any]? = nil) -> Bool {
-        guard OSCMatch.match(addressPattern: message.addressPattern.fullPath,
-                             address: address.fullPath)
-                .match == .fullMatch else {
-            return false
+        switch dispatch {
+        case .pattern:
+            guard OSCMatch.match(addressPattern: message.addressPattern.fullPath,
+                                 address: address.fullPath)
+                    .match == .fullMatch else {
+                return false
+            }
+        case .exact:
+            guard message.addressPattern.fullPath == address.fullPath else {
+                return false
+            }
         }
         invoke(message, userInfo)
         return true

@@ -38,7 +38,7 @@ public struct OSCFilterMethod: Hashable, Equatable {
     ///   - filterAddress: The full path to this OSC Method.
     ///   - invokedAction: A closure that is invoked when the address pattern of an OSC Message matches against the given address. It receives the matched `OSCMessage` and an optional user information dictionary.
     ///
-    /// The user information dictionary stores any additional objects that the invoking action might use.
+    /// The user information dictionary carries per-invocation context that is not part of the OSC Message itself — for example, the destination a reply should be sent to.
     public init(with filterAddress: OSCFilterAddress,
                 invokedAction: @escaping (_ message: OSCMessage,
                                           _ userInfo: [AnyHashable : Any]?) -> Void) {
