@@ -7,7 +7,7 @@
 
 CoreOSC provides the infrastructural value types for your apps to communicate among computers, sound synthesisers and other multimedia devices via [OSC](https://opensoundcontrol.stanford.edu): messages, bundles, time tags and every required argument type from [OSC 1.1](https://opensoundcontrol.stanford.edu/files/2009-NIME-OSC-1.1.pdf), together with validated address types, pattern matching, and the address space and filter machinery an OSC server needs to invoke methods from received packets.
 
-The package is transport-agnostic — it produces and consumes the `Data` an OSC packet is on the wire, and leaves the networking to a transport library such as [swift-open-sound-control](https://github.com/artifice-industries/swift-open-sound-control).
+The package is transport-agnostic — it produces and consumes the `Data` an OSC packet is on the wire, and leaves the networking to a transport layer of your choosing.
 
 ## Features
 
@@ -32,7 +32,7 @@ dependencies: [
 
 Platforms: iOS 13+, macOS 10.15+, tvOS 13+, watchOS 6+.
 
-API documentation is available as a DocC catalogue: build it in Xcode with Product ▸ Build Documentation.
+API documentation is available at [sammysmallman.github.io/CoreOSC](https://sammysmallman.github.io/CoreOSC/documentation/coreosc/), or build the DocC catalogue locally in Xcode with Product ▸ Build Documentation.
 
 ## Architecture
 
