@@ -16,6 +16,7 @@ The package is transport-agnostic — it produces and consumes the `Data` an OSC
 - ``OSCMessage``
 - ``OSCBundle``
 - ``OSCTimeTag``
+- ``OSCInvocation``
 
 ### Arguments
 

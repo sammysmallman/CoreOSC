@@ -24,7 +24,7 @@
 import Foundation
 
 /// An OSC Time Tag.
-public struct OSCTimeTag: OSCArgumentProtocol, Equatable, CustomStringConvertible, Sendable, Codable {
+public struct OSCTimeTag: OSCArgumentProtocol, Equatable, Hashable, Comparable, CustomStringConvertible, Sendable, Codable {
 
     /// The OSC data representation for the argument.
     public var oscData: Data { Data(seconds.bigEndian.data + fraction.bigEndian.data) }
@@ -49,6 +49,12 @@ public struct OSCTimeTag: OSCArgumentProtocol, Equatable, CustomStringConvertibl
 
     /// Creates an OSC Time Tag initialized to immediately.
     public static let immediate: OSCTimeTag = OSCTimeTag()
+
+    /// Orders time tags by `(seconds, fraction)` compared lexicographically, so the
+    /// immediate tag's raw value (0 seconds, 1 fraction) sorts before every real time.
+    public static func < (lhs: OSCTimeTag, rhs: OSCTimeTag) -> Bool {
+        (lhs.seconds, lhs.fraction) < (rhs.seconds, rhs.fraction)
+    }
 
     public let seconds: UInt32
     public let fraction: UInt32
