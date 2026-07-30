@@ -59,7 +59,7 @@ public struct OSCMessage: Sendable, Equatable, Codable {
     /// An OSC Message.
     /// - Parameters:
     ///   - addressPattern: The messages OSC Address Pattern.
-    ///   - arguments: The messages `Array` of arguments.
+    ///   - anyArguments: The messages `Array` of arguments.
     /// - Throws: An `OSCAddressError` if the given `addressPattern` can not be initialized as a `OSCAddressPattern`.
     public init(with addressPattern: String, arguments anyArguments: [any OSCArgumentProtocol] = []) throws {
         let fullPath = try OSCAddressPattern(addressPattern)
@@ -78,7 +78,7 @@ public struct OSCMessage: Sendable, Equatable, Codable {
     /// An OSC Message.
     /// - Parameters:
     ///   - addressPattern: The messages OSC Address Pattern.
-    ///   - arguments: The messages `Array` of arguments.
+    ///   - anyArguments: The messages `Array` of arguments.
     public init(with addressPattern: OSCAddressPattern, arguments anyArguments: [OSCArgumentProtocol] = []) throws {
         self.addressPattern = addressPattern
         self.arguments = try Self.arguments(from: anyArguments)

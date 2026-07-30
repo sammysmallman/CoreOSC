@@ -26,11 +26,10 @@ import Foundation
 /// An OSC Bundle.
 public struct OSCBundle: Sendable, Equatable, Codable {
 
-    /// The bundles time tag used to indicate
-    ///when it's contained elements should be invoked
+    /// The bundle's time tag used to indicate when its contained elements should be invoked.
     public var timeTag: OSCTimeTag
 
-    /// The bundles elements. The contents are either `OSCMessage` or `OSCBundle`.
+    /// The bundle's elements. The contents are either `OSCMessage` or `OSCBundle`.
     ///
     /// - Note: A bundle may contain bundles.
     public var elements: [OSCPacket]

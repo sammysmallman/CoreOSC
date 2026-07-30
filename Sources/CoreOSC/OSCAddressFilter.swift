@@ -23,7 +23,14 @@
 
 import Foundation
 
-/// An object containing a set of OSC Methods to be invoked by a client after a filter process.
+/// A set of OSC Filter Methods invoked by matching received messages against their filter addresses.
+///
+/// The mirror image of an `OSCAddressSpace`: there, wildcards arrive in the message's
+/// address pattern and match against fixed addresses; here, the wildcard lives in the
+/// registered `OSCFilterAddress` — "#" matches any single part — so one method can respond
+/// to a whole family of addresses, such as "/cue/#/fired" for every cue number.
+/// A filter address matches when both contain the same number of parts and each part
+/// matches. `priority` orders multiple matches and `invokeFirstOnly` stops after the first.
 public struct OSCAddressFilter {
     
     /// The priority for which OSC Filter Methods are invoked first.
@@ -36,7 +43,7 @@ public struct OSCAddressFilter {
         /// OSC Filter Methods sorted by the amount of "#" matches
         /// and will be invoked in that order.
         case wildcard
-        /// There is no prioritization.
+        /// There is no prioritisation.
         /// OSC Filter Methods that match will be invoked in a random order.
         case none
     }
@@ -58,7 +65,7 @@ public struct OSCAddressFilter {
     
     /// Invoke the address filters methods with a message.
     /// - Parameters:
-    ///   - message: An OSC Message to ivoke the methods with.
+    ///   - message: An OSC Message to invoke the methods with.
     ///   - userInfo: The user information dictionary stores any additional objects that the invoking action might use.
     ///
     /// Each methods filter address is matched against the address pattern of the message.

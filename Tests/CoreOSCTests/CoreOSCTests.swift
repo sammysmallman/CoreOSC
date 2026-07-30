@@ -28,7 +28,7 @@ import XCTest
 class CoreOSCTests: XCTestCase {
 
     func testVersion() {
-        XCTAssertEqual(CoreOSC.version, "2.2.1")
+        XCTAssertEqual(CoreOSC.version, "2.2.2")
         XCTAssertEqual(NSLocalizedString("OSC_VERSION", bundle: .module, comment: "OSC Version"), CoreOSC.version)
     }
     

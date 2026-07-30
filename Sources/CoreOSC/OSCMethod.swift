@@ -23,7 +23,8 @@
 
 import Foundation
 
-/// The potential destination of an OSC Message and a point of control made available by invoking the method.
+/// A closure paired with the OSC Address needed to invoke it: the potential destination
+/// of an OSC Message and a point of control made available by invoking the method.
 public struct OSCMethod: Hashable, Equatable {
 
     /// An object that represents the full path to this OSC Method in an OSC Address Space.
@@ -35,9 +36,7 @@ public struct OSCMethod: Hashable, Equatable {
     /// An OSC Method that can be invoked by an OSC Message.
     /// - Parameters:
     ///   - address: The full path to this OSC Method.
-    ///   - invokedAction: A closure that is invoked when the address pattern of an OSC Message matches against the given address.
-    ///   - message: `OSCMessage`
-    ///   - userInfo: `[AnyHashable : Any]`?
+    ///   - invokedAction: A closure that is invoked when the address pattern of an OSC Message matches against the given address. It receives the matched `OSCMessage` and an optional user information dictionary.
     ///
     /// The user information dictionary stores any additional objects that the invoking action might use.
     public init(with address: OSCAddress,
